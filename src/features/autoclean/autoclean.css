@@ -1,0 +1,174 @@
+.autoclean-card {
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.autoclean-info {
+  font-size: var(--font-sm);
+  background: hsl(var(--card));
+  padding: var(--space-md);
+  color: hsl(var(--muted-foreground));
+}
+
+.folder-clean-list {
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--space-lg);
+}
+
+.folder-clean-card {
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  transition: all 0.2s ease;
+  margin-top: var(--space-md);
+}
+
+.folder-clean-card.enabled {
+  box-shadow: 0 0 0 1px hsl(var(--primary) / 0.2);
+}
+
+.folder-clean-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.folder-clean-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.folder-clean-info .folder-icon {
+  width: 5rem;
+  height: 5rem;
+}
+
+.folder-clean-info span {
+  font-weight: 500;
+  color: hsl(var(--foreground));
+}
+
+.folder-clean-switches {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.clean-switch-container {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-xs);
+  align-items: center;
+}
+
+.switch {
+  position: relative;
+  width: 4.4rem;
+  height: 2.4rem;
+  background: hsl(var(--muted));
+  border-radius: var(--radius-full);
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.switch.active {
+  background: rgba(59, 130, 246, 0.4);
+}
+
+.switch::after {
+  content: "";
+  position: absolute;
+  top: 0.2rem;
+  left: 0.2rem;
+  width: 2rem;
+  height: 2rem;
+  background: rgba(59, 130, 246, 0.3);
+  border-radius: var(--radius-full);
+  transition: transform 0.2s ease;
+}
+
+.switch.active::after {
+  transform: translateX(2rem);
+  background: rgba(59, 130, 246, 0.8);
+}
+
+.switch-label {
+  color: hsl(var(--muted-foreground));
+  font-size: var(--font-sm);
+}
+
+.folder-clean-options {
+  margin-top: var(--space-sm);
+  border-top: 1px solid hsl(var(--border));
+}
+
+.folder-clean-options p {
+  font-size: var(--font-xs);
+  color: hsl(var(--muted-foreground));
+  margin-bottom: var(--space-xs);
+}
+
+.clean-option-group {
+  padding-top: var(--space-xs);
+  transition: all 0.3s ease;
+  opacity: 1;
+}
+
+.days-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+.day-button {
+  padding: 0.6rem var(--space-sm);
+  border-radius: var(--radius-xs);
+  font-size: var(--font-sm);
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.day-button.active {
+  background: linear-gradient(
+    135deg,
+    hsl(var(--primary)) 0%,
+    hsl(var(--accent)) 100%
+  );
+  color: hsl(var(--primary-foreground));
+}
+
+.day-button:not(.active) {
+  background: hsl(var(--secondary));
+  color: hsl(var(--muted-foreground));
+}
+
+/* Styles for colored dots in subtitle */
+.subtitle-item {
+  display: inline-flex;
+  align-items: center;
+}
+
+.dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.dot-screenshot {
+  background-color: hsl(var(--ring));
+}
+
+.dot-recording {
+  background-color: hsl(var(--accent));
+}

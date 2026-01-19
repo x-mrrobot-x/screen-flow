@@ -1,0 +1,10 @@
+/* Importação de estilos base */
+@import url('./base/reset.css');
+@import url('./base/variables.css');
+@import url('./base/typography.css');
+@import url('./base/globals.css');
+@import url('./base/info-card.css');
+@import url('./base/buttons.css');
+@import url('./base/button-cards.css');
+@import url('./base/modal.css');
+@import url('./base/toast.css');

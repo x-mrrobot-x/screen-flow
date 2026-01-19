@@ -1,0 +1,771 @@
+<!doctype html>
+<html lang="pt-BR" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no"
+    />
+    <title>ScreenFlow — Organize Automaticamente</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="src/assets/styles/main.css" />
+    <link rel="stylesheet" href="src/assets/styles/animations.css" />
+
+    <!-- Feature CSS -->
+    <link rel="stylesheet" href="src/features/dashboard/dashboard.css" />
+    <link rel="stylesheet" href="src/features/stats/stats.css" />
+    <link rel="stylesheet" href="src/features/autoclean/autoclean.css" />
+    <link rel="stylesheet" href="src/features/folders/folders.css" />
+    <link rel="stylesheet" href="src/features/settings/settings.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script>
+      eruda.init();
+    </script>
+  </head>
+  <body>
+    <div id="app">
+      <!--  DASHBOARD TAB  -->
+      <main
+        id="tab-dashboard"
+        class="tab-content active page-container page-enter animate-fade-in"
+      >
+        <header class="page-header animate-fade-in-down">
+          <div class="header-row">
+            <img src="src/assets/brand/logo.png" alt="ScreenFlow Logo" class="logo-img" />
+            <div class="header-text">
+              <h1 class="page-title">ScreenFlow</h1>
+              <p class="page-subtitle">Tudo organizado automaticamente</p>
+            </div>
+          </div>
+        </header>
+
+        <section class="stats-grid">
+          <article
+            class="stat-card gradient glow card-glow animate-fade-in-up delay-1"
+          >
+            <div class="overlay"></div>
+            <div class="content">
+              <div class="stat-icon-wrapper glass-icon">
+                <i class="stat-icon" data-icon="folder-check"></i>
+              </div>
+              <p class="stat-label">Capturas Organizadas</p>
+              <p class="stat-value" id="dash-stat-organized">1,234</p>
+              <p class="stat-subtext">Este mês</p>
+            </div>
+          </article>
+
+          <article
+            class="stat-card dark-card card-glow animate-fade-in-up delay-2"
+          >
+            <div class="content">
+              <div class="stat-icon-wrapper glass-icon">
+                <i class="stat-icon" data-icon="trash"></i>
+              </div>
+              <p class="stat-label">Capturas Removidas</p>
+              <p class="stat-value" id="dash-stat-removed">0</p>
+              <p class="stat-subtext">Este mês</p>
+            </div>
+          </article>
+
+          <article
+            class="stat-card dark-card card-glow animate-fade-in-up delay-3"
+          >
+            <div class="content">
+              <div class="stat-icon-wrapper dark-icon-blue">
+                <i class="stat-icon" data-icon="clock"></i>
+              </div>
+              <p class="stat-label">Última Organização</p>
+              <p class="stat-value" id="dash-last-organized">5h atrás</p>
+              <p class="stat-subtext">Esta semana</p>
+            </div>
+          </article>
+
+          <article
+            class="stat-card dark-card card-glow animate-fade-in-up delay-4"
+          >
+            <div class="content">
+              <div class="stat-icon-wrapper dark-icon-blue">
+                <i class="stat-icon" data-icon="trash"></i>
+              </div>
+              <p class="stat-label">Última Limpeza</p>
+              <p class="stat-value" id="dash-last-cleanup">2h atrás</p>
+              <p class="stat-subtext">Esta semana</p>
+            </div>
+          </article>
+
+          <article
+            class="stat-card dark-card card-glow animate-fade-in-up delay-5"
+          >
+            <div class="content">
+              <div class="stat-icon-wrapper dark-icon-blue">
+                <i class="stat-icon" data-icon="layers"></i>
+              </div>
+              <p class="stat-label">Arquivos Pendentes</p>
+              <p class="stat-value" id="dash-stat-pending">0</p>
+              <p class="stat-subtext">aguardando organização</p>
+            </div>
+          </article>
+
+          <article
+            class="stat-card dark-card card-glow animate-fade-in-up delay-6"
+          >
+            <div class="content">
+              <div class="stat-icon-wrapper dark-icon-blue">
+                <i class="stat-icon" data-icon="trophy"></i>
+              </div>
+              <p class="stat-label">App Mais Organizado</p>
+              <p class="stat-value" id="dash-top-app-name">WhatsApp</p>
+              <p class="stat-subtext" id="dash-top-app-count">156 arquivos</p>
+            </div>
+          </article>
+        </section>
+
+        <section class="animate-fade-in delay-5">
+          <h2 class="section-title animate-fade-in-up delay-7">
+            Ações Rápidas
+          </h2>
+          <div class="quick-actions">
+            <button
+              class="btn-card btn-blue animate-fade-in-up delay-7"
+              data-process-type="screenshots"
+            >
+              <div class="icon-wrapper">
+                <i data-icon="camera"></i>
+              </div>
+              <span class="btn-label">Organizar<br />capturas</span>
+            </button>
+
+            <button
+              class="btn-card btn-purple animate-fade-in-up delay-8"
+              data-process-type="recordings"
+            >
+              <div class="icon-wrapper">
+                <i data-icon="video"></i>
+              </div>
+              <span class="btn-label">Organizar <br />gravações</span>
+            </button>
+            <button
+              class="btn-card btn-green animate-fade-in-up delay-9"
+              data-process-type="cleanup"
+            >
+              <div class="icon-wrapper">
+                <i data-icon="sparkles"></i>
+              </div>
+              <span class="btn-label">Executar <br />limpeza</span>
+            </button>
+          </div>
+        </section>
+
+      </main>
+
+      <!--  FOLDERS TAB  -->
+      <main
+        id="tab-folders"
+        class="tab-content page-container page-enter animate-fade-in"
+      >
+        <header class="page-header animate-fade-in-down">
+          <div class="header-row">
+            <div class="page-header-icon">
+              <i data-icon="folder-open"></i>
+            </div>
+            <div class="header-text">
+              <h1 class="page-title">Pastas</h1>
+              <p class="page-subtitle">
+                Gerencie suas capturas e gravações de tela
+              </p>
+            </div>
+          </div>
+
+          <div class="search-container animate-fade-in-up delay-1">
+            <i class="search-icon" data-icon="search"></i>
+            <input
+              type="text"
+              class="search-input"
+              placeholder="Buscar por pasta..."
+            />
+            <button class="search-filter-btn">
+              <i data-icon="sliders"></i>
+            </button>
+          </div>
+
+          <div class="filters-row animate-fade-in-up delay-2">
+            <button
+              id="filter-all"
+              class="filter-button active tap-scale"
+              data-filter="all"
+            >
+              Todas
+            </button>
+            <button
+              id="filter-screenshots"
+              class="filter-button tap-scale"
+              data-filter="screenshots"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path></svg>
+              Screenshots
+            </button>
+            <button
+              id="filter-recordings"
+              class="filter-button tap-scale"
+              data-filter="recordings"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8Z"></path><rect width="14" height="12" x="2" y="6" rx="2" ry="2"></rect></svg>
+              Gravações
+            </button>
+
+            <div class="media-counter" id="media-counter"></div>
+
+          </div>
+        </header>
+
+        <section
+          id="folders-grid"
+          class="folders-grid animate-fade-in delay-3"
+        ></section>
+      </main>
+
+      <!--  AUTOCLEAN TAB  -->
+      <main
+        id="tab-autoclean"
+        class="tab-content page-container page-enter animate-fade-in"
+      >
+        <header class="page-header animate-fade-in-down">
+          <div class="header-row">
+            <div class="page-header-icon">
+              <i data-icon="trash"></i>
+            </div>
+            <div class="header-text">
+              <h1 class="page-title">Limpeza Automática</h1>
+              <p class="page-subtitle" id="autoclean-count-text">
+                Limpe pastas automaticamente
+              </p>
+            </div>
+          </div>
+        </header>
+
+        <section class="autoclean-card card-glow animate-fade-in-up delay-1">
+          <div class="autoclean-row">
+            <div class="autoclean-content">
+              <div class="autoclean-icon accent">
+                <i data-icon="sparkles"></i>
+              </div>
+              <div class="autoclean-text">
+                <h4>Limpeza Automática</h4>
+              </div>
+            </div>
+            <button
+              class="switch active"
+              id="switch-autoCleanup"
+              data-action="toggleAutoCleanup"
+            ></button>
+          </div>
+          <aside class="autoclean-info">
+            Ao habilitar nas pastas, screenshots e gravações que ultrapassarem o
+            dia limite serão automaticamente apagados.
+          </aside>
+        </section>
+
+        <section
+          id="folder-clean-list"
+          class="folder-clean-list animate-fade-in delay-4"
+        ></section>
+      </main>
+
+      <!--  STATS TAB  -->
+      <main
+        id="tab-stats"
+        class="tab-content page-container page-enter animate-fade-in"
+      >
+        <header class="page-header animate-fade-in-down">
+          <div class="header-row">
+            <div class="page-header-icon">
+              <i data-icon="chart-column"></i>
+            </div>
+            <div class="header-text">
+              <h1 class="page-title">Estatísticas</h1>
+              <p class="page-subtitle">Acompanhe seu uso e economia</p>
+            </div>
+          </div>
+        </header>
+
+        <nav
+          id="media-type-selector"
+          class="media-type-selector animate-fade-in-up delay-1"
+        >
+          <button
+            class="media-type-button active tap-scale"
+            data-media-type="screenshots"
+            data-action="setMediaType"
+          >
+            <i data-icon="image"></i>
+            Capturas
+          </button>
+          <button
+            class="media-type-button tap-scale"
+            data-media-type="recordings"
+            data-action="setMediaType"
+          >
+            <i data-icon="video"></i>
+            Gravações
+          </button>
+        </nav>
+
+        <article class="chart-card card-glow animate-fade-in-up delay-2">
+          <header class="chart-header">
+            <i data-icon="trending-up"></i>
+            <h3 id="weekly-chart-title" class="chart-title">
+              Capturas por Dia
+            </h3>
+          </header>
+          <div class="chart-container">
+            <canvas id="weeklyChart"></canvas>
+          </div>
+        </article>
+
+        <article class="chart-card card-glow animate-fade-in-left delay-3">
+          <header class="chart-header">
+            <i data-icon="pie-chart"></i>
+            <h3 class="chart-title">Por Pasta</h3>
+          </header>
+          <div class="chart-container">
+            <canvas id="foldersChart"></canvas>
+          </div>
+        </article>
+
+        <section class="summary-cards">
+          <article class="summary-card card-glow animate-fade-in-left delay-5">
+            <div class="summary-icon-wrapper">
+              <div class="summary-icon success">
+                <i data-icon="trash"></i>
+              </div>
+            </div>
+            <p class="summary-value">847</p>
+            <p class="summary-label">Arquivos limpos</p>
+          </article>
+          <article class="summary-card card-glow animate-fade-in-right delay-6">
+            <div class="summary-icon-wrapper">
+              <div class="summary-icon primary">
+                <i data-icon="folder-check"></i>
+              </div>
+            </div>
+            <p class="summary-value">1,456</p>
+            <p class="summary-label">Organizados</p>
+          </article>
+        </section>
+
+        <article class="activity-card card-glow animate-fade-in-up delay-7">
+
+          <!-- Cabeçalho -->
+          <div class="card-header">
+            <div class="header-icon">
+              <!-- Ícone de Calendário (using project's icon system) -->
+              <i data-icon="calendar"></i>
+            </div>
+            <h2 class="card-title">Atividade Recente</h2>
+          </div>
+
+          <!-- Lista -->
+          <ul class="activity-list">
+
+            <!-- Item 1: Limpeza -->
+            <li class="activity-item">
+              <div class="item-left">
+                    <div class="icon-box yellow">
+                      <!-- Ícone Brilho/Clean (using project's icon system) -->
+                      <i data-icon="sparkles"></i>
+                    </div>
+                    <div class="item-info">
+                      <h3>Limpeza automática</h3>
+                      <p>156 arquivos removidos</p>
+                    </div>
+                  </div>
+                  <span class="item-time">2h atrás</span>
+            </li>
+
+            <!-- Item 2: Organização -->
+            <li class="activity-item">
+              <div class="item-left">
+                <div class="icon-box orange">
+                  <!-- Ícone Pasta (using project's icon system) -->
+                  <i data-icon="folder"></i>
+                </div>
+                <div class="item-info">
+                  <h3>Organização</h3>
+                  <p>34 screenshots do Instagram</p>
+                </div>
+              </div>
+              <span class="item-time">5h atrás</span>
+            </li>
+
+          </ul>
+        </article>
+      </main>
+
+      <!--  SETTINGS TAB  -->
+      <main
+        id="tab-settings"
+        class="tab-content page-container page-enter animate-fade-in"
+      >
+        <header class="page-header animate-fade-in-down">
+          <div class="header-row">
+            <div class="page-header-icon">
+              <i data-icon="settings"></i>
+            </div>
+            <div class="header-text">
+              <h1 class="page-title">Configurações</h1>
+              <p class="page-subtitle">Personalize sua experiência</p>
+            </div>
+          </div>
+        </header>
+
+        <section class="settings-section animate-fade-in-up delay-1">
+          <h2 class="section-title">TEMA</h2>
+          <article class="settings-card card-glow">
+            <div class="theme-grid">
+              <button
+                class="theme-button tap-scale"
+                data-theme="light"
+                id="theme-light"
+              >
+                <i data-icon="sun"></i>
+                <span>Claro</span>
+              </button>
+              <button
+                class="theme-button tap-scale"
+                data-theme="dark"
+                id="theme-dark"
+              >
+                <i data-icon="moon"></i>
+                <span>Escuro</span>
+              </button>
+              <button
+                class="theme-button tap-scale"
+                data-theme="system"
+                id="theme-system"
+              >
+                <i data-icon="monitor"></i>
+                <span>Sistema</span>
+              </button>
+            </div>
+          </article>
+        </section>
+
+        <section class="settings-section animate-fade-in-up delay-2">
+          <h2 class="section-title">AUTOMAÇÃO</h2>
+          <article class="settings-card card-glow">
+            <div class="setting-row">
+              <div class="setting-info">
+                <div class="setting-icon primary">
+                  <i data-icon="folder-sync"></i>
+                </div>
+                <div class="setting-text">
+                  <h4>Organização Automática</h4>
+                  <p>Mover arquivos automaticamente</p>
+                </div>
+              </div>
+              <button
+                class="switch active"
+                id="switch-autoOrganize"
+                data-setting-key="autoOrganize"
+              ></button>
+            </div>
+          </article>
+        </section>
+
+        <section class="settings-section animate-fade-in-up delay-3">
+          <h2 class="section-title">OUTROS</h2>
+          <article class="settings-card card-glow">
+            <div class="setting-row">
+              <div class="setting-info">
+                <div class="setting-icon primary">
+                  <i data-icon="sparkles"></i>
+                </div>
+                <div class="setting-text">
+                  <h4>Animações</h4>
+                  <p>Efeitos visuais e transições</p>
+                </div>
+              </div>
+              <button
+                class="switch active"
+                id="switch-animationsEnabled"
+                data-setting-key="animationsEnabled"
+              ></button>
+            </div>
+          </article>
+        </section>
+
+        <section class="settings-section animate-fade-in-up delay-4">
+          <h2 class="section-title">NOTIFICAÇÕES</h2>
+          <article class="settings-card card-glow">
+            <div class="setting-row">
+              <div class="setting-info">
+                <div class="setting-icon warning">
+                  <i data-icon="bell"></i>
+                </div>
+                <div class="setting-text">
+                  <h4>Notificações</h4>
+                  <p>Receber alertas de limpeza</p>
+                </div>
+              </div>
+              <button
+                class="switch active"
+                id="switch-notifications"
+                data-setting-key="notifications"
+              ></button>
+            </div>
+          </article>
+        </section>
+
+        <div
+          class="settings-section glass-panel danger-zone animate-fade-in-up delay-5"
+        >
+          <div class="settings-section-header">
+            <div class="setting-icon danger">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+                ></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+            </div>
+            <h3 class="settings-title" data-i18n="settings.danger_zone">
+              Zona de Perigo
+            </h3>
+          </div>
+
+          <div class="danger-actions">
+            <div class="danger-action">
+              <div class="danger-action-info">
+                <h4 data-i18n="settings.reset_settings">
+                  Resetar Configurações
+                </h4>
+                <p data-i18n="settings.reset_desc">
+                  Restaura todas as configurações para os valores padrão.
+                </p>
+              </div>
+              <button
+                type="button"
+                class="btn btn-outline-danger"
+                id="resetSettingsBtn"
+                data-i18n="common.reset"
+              >
+                Resetar
+              </button>
+            </div>
+            <div class="danger-action">
+              <div class="danger-action-info">
+                <h4 data-i18n="settings.delete_all">Excluir Todos os Dados</h4>
+                <p data-i18n="settings.delete_all_desc">
+                  Remove permanentemente todos os screenshots e pastas.
+                </p>
+              </div>
+              <button
+                type="button"
+                class="btn btn-danger"
+                id="deleteAllBtn"
+                data-i18n="settings.delete_all_btn"
+              >
+                Excluir Tudo
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!--  BOTTOM NAV  -->
+    <nav class="bottom-nav animate-fade-in-up">
+      <div class="nav-container">
+        <button
+          id="nav-dashboard"
+          class="nav-button active tap-scale"
+          data-tab="dashboard"
+        >
+          <div class="nav-bg"></div>
+          <i class="nav-icon" data-icon="dashboard"></i>
+          <span class="nav-label">Início</span>
+        </button>
+        <button
+          id="nav-folders"
+          class="nav-button tap-scale"
+          data-tab="folders"
+        >
+          <div class="nav-bg"></div>
+          <i class="nav-icon" data-icon="folder-open"></i>
+          <span class="nav-label">Pastas</span>
+        </button>
+        <button
+          id="nav-autoclean"
+          class="nav-button tap-scale"
+          data-tab="autoclean"
+        >
+          <div class="nav-bg"></div>
+          <i class="nav-icon" data-icon="trash"></i>
+          <span class="nav-label">Clean</span>
+        </button>
+        <button id="nav-stats" class="nav-button tap-scale" data-tab="stats">
+          <div class="nav-bg"></div>
+          <i class="nav-icon" data-icon="chart-column"></i>
+          <span class="nav-label">Stats</span>
+        </button>
+        <button
+          id="nav-settings"
+          class="nav-button tap-scale"
+          data-tab="settings"
+        >
+          <div class="nav-bg"></div>
+          <i class="nav-icon" data-icon="settings"></i>
+          <span class="nav-label">Config</span>
+        </button>
+      </div>
+    </nav>
+
+    <!--  MODAL  -->
+    <aside id="process-modal" class="modal-overlay">
+      <article class="modal animate-scale-in">
+        <header class="modal-header">
+          <h2 class="modal-title" id="modal-title">Processando</h2>
+        </header>
+        <div class="modal-body">
+          <div class="progress-bar-container">
+            <div
+              id="modal-progress-bar"
+              class="progress-bar"
+              style="width: 0%"
+            ></div>
+          </div>
+          <div class="progress-info">
+            <span id="modal-step-label">Iniciando...</span>
+            <span id="modal-percent">0%</span>
+          </div>
+          <div id="modal-steps-container" class="process-steps"></div>
+          <div
+            id="modal-completion"
+            class="process-complete animate-fade-in-up"
+            style="display: none"
+          >
+            <div class="process-complete-icon">
+              <i data-icon="check"></i>
+            </div>
+            <p class="process-complete-title">Processo Concluído!</p>
+            <p id="modal-result-text" class="process-complete-stats"></p>
+          </div>
+        </div>
+      </article>
+    </aside>
+
+    <!-- Confirmation Modal -->
+    <aside id="confirmation-modal" class="modal-overlay">
+      <article class="modal animate-scale-in">
+        <header class="modal-header">
+          <h2 class="modal-title" id="confirmation-modal-title">Confirmação</h2>
+        </header>
+        <div class="modal-body">
+          <p id="confirmation-modal-message">
+            Tem certeza de que deseja continuar?
+          </p>
+          <div
+            style="
+              display: flex;
+              gap: 1rem;
+              justify-content: flex-end;
+              margin-top: 2rem;
+            "
+          >
+            <button
+              id="confirmation-modal-cancel"
+              class="btn btn-outline-secondary"
+              type="button"
+            >
+              Cancelar
+            </button>
+            <button
+              id="confirmation-modal-confirm"
+              class="btn btn-danger"
+              type="button"
+            >
+              Confirmar
+            </button>
+          </div>
+        </div>
+      </article>
+    </aside>
+
+    <!-- 1. Utilitários (sem dependências) -->
+    <script src="src/lib/constants.js"></script>
+    <script src="src/lib/defaults.js"></script>
+    <script src="src/lib/utils.js"></script>
+    <script src="src/lib/dom.js"></script>
+    <script src="src/lib/validators.js"></script>
+    <script src="src/lib/activity-helper.js"></script>
+    <script src="src/lib/Modal.js"></script>
+    <script src="src/lib/Toast.js"></script>
+    <script src="src/lib/ConfirmationModal.js"></script>
+
+    <!-- 2. Core (podem depender de lib) -->
+    <script src="src/core/icons.js"></script>
+    <script src="src/core/storage.js"></script>
+    <script src="src/core/event-bus.js"></script>
+    <script src="src/core/state-manager.js"></script>
+    <script src="src/core/navigation.js"></script>
+
+    <!-- 3. Features (dependem de core e lib) -->
+    <!-- Dashboard -->
+    <script src="src/features/dashboard/dashboard.config.js"></script>
+    <script src="src/features/dashboard/dashboard.model.js"></script>
+    <script src="src/features/dashboard/dashboard.view.js"></script>
+    <script src="src/features/dashboard/dashboard.controller.js"></script>
+
+    <!-- Dashboard/Process -->
+    <script src="src/features/dashboard/process/process.config.js"></script>
+    <script src="src/features/dashboard/process/process.model.js"></script>
+    <script src="src/features/dashboard/process/process.view.js"></script>
+    <script src="src/features/dashboard/process/process.controller.js"></script>
+
+    <!-- Stats -->
+    <script src="src/features/stats/stats.config.js"></script>
+    <script src="src/features/stats/stats.model.js"></script>
+    <script src="src/features/stats/stats.view.js"></script>
+    <script src="src/features/stats/stats.controller.js"></script>
+
+    <!-- AutoClean -->
+    <script src="src/features/autoclean/autoclean.config.js"></script>
+    <script src="src/features/autoclean/autoclean.model.js"></script>
+    <script src="src/features/autoclean/autoclean.view.js"></script>
+    <script src="src/features/autoclean/autoclean.controller.js"></script>
+
+    <!-- Folders -->
+    <script src="src/features/folders/folders.config.js"></script>
+    <script src="src/features/folders/folders.model.js"></script>
+    <script src="src/features/folders/folders.view.js"></script>
+    <script src="src/features/folders/folders.controller.js"></script>
+
+    <!-- Settings -->
+    <script src="src/features/settings/settings.config.js"></script>
+    <script src="src/features/settings/settings.model.js"></script>
+    <script src="src/features/settings/settings.view.js"></script>
+    <script src="src/features/settings/settings.controller.js"></script>
+    
+    <!-- 4. App (depende de tudo) -->
+    <script src="src/app.js"></script>
+  </body>
+</html>

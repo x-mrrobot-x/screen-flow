@@ -1,0 +1,50 @@
+/* Classes utilitárias */
+.glow {
+  box-shadow: 0 0 40px -10px hsl(var(--primary) / 0.4);
+}
+
+.card-glow {
+  box-shadow: 0 4px 24px -8px hsl(var(--primary) / 0.15);
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 1rem);
+}
+
+.safe-top {
+  padding-top: env(safe-area-inset-top, 1rem);
+}
+
+/* Interações */
+.tap-scale {
+  transition: transform 0.15s ease;
+}
+.tap-scale:active {
+  transform: scale(0.98);
+}
+
+.hover-scale {
+  transition: transform 0.2s ease;
+}
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+/* Exibição */
+.tab-content {
+  display: none;
+}
+.tab-content.active {
+  display: block;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.modal-overlay {
+  display: none;
+}
+.modal-overlay.active {
+  display: flex;
+}
