@@ -40,7 +40,11 @@
       >
         <header class="page-header animate-fade-in-down">
           <div class="header-row">
-            <img src="src/assets/brand/logo.png" alt="ScreenFlow Logo" class="logo-img" />
+            <img
+              src="src/assets/brand/logo.png"
+              alt="ScreenFlow Logo"
+              class="logo-img"
+            />
             <div class="header-text">
               <h1 class="page-title">ScreenFlow</h1>
               <p class="page-subtitle">Tudo organizado automaticamente</p>
@@ -164,7 +168,6 @@
             </button>
           </div>
         </section>
-
       </main>
 
       <!--  FOLDERS TAB  -->
@@ -210,7 +213,20 @@
               class="filter-button tap-scale"
               data-filter="screenshots"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path></svg>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect>
+                <circle cx="9" cy="9" r="2"></circle>
+                <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path>
+              </svg>
               Screenshots
             </button>
             <button
@@ -218,12 +234,23 @@
               class="filter-button tap-scale"
               data-filter="recordings"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8Z"></path><rect width="14" height="12" x="2" y="6" rx="2" ry="2"></rect></svg>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="m22 8-6 4 6 4V8Z"></path>
+                <rect width="14" height="12" x="2" y="6" rx="2" ry="2"></rect>
+              </svg>
               Gravações
             </button>
 
             <div class="media-counter" id="media-counter"></div>
-
           </div>
         </header>
 
@@ -363,7 +390,6 @@
         </section>
 
         <article class="activity-card card-glow animate-fade-in-up delay-7">
-
           <!-- Cabeçalho -->
           <div class="card-header">
             <div class="header-icon">
@@ -375,20 +401,19 @@
 
           <!-- Lista -->
           <ul class="activity-list">
-
             <!-- Item 1: Limpeza -->
             <li class="activity-item">
               <div class="item-left">
-                    <div class="icon-box yellow">
-                      <!-- Ícone Brilho/Clean (using project's icon system) -->
-                      <i data-icon="sparkles"></i>
-                    </div>
-                    <div class="item-info">
-                      <h3>Limpeza automática</h3>
-                      <p>156 arquivos removidos</p>
-                    </div>
-                  </div>
-                  <span class="item-time">2h atrás</span>
+                <div class="icon-box yellow">
+                  <!-- Ícone Brilho/Clean (using project's icon system) -->
+                  <i data-icon="sparkles"></i>
+                </div>
+                <div class="item-info">
+                  <h3>Limpeza automática</h3>
+                  <p>156 arquivos removidos</p>
+                </div>
+              </div>
+              <span class="item-time">2h atrás</span>
             </li>
 
             <!-- Item 2: Organização -->
@@ -405,7 +430,6 @@
               </div>
               <span class="item-time">5h atrás</span>
             </li>
-
           </ul>
         </article>
       </main>
@@ -674,41 +698,41 @@
     </aside>
 
     <!-- Confirmation Modal -->
-    <aside id="confirmation-modal" class="modal-overlay">
-      <article class="modal animate-scale-in">
+
+    <div id="confirmation-modal" class="modal">
+      <div class="modal-content">
         <header class="modal-header">
           <h2 class="modal-title" id="confirmation-modal-title">Confirmação</h2>
+
+          <button type="button" id="confirmation-modal-close" class="modal-close">
+            <i data-icon="x"></i>
+          </button>
         </header>
+
         <div class="modal-body">
           <p id="confirmation-modal-message">
             Tem certeza de que deseja continuar?
           </p>
-          <div
-            style="
-              display: flex;
-              gap: 1rem;
-              justify-content: flex-end;
-              margin-top: 2rem;
-            "
-          >
-            <button
-              id="confirmation-modal-cancel"
-              class="btn btn-outline-secondary"
-              type="button"
-            >
-              Cancelar
-            </button>
-            <button
-              id="confirmation-modal-confirm"
-              class="btn btn-danger"
-              type="button"
-            >
-              Confirmar
-            </button>
-          </div>
         </div>
-      </article>
-    </aside>
+
+        <footer class="modal-actions">
+          <button
+            id="confirmation-modal-cancel"
+            class="btn btn-outline-secondary"
+            type="button"
+          >
+            Cancelar
+          </button>
+          <button
+            id="confirmation-modal-confirm"
+            class="btn btn-danger"
+            type="button"
+          >
+            Confirmar
+          </button>
+        </footer>
+      </div>
+    </div>
 
     <!-- 1. Utilitários (sem dependências) -->
     <script src="src/lib/constants.js"></script>
@@ -765,7 +789,7 @@
     <script src="src/features/settings/settings.model.js"></script>
     <script src="src/features/settings/settings.view.js"></script>
     <script src="src/features/settings/settings.controller.js"></script>
-    
+
     <!-- 4. App (depende de tudo) -->
     <script src="src/app.js"></script>
   </body>

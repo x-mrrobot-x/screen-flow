@@ -41,10 +41,3 @@
 .hidden {
   display: none !important;
 }
-
-.modal-overlay {
-  display: none;
-}
-.modal-overlay.active {
-  display: flex;
-}

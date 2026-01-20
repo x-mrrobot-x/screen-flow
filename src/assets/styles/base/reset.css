@@ -8,3 +8,12 @@ html {
   box-sizing: border-box;
   user-select: none;
 }
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+  border: none;
+  outline: none;
+}
