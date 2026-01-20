@@ -22,7 +22,7 @@ const SettingsController = (function() {
     onReset: () => {
       SettingsModel.resetAllSettings();
       render();
-      EventBus.emit(EVENTS.SHOW_TOAST, { message: "Configurações restauradas com sucesso!", type: 'success' });
+      Toast.success("Configurações restauradas com sucesso!");
     },
     onDelete: () => {
       Modal.confirm(
@@ -31,10 +31,10 @@ const SettingsController = (function() {
         () => {
           const success = SettingsModel.deleteAllData();
           if (success) {
-            EventBus.emit(EVENTS.SHOW_TOAST, { message: "Todos os dados foram excluídos com sucesso!", type: 'success' });
+            Toast.success("Todos os dados foram excluídos com sucesso!");
             setTimeout(() => window.location.reload(), 1000);
           } else {
-            EventBus.emit(EVENTS.SHOW_TOAST, { message: "Ocorreu um erro ao excluir os dados.", type: 'error' });
+            Toast.error("Ocorreu um erro ao excluir os dados.");
           }
         }
       );

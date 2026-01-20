@@ -1,24 +1,28 @@
-const FoldersView = (function() {
-  'use strict';
-  
+const FoldersView = (function () {
+  "use strict";
+
   let container = null;
   const elements = {};
 
   const templates = {
     folderBadges: (folder, activeFilter) => {
-      if (activeFilter === 'all') {
+      if (activeFilter === "all") {
         return `
           <div class="folder-badge">
-            ${Icons.get('screenshot')} ${folder.stats.ss}
+            ${Icons.get("image")} ${folder.stats.ss}
           </div>
           <div class="folder-badge">
-            ${Icons.get('recording')} ${folder.stats.sr}
+            ${Icons.get("video")} ${folder.stats.sr}
           </div>
         `;
       }
-      const mediaCount = activeFilter === "recordings" ? folder.stats.sr : folder.stats.ss;
-      const mediaIcon = activeFilter === "recordings" ? Icons.get('recording') : Icons.get('screenshot');
-      const mediaType = activeFilter === "recordings" ? "Gravações" : "Screenshots";
+      const mediaCount =
+        activeFilter === "recordings" ? folder.stats.sr : folder.stats.ss;
+      const mediaIcon = Icons.get(
+        activeFilter === "recordings" ? "video" : "image"
+      );
+      const mediaType =
+        activeFilter === "recordings" ? "Gravações" : "Screenshots";
       return `
         <div class="folder-badge">
           ${mediaIcon} ${mediaCount} ${mediaType}
@@ -26,7 +30,9 @@ const FoldersView = (function() {
       `;
     },
     folderCard: (folder, index, activeFilter) => `
-      <div class="folder-card card-glow animate-scale-in delay-${index % 10}" data-folder-id="${folder.id}">
+      <div class="folder-card card-glow animate-scale-in delay-${
+        index % 10
+      }" data-folder-id="${folder.id}">
         <div class="folder-top">
           <div class="folder-badges">
             ${templates.folderBadges(folder, activeFilter)}
@@ -44,8 +50,9 @@ const FoldersView = (function() {
           </div>
         </div>
       </div>`,
-    emptyState: (mediaFilter) => {
-      const emptyMediaText = mediaFilter === "screenshots" ? "capturas" : "gravações";
+    emptyState: mediaFilter => {
+      const emptyMediaText =
+        mediaFilter === "screenshots" ? "capturas" : "gravações";
       return `
         <div class="empty-state animate-fade-in delay-3">
             <div class="empty-icon-wrapper">${Icons.get("folder")}</div>
@@ -53,7 +60,7 @@ const FoldersView = (function() {
             <p class="empty-subtitle">Nenhuma pasta com ${emptyMediaText} para exibir. Tente ajustar os filtros.</p>
         </div>`;
     },
-    actionsMenu: (folderId) => `
+    actionsMenu: folderId => `
       <div class="folder-actions-popup" data-folder-id="${folderId}">
         <div class="folder-action-item" data-action="clear">
           <svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2">
@@ -69,63 +76,79 @@ const FoldersView = (function() {
   const render = {
     folders: (folders, activeFilter, mediaFilter) => {
       if (folders.length > 0) {
-        elements.foldersGrid.innerHTML = folders.map((f, i) => templates.folderCard(f, i, activeFilter)).join('');
+        elements.foldersGrid.innerHTML = folders
+          .map((f, i) => templates.folderCard(f, i, activeFilter))
+          .join("");
       } else {
         elements.foldersGrid.innerHTML = templates.emptyState(mediaFilter);
       }
     },
     mediaCounter: (folders, activeFilter) => {
       let totalMedia = 0;
-      let mediaIcon = '';
+      let mediaIcon = "";
       if (activeFilter === "all") {
-        const totalScreenshots = folders.reduce((sum, f) => sum + f.stats.ss, 0);
+        const totalScreenshots = folders.reduce(
+          (sum, f) => sum + f.stats.ss,
+          0
+        );
         const totalRecordings = folders.reduce((sum, f) => sum + f.stats.sr, 0);
         elements.mediaCounter.innerHTML = `
-          <span style="display: flex; align-items: center; gap: 0.25rem;">${Icons.get("folder")} ${folders.length}</span>
-          <span style="display: flex; align-items: center; gap: 0.25rem;">${Icons.get("file")} ${totalScreenshots + totalRecordings}</span>
+          <span style="display: flex; align-items: center; gap: 0.25rem;">${Icons.get(
+            "folder"
+          )} ${folders.length}</span>
+          <span style="display: flex; align-items: center; gap: 0.25rem;">${Icons.get(
+            "file"
+          )} ${totalScreenshots + totalRecordings}</span>
         `;
       } else {
         if (activeFilter === "recordings") {
           totalMedia = folders.reduce((sum, f) => sum + f.stats.sr, 0);
-          mediaIcon = Icons.get('recording');
+          mediaIcon = Icons.get("video");
         } else {
           totalMedia = folders.reduce((sum, f) => sum + f.stats.ss, 0);
-          mediaIcon = Icons.get('screenshot');
+          mediaIcon = Icons.get("image");
         }
         elements.mediaCounter.innerHTML = `
-          <span style="display: flex; align-items: center; gap: 0.25rem;">${Icons.get("folder")} ${folders.length}</span>
+          <span style="display: flex; align-items: center; gap: 0.25rem;">${Icons.get(
+            "folder"
+          )} ${folders.length}</span>
           <span style="display: flex; align-items: center; gap: 0.25rem;">${mediaIcon} ${totalMedia}</span>
         `;
       }
     },
-    filters: (activeFilter) => {
-      elements.filterButtons.forEach(btn => btn.classList.remove("active", "glow"));
+    filters: activeFilter => {
+      elements.filterButtons.forEach(btn =>
+        btn.classList.remove("active", "glow")
+      );
       DOM.qs(`#filter-${activeFilter}`).classList.add("active", "glow");
     }
   };
 
   function showActionsMenu(folderId, folderCard) {
-    const existingMenu = DOM.qs(`.folder-actions-popup[data-folder-id="${folderId}"]`);
+    const existingMenu = DOM.qs(
+      `.folder-actions-popup[data-folder-id="${folderId}"]`
+    );
     if (existingMenu) {
       existingMenu.remove();
       return;
     }
-    
-    const menu = document.createElement('div');
+
+    const menu = document.createElement("div");
     menu.innerHTML = templates.actionsMenu(folderId).trim();
     const popupElement = menu.firstChild;
-    
-    const menuDots = folderCard.querySelector('.folder-menu-dots');
+
+    const menuDots = folderCard.querySelector(".folder-menu-dots");
     if (menuDots) {
-      if (getComputedStyle(folderCard).position === 'static') {
-        folderCard.style.position = 'relative';
+      if (getComputedStyle(folderCard).position === "static") {
+        folderCard.style.position = "relative";
       }
       folderCard.appendChild(popupElement);
       const dotsRect = menuDots.getBoundingClientRect();
       const cardRect = folderCard.getBoundingClientRect();
-      const topPos = dotsRect.top - cardRect.top - popupElement.offsetHeight - 5;
+      const topPos =
+        dotsRect.top - cardRect.top - popupElement.offsetHeight - 5;
       popupElement.style.top = `${topPos}px`;
-      popupElement.style.display = 'block';
+      popupElement.style.display = "block";
     }
     return popupElement;
   }

@@ -17,17 +17,12 @@ const ACTIVITY_CONFIG = {
   }
 };
 
-const EVENTS = {
-  DASHBOARD_LOADED: "dashboard:loaded",
-  STATE_CHANGED: "state:changed",
-  SHOW_TOAST: "toast:show"
-};
 
 const STORAGE_KEYS = {
-  PREFIX: "screenflow.v1",
-  FOLDERS: "screenflow.v1.folders",
-  STATE: "screenflow.v1.state",
-  ACTIVITIES: "screenflow.v1.activities"
+  PREFIX: "@screenflow",
+  FOLDERS: "@screenflow:folders",
+  STATE: "@screenflow:state",
+  ACTIVITIES: "@screenflow:activities"
 };
 
 const CSS_CLASSES = {

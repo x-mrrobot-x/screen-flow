@@ -51,7 +51,7 @@ const FoldersController = (function() {
         const type = activeFilter === 'all' ? 'both' : (activeFilter === 'screenshots' ? 'ss' : 'sr');
         const removedCount = FoldersModel.clearFolderStats(folderId, type);
         if (removedCount > 0) {
-          EventBus.emit(EVENTS.SHOW_TOAST, { message: `${removedCount} item(ns) removido(s) com sucesso!`, type: 'success' });
+          Toast.success(`${removedCount} item(ns) removido(s) com sucesso!`);
         }
         render();
       }

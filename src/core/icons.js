@@ -1,6 +1,4 @@
-const Icons = (function() {
-  'use strict';
-
+const Icons = (function () {
   const DEFAULT_ATTRS = {
     width: "24",
     height: "24",
@@ -21,6 +19,8 @@ const Icons = (function() {
       '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
     sparkles:
       '<path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/>',
+    "toggle-right":
+      '<circle cx="15" cy="12" r="3"/><rect width="20" height="14" x="2" y="5" rx="7"/>',
     trophy:
       '<path d="M10 14.66v1.626a2 2 0 0 1-.976 1.696A5 5 0 0 0 7 21.978"/><path d="M14 14.66v1.626a2 2 0 0 0 .976 1.696A5 5 0 0 1 17 21.978"/><path d="M18 9h1.5a1 1 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z"/><path d="M6 9H4.5a1 1 0 0 1 0-5H6"/>',
     camera:
@@ -86,7 +86,7 @@ const Icons = (function() {
     const attrString = buildAttrs(attrs);
     return `<svg ${attrString}>${content}</svg>`;
   }
-  
+
   function getIcon(name, attrs = {}) {
     const content = DATA[name];
     if (!content) {

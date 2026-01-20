@@ -31,7 +31,6 @@ const StateManager = (function() {
     clearTimeout(saveTimer);
     saveTimer = setTimeout(() => {
       Storage.set(STORAGE_KEYS.STATE, state);
-      EventBus.emit(EVENTS.STATE_CHANGED, { state });
     }, 500);
   }
 

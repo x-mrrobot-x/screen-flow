@@ -42,6 +42,7 @@ const StatsController = (function() {
       }
     },
     onStateChange: (data) => {
+      console.log(data)
       if(data.key === 'activities') {
         const activities = StateManager.getActivities();
         StatsView.render.activityCard(activities);
@@ -54,7 +55,6 @@ const StatsController = (function() {
     mediaButtons.forEach(btn => {
       btn.addEventListener('click', handlers.onMediaTypeChange);
     });
-    EventBus.on(EVENTS.STATE_CHANGED, handlers.onStateChange);
   }
   
   function detachEventListeners() {
@@ -62,7 +62,6 @@ const StatsController = (function() {
     mediaButtons.forEach(btn => {
       btn.removeEventListener('click', handlers.onMediaTypeChange);
     });
-    EventBus.off(EVENTS.STATE_CHANGED, handlers.onStateChange);
   }
   
   function destroy() {
