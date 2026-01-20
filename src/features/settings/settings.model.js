@@ -2,15 +2,15 @@ const SettingsModel = (function() {
   'use strict';
   
   function getSettings() {
-    return StateManager.getSettings();
+    return AppState.getSettings();
   }
 
   function getSetting(key) {
-    return StateManager.getSetting(key);
+    return AppState.getSetting(key);
   }
 
   function setSetting(key, value) {
-    StateManager.setSetting(key, value);
+    AppState.setSetting(key, value);
     if (key === 'theme') {
       localStorage.setItem("screenflow-theme", value);
     }
@@ -18,20 +18,20 @@ const SettingsModel = (function() {
   }
 
   function toggleSetting(key) {
-    const newValue = StateManager.toggleSetting(key);
+    const newValue = AppState.toggleSetting(key);
     logSettingChange(key, newValue);
     return newValue;
   }
 
   function logSettingChange(key, value) {
     if (key === "autoOrganize") {
-      StateManager.addActivity({
+      AppState.addActivity({
         type: "feature-toggle",
         feature: "auto-organize",
         enabled: value
       });
     } else {
-      StateManager.addActivity({
+      AppState.addActivity({
         type: "settings",
         setting: key,
         value: value
@@ -40,11 +40,11 @@ const SettingsModel = (function() {
   }
 
   function resetAllSettings() {
-    StateManager.resetConfig();
+    AppState.resetConfig();
   }
 
   function deleteAllData() {
-    return StateManager.deleteAll();
+    return AppState.deleteAll();
   }
 
   return {

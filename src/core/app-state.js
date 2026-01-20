@@ -1,4 +1,4 @@
-const StateManager = (() => {
+const AppState = (() => {
   "use strict";
 
   let stats = {};

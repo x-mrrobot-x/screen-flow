@@ -8,7 +8,7 @@ const FoldersModel = (function() {
   };
 
   function getFolders() {
-    state.folders = StateManager.getFolders();
+    state.folders = AppState.getFolders();
 
     let filteredFolders = state.folders;
 
@@ -30,13 +30,13 @@ const FoldersModel = (function() {
   }
 
   function deleteFolder(id) {
-    const folders = StateManager.getFolders();
+    const folders = AppState.getFolders();
     const updatedFolders = folders.filter(f => f.id !== id);
-    StateManager.setFolders(updatedFolders);
+    AppState.setFolders(updatedFolders);
   }
 
   function clearFolderStats(folderId, type) {
-    const folders = StateManager.getFolders();
+    const folders = AppState.getFolders();
     const folderIndex = folders.findIndex(f => f.id === folderId);
 
     if (folderIndex !== -1) {
@@ -54,7 +54,7 @@ const FoldersModel = (function() {
         folder.stats.sr = 0;
       }
       folder.stats.lu = Date.now();
-      StateManager.setFolders(folders);
+      AppState.setFolders(folders);
       return removedCount;
     }
     return 0;

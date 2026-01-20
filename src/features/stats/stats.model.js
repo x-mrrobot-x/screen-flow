@@ -31,7 +31,7 @@ const StatsModel = (function() {
   }
 
   function getTopFolders(mediaType) {
-    return StateManager.getTopFoldersByType(mediaType);
+    return AppState.getTopFoldersByType(mediaType);
   }
 
   function getState() {

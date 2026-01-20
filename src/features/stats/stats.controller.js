@@ -44,7 +44,7 @@ const StatsController = (function() {
     onStateChange: (data) => {
       console.log(data)
       if(data.key === 'activities') {
-        const activities = StateManager.getActivities();
+        const activities = AppState.getActivities();
         StatsView.render.activityCard(activities);
       }
     }

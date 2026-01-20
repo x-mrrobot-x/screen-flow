@@ -189,7 +189,7 @@ const StatsView = (function () {
       render.mediaTypeUI(data.activeMediaType);
       render.weeklyChart(data);
       render.foldersChart(data);
-      const activities = StateManager.getActivities();
+      const activities = AppState.getActivities();
       render.activityCard(activities);
     }
   };

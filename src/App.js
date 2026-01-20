@@ -7,7 +7,7 @@ const App = (function() {
     try {
       // 1. Initialize Core Services
       EventBus.init();
-      StateManager.init();
+      AppState.init();
       Icons.init();
       Navigation.init();
       

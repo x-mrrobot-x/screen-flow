@@ -2,7 +2,7 @@ const AutoCleanModel = (function() {
   'use strict';
   
   function updateFolderState(folderId, mediaType, updateFn) {
-    const folders = StateManager.getFolders();
+    const folders = AppState.getFolders();
     const updatedFolders = folders.map(folder => {
       if (folder.id === folderId) {
         const newState = { ...folder };
@@ -11,7 +11,7 @@ const AutoCleanModel = (function() {
       }
       return folder;
     });
-    StateManager.setFolders(updatedFolders);
+    AppState.setFolders(updatedFolders);
     return updatedFolders;
   }
 
@@ -29,7 +29,7 @@ const AutoCleanModel = (function() {
       const actionType = mediaType === "screenshots" ? "screenshots" : "recordings";
       const isEnabled = mediaType === "screenshots" ? folder.autoClean.ss.on : folder.autoClean.sr.on;
 
-      StateManager.addActivity({
+      AppState.addActivity({
         type: "feature-toggle",
         feature: `auto-clean-folder-${actionType}`,
         folderName: folder.name,
@@ -49,9 +49,9 @@ const AutoCleanModel = (function() {
   }
 
   function toggleAutoCleanup() {
-    const newValue = StateManager.toggleSetting('autoCleanup');
+    const newValue = AppState.toggleSetting('autoCleanup');
 
-    StateManager.addActivity({
+    AppState.addActivity({
       type: "feature-toggle",
       feature: "auto-clean",
       enabled: newValue
@@ -60,13 +60,13 @@ const AutoCleanModel = (function() {
   }
 
   function getFolders() {
-    return StateManager.getFolders();
+    return AppState.getFolders();
   }
 
   function getState() {
     return {
-      autoCleanup: StateManager.getSetting('autoCleanup'),
-      ...StateManager.getStats()
+      autoCleanup: AppState.getSetting('autoCleanup'),
+      ...AppState.getStats()
     };
   }
 

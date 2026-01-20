@@ -4,12 +4,12 @@ const DashboardModel = (function() {
   let state = {};
 
   function getTotalOrganized() {
-    const folders = StateManager.getFolders();
+    const folders = AppState.getFolders();
     return folders.reduce((sum, folder) => sum + folder.stats.ss + folder.stats.sr, 0);
   }
 
   function getTopOrganizedApp() {
-    const folders = StateManager.getFolders();
+    const folders = AppState.getFolders();
     if (folders.length === 0) return null;
 
     const foldersWithTotals = folders.map(folder => ({
@@ -17,13 +17,13 @@ const DashboardModel = (function() {
       totalFiles: folder.stats.ss + folder.stats.sr
     }));
 
-    return foldersWithTotals.reduce((top, current) => 
+    return foldersWithTotals.reduce((top, current) =>
       current.totalFiles > top.totalFiles ? current : top
     );
   }
 
   function getState() {
-    const stats = StateManager.getStats();
+    const stats = AppState.getStats();
     const topApp = getTopOrganizedApp();
 
     state = {
