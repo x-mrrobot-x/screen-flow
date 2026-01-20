@@ -12,19 +12,6 @@ const FoldersModel = (function() {
 
     let filteredFolders = state.folders;
 
-    // Apply active filter
-    if (state.activeFilter && state.activeFilter !== 'all') {
-      if (state.activeFilter === 'screenshots') {
-        filteredFolders = filteredFolders.filter(folder =>
-          (folder.stats.ss || 0) > 0
-        );
-      } else if (state.activeFilter === 'recordings') {
-        filteredFolders = filteredFolders.filter(folder =>
-          (folder.stats.sr || 0) > 0
-        );
-      }
-    }
-
     if (state.searchTerm) {
       filteredFolders = filteredFolders.filter(folder =>
         folder.name.toLowerCase().includes(state.searchTerm.toLowerCase())
