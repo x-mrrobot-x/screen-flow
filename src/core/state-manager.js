@@ -1,168 +1,137 @@
-const StateManager = (function() {
-  'use strict';
-  
-  let state = {};
+const StateManager = (() => {
+  "use strict";
 
-  function getDefaultState() {
-    return {
-      activeFilter: DEFAULT_STATE.activeFilter,
-      mediaFilter: DEFAULT_STATE.mediaFilter,
-      lastOrganized: DEFAULT_STATE.lastOrganized,
-      lastCleanup: DEFAULT_STATE.lastCleanup,
-      pendingFiles: DEFAULT_STATE.pendingFiles,
-      organizedCaptures: DEFAULT_STATE.organizedCaptures,
-      removedCaptures: DEFAULT_STATE.removedCaptures,
-      folders: JSON.parse(JSON.stringify(DEFAULT_FOLDERS)),
-      activities: JSON.parse(JSON.stringify(DEFAULT_ACTIVITIES)),
-      settings: JSON.parse(JSON.stringify(DEFAULT_SETTINGS))
-    };
-  }
-  
+  let stats = {};
+  let settings = {};
+  let activities = [];
+  let folders = [];
+
   function init() {
-    state = Storage.get(STORAGE_KEYS.STATE) || getDefaultState();
-  }
-  
-  function getState() {
-    return { ...state };
-  }
-  
-  let saveTimer = null;
-  function autoSave() {
-    clearTimeout(saveTimer);
-    saveTimer = setTimeout(() => {
-      Storage.set(STORAGE_KEYS.STATE, state);
-    }, 500);
+    settings = ENV.get("SETTINGS");
+    stats = ENV.get("STATS");
+    folders = ENV.get("FOLDERS");
+    activities = ENV.get("ACTIVITIES");
   }
 
-  function setState(newState) {
-    state = { ...state, ...newState };
-    autoSave();
-  }
+  // Auto-save com debounce
+  let statsTimer = null;
+  let settingsTimer = null;
 
-  function getActiveFilter() {
-    return state.activeFilter;
-  }
+  const persist = {
+    folders: () => ENV.set("FOLDERS", folders),
 
-  function setActiveFilter(filter) {
-    state.activeFilter = filter;
-    autoSave();
-  }
+    settings: () => {
+      clearTimeout(settingsTimer);
+      settingsTimer = setTimeout(() => ENV.set("SETTINGS", settings), 500);
+    },
 
-  function getMediaFilter() {
-    return state.mediaFilter;
-  }
+    stats: () => {
+      clearTimeout(statsTimer);
+      statsTimer = setTimeout(() => ENV.set("STATS", stats), 500);
+    },
 
-  function setMediaFilter(filter) {
-    state.mediaFilter = filter;
-    autoSave();
-  }
+    activities: () => ENV.set("ACTIVITIES", activities)
+  };
 
-  function getFolders() {
-    return state.folders || [];
-  }
-
-  function setFolders(newFolders) {
-    state.folders = [...newFolders];
-    autoSave();
-  }
-
-  function getActivities() {
-    return ActivityHelper.enrichActivities([...state.activities]);
-  }
-  
-  function addActivity(activity) {
-    const newActivity = {
-      id: Date.now().toString(),
-      ...activity,
-      timestamp: activity.timestamp || Date.now()
-    };
-
-    state.activities = [newActivity, ...state.activities];
-    if (state.activities.length > 10) {
-      state.activities = state.activities.slice(0, 10);
-    }
-    autoSave();
-  }
-
-  function getSettings() {
-    return state.settings;
-  }
-
-  function getSetting(key) {
-    return state.settings[key];
-  }
-
-  function setSetting(key, value) {
-    state.settings = { ...state.settings, [key]: value };
-    autoSave();
-  }
-
-  function setSettings(newSettings) {
-    state.settings = { ...state.settings, ...newSettings };
-    autoSave();
-  }
-
-  function toggleSetting(key) {
-    const newValue = !state.settings[key];
-    state.settings = { ...state.settings, [key]: newValue };
-    autoSave();
-    return newValue;
-  }
-
-  function resetConfig() {
-    state = getDefaultState();
-    autoSave();
-  }
-
-  function deleteAll() {
-    try {
-      Storage.clear();
-      state = getDefaultState();
-      autoSave();
-      return true;
-    } catch (error) {
-      console.error("Error deleting all data:", error);
-      return false;
-    }
-  }
-
-  function getTopFoldersByType(type) {
-    const foldersCopy = [...state.folders];
-    const sortedFolders = foldersCopy.sort((a, b) => {
-      if (type === "screenshots") {
-        return b.stats.ss - a.stats.ss;
-      } else if (type === "recordings") {
-        return b.stats.sr - a.stats.sr;
-      }
-      return 0;
-    });
-
-    const topFolders = sortedFolders.slice(0, 5);
-    return topFolders.map(folder => ({
-      name: folder.name,
-      count: type === "screenshots" ? folder.stats.ss : folder.stats.sr
-    }));
-  }
-  
   return {
     init,
-    getState,
-    setState,
-    getActiveFilter,
-    setActiveFilter,
-    getMediaFilter,
-    setMediaFilter,
-    getFolders,
-    setFolders,
-    getActivities,
-    addActivity,
-    getSettings,
-    getSetting,
-    setSetting,
-    setSettings,
-    toggleSetting,
-    resetConfig,
-    deleteAll,
-    getTopFoldersByType
+
+    // Folders
+    getFolders: () => [...folders],
+    setFolders(newFolders) {
+      folders = [...newFolders];
+      persist.folders();
+    },
+
+    // Activities
+    getActivities: () => ActivityHelper.enrichActivities([...activities]),
+    addActivity(activity) {
+      activities = [
+        {
+          id: Date.now().toString(),
+          timestamp: Date.now(),
+          ...activity
+        },
+        ...activities.slice(0, 9)
+      ];
+      persist.activities();
+    },
+
+    // Settings (configurações do usuário)
+    getSettings: () => ({ ...settings }),
+    getSetting: key => settings[key],
+    setSetting(key, value) {
+      settings = { ...settings, [key]: value };
+      persist.settings();
+    },
+    setSettings(newSettings) {
+      Object.assign(settings, newSettings);
+      persist.settings();
+    },
+    toggleSetting(key) {
+      settings[key] = !settings[key];
+      persist.settings();
+      return settings[key];
+    },
+
+    // Stats (estatísticas e métricas)
+    getStats: () => ({ ...stats }),
+    getStat: key => stats[key],
+    setStat(key, value) {
+      stats = { ...stats, [key]: value };
+      persist.stats();
+    },
+    incrementStat(key, amount = 1) {
+      stats[key] = (stats[key] || 0) + amount;
+      persist.stats();
+    },
+    updateLastOrganized() {
+      stats.lastOrganized = Date.now();
+      persist.stats();
+    },
+    updateLastCleanup() {
+      stats.lastCleanup = Date.now();
+      persist.stats();
+    },
+
+    // Reset & Delete
+    resetConfig() {
+      settings = DEFAULT_SETTINGS;
+      stats = JSON.parse(JSON.stringify(DEFAULT_STATS));
+      folders = JSON.parse(JSON.stringify(DEFAULT_FOLDERS));
+      activities = JSON.parse(JSON.stringify(DEFAULT_ACTIVITIES));
+
+      persist.settings();
+      persist.stats();
+      persist.folders();
+      persist.activities();
+    },
+
+    deleteAll() {
+      try {
+        settings = DEFAULT_SETTINGS;
+        stats = JSON.parse(JSON.stringify(DEFAULT_STATS));
+        folders = JSON.parse(JSON.stringify(DEFAULT_FOLDERS));
+        activities = JSON.parse(JSON.stringify(DEFAULT_ACTIVITIES));
+
+        persist.settings();
+        persist.stats();
+        persist.folders();
+        persist.activities();
+        return true;
+      } catch (error) {
+        console.error("Error deleting all data:", error);
+        return false;
+      }
+    },
+
+    // Utils
+    getTopFoldersByType(type) {
+      const key = type === "screenshots" ? "ss" : "sr";
+      return [...folders]
+        .sort((a, b) => b.stats[key] - a.stats[key])
+        .slice(0, 5)
+        .map(f => ({ name: f.name, count: f.stats[key] }));
+    }
   };
 })();

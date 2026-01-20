@@ -49,9 +49,7 @@ const AutoCleanModel = (function() {
   }
 
   function toggleAutoCleanup() {
-    const currentState = StateManager.getState();
-    const newValue = !currentState.autoCleanup;
-    StateManager.setState({ autoCleanup: newValue });
+    const newValue = StateManager.toggleSetting('autoCleanup');
 
     StateManager.addActivity({
       type: "feature-toggle",
@@ -66,7 +64,10 @@ const AutoCleanModel = (function() {
   }
 
   function getState() {
-    return StateManager.getState();
+    return {
+      autoCleanup: StateManager.getSetting('autoCleanup'),
+      ...StateManager.getStats()
+    };
   }
 
   return {

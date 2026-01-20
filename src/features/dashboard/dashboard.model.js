@@ -23,15 +23,15 @@ const DashboardModel = (function() {
   }
 
   function getState() {
-    const managerState = StateManager.getState();
+    const stats = StateManager.getStats();
     const topApp = getTopOrganizedApp();
-    
+
     state = {
       organized: getTotalOrganized(),
-      removed: managerState.removedCaptures,
-      pending: managerState.pendingFiles,
-      lastOrganized: managerState.lastOrganized,
-      lastCleanup: managerState.lastCleanup,
+      removed: stats.removedCaptures || 0,
+      pending: stats.pendingFiles || 0,
+      lastOrganized: stats.lastOrganized,
+      lastCleanup: stats.lastCleanup,
       topApp: topApp ? {
         name: topApp.name,
         count: topApp.totalFiles

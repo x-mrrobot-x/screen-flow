@@ -9,7 +9,7 @@ const Toast = (() => {
     });
 
     toast.innerHTML = `
-      ${Icons.getIcon(
+      ${Icons.get(
         type === "success"
           ? "check-icon"
           : type === "error"

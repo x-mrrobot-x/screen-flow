@@ -4,33 +4,38 @@ const FoldersModel = (function() {
   let state = {
     folders: [],
     activeFilter: 'all',
-    mediaFilter: 'screenshots',
     searchTerm: ''
   };
 
   function getFolders() {
     state.folders = StateManager.getFolders();
-    state.activeFilter = StateManager.getActiveFilter() || 'all';
-    state.mediaFilter = StateManager.getMediaFilter() || 'screenshots';
-    
+
     let filteredFolders = state.folders;
+
+    // Apply active filter
+    if (state.activeFilter && state.activeFilter !== 'all') {
+      if (state.activeFilter === 'screenshots') {
+        filteredFolders = filteredFolders.filter(folder =>
+          (folder.stats.ss || 0) > 0
+        );
+      } else if (state.activeFilter === 'recordings') {
+        filteredFolders = filteredFolders.filter(folder =>
+          (folder.stats.sr || 0) > 0
+        );
+      }
+    }
+
     if (state.searchTerm) {
-      filteredFolders = filteredFolders.filter(folder => 
+      filteredFolders = filteredFolders.filter(folder =>
         folder.name.toLowerCase().includes(state.searchTerm.toLowerCase())
       );
     }
-    
+
     return filteredFolders;
   }
 
   function setFilter(filter) {
-    StateManager.setActiveFilter(filter);
     state.activeFilter = filter;
-  }
-
-  function setMediaFilter(filter) {
-    StateManager.setMediaFilter(filter);
-    state.mediaFilter = filter;
   }
 
   function setSearchTerm(term) {
@@ -71,7 +76,6 @@ const FoldersModel = (function() {
   return {
     getFolders,
     setFilter,
-    setMediaFilter,
     setSearchTerm,
     deleteFolder,
     clearFolderStats,

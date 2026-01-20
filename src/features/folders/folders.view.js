@@ -50,9 +50,9 @@ const FoldersView = (function () {
           </div>
         </div>
       </div>`,
-    emptyState: mediaFilter => {
+    emptyState: activeFilter => {
       const emptyMediaText =
-        mediaFilter === "screenshots" ? "capturas" : "gravações";
+        activeFilter === "screenshots" ? "capturas" : "gravações";
       return `
         <div class="empty-state animate-fade-in delay-3">
             <div class="empty-icon-wrapper">${Icons.get("folder")}</div>
@@ -74,13 +74,13 @@ const FoldersView = (function () {
   };
 
   const render = {
-    folders: (folders, activeFilter, mediaFilter) => {
+    folders: (folders, activeFilter) => {
       if (folders.length > 0) {
         elements.foldersGrid.innerHTML = folders
           .map((f, i) => templates.folderCard(f, i, activeFilter))
           .join("");
       } else {
-        elements.foldersGrid.innerHTML = templates.emptyState(mediaFilter);
+        elements.foldersGrid.innerHTML = templates.emptyState(activeFilter);
       }
     },
     mediaCounter: (folders, activeFilter) => {

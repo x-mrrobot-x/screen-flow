@@ -1,12 +1,20 @@
-const DEFAULT_STATE = {
-  activeFilter: "all",
-  mediaFilter: "screenshots",
+const DEFAULT_STATS = {
   lastOrganized: Date.now(),
   lastCleanup: Date.now() - 2 * 60 * 60 * 1000,
   pendingFiles: 89,
   organizedCaptures: 450,
   removedCaptures: 389
 };
+
+const DEFAULT_SETTINGS = {
+  theme: "system",
+  autoOrganize: true,
+  autoCleanup: false,
+  notifications: true,
+  animationsEnabled: true
+};
+
+const DEFAULT_TRANSLATIONS = {};
 
 const DEFAULT_ACTIVITIES = [
   {
@@ -65,14 +73,6 @@ const DEFAULT_ACTIVITIES = [
     timestamp: Date.now() - 4 * 24 * 60 * 60 * 1000
   }
 ];
-
-const DEFAULT_SETTINGS = {
-  notifications: true,
-  autoOrganize: true,
-  autoCleanup: true,
-  animationsEnabled: true,
-  theme: "system"
-};
 
 const DEFAULT_FOLDERS = [
   {

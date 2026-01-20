@@ -6,7 +6,7 @@ const FoldersController = (function() {
   function render() {
     const folders = FoldersModel.getFolders();
     const state = FoldersModel.getState();
-    FoldersView.render.folders(folders, state.activeFilter, state.mediaFilter);
+    FoldersView.render.folders(folders, state.activeFilter);
     FoldersView.render.mediaCounter(folders, state.activeFilter);
     FoldersView.render.filters(state.activeFilter);
   }
