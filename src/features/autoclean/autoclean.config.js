@@ -1,7 +1,7 @@
 const AutoCleanConfig = {
   SELECTORS: {
     CONTAINER: "#tab-autoclean",
-    folderCleanList: "#organize-item-clean-list",
+    folderCleanList: "#folder-clean-list",
     autocleanCountText: "#autoclean-count-text",
     autoCleanupSwitch: "#switch-autoCleanup"
   },

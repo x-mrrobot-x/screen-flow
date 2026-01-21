@@ -4,10 +4,10 @@ const OrganizeController = (function() {
   let isInitialized = false;
 
   function render() {
-    const organizeItems = OrganizeModel.getOrganizeItems();
+    const folders = OrganizeModel.getFolders();
     const state = OrganizeModel.getState();
-    OrganizeView.render.organizeItems(organizeItems, state.activeFilter);
-    OrganizeView.render.mediaCounter(organizeItems, state.activeFilter);
+    OrganizeView.render.folders(folders, state.activeFilter);
+    OrganizeView.render.mediaCounter(folders, state.activeFilter);
     OrganizeView.render.filters(state.activeFilter);
   }
 
@@ -22,16 +22,16 @@ const OrganizeController = (function() {
       render();
     },
     onCardClick: (e) => {
-      const organizeCard = e.target.closest(OrganizeConfig.SELECTORS.organizeCard);
-      if (!organizeCard) return;
+      const folderCard = e.target.closest(OrganizeConfig.SELECTORS.folderCard);
+      if (!folderCard) return;
 
-      const organizeId = organizeCard.dataset.organizeId;
-      if (!organizeId) return;
+      const folderId = folderCard.dataset.folderId;
+      if (!folderId) return;
 
-      const menuDots = e.target.closest(OrganizeConfig.SELECTORS.organizeMenuDots);
+      const menuDots = e.target.closest(OrganizeConfig.SELECTORS.folderMenuDots);
       if (menuDots) {
         e.stopPropagation();
-        const menu = OrganizeView.showActionsMenu(organizeId, organizeCard);
+        const menu = OrganizeView.showActionsMenu(folderId, folderCard);
         if(menu) {
           menu.addEventListener('click', handlers.onMenuClick);
         }
@@ -43,13 +43,13 @@ const OrganizeController = (function() {
       if(!actionItem) return;
 
       const action = actionItem.dataset.action;
-      const popup = actionItem.closest(OrganizeConfig.SELECTORS.organizeActionsPopup);
-      const organizeId = popup.dataset.organizeId;
+      const popup = actionItem.closest(OrganizeConfig.SELECTORS.folderActionsPopup);
+      const folderId = popup.dataset.folderId;
 
       if (action === 'clear') {
         const activeFilter = OrganizeModel.getState().activeFilter;
         const type = activeFilter === 'all' ? 'both' : (activeFilter === 'screenshots' ? 'ss' : 'sr');
-        const removedCount = OrganizeModel.clearOrganizeStats(organizeId, type);
+        const removedCount = OrganizeModel.clearFolderStats(folderId, type);
         if (removedCount > 0) {
           Toast.success(`${removedCount} item(ns) removido(s) com sucesso!`);
         }
@@ -66,7 +66,7 @@ const OrganizeController = (function() {
     const filterButtons = DOM.qsa(OrganizeConfig.SELECTORS.filterButtons);
     filterButtons.forEach(btn => btn.addEventListener('click', handlers.onFilterClick));
 
-    const grid = DOM.qs(OrganizeConfig.SELECTORS.organizeGrid);
+    const grid = DOM.qs(OrganizeConfig.SELECTORS.foldersGrid);
     if(grid) grid.addEventListener('click', handlers.onCardClick);
   }
 

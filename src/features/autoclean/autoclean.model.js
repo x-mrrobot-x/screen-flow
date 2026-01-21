@@ -1,49 +1,49 @@
 const AutoCleanModel = (function() {
   'use strict';
   
-  function updateOrganizeItemState(organizeItemId, mediaType, updateFn) {
-    const organizeItems = AppState.getOrganizeItems();
-    const updatedOrganizeItems = organizeItems.map(item => {
-      if (item.id === organizeItemId) {
-        const newState = { ...item };
+  function updateFolderState(folderId, mediaType, updateFn) {
+    const folders = AppState.getFolders();
+    const updatedFolders = folders.map(folder => {
+      if (folder.id === folderId) {
+        const newState = { ...folder };
         updateFn(newState);
         return newState;
       }
-      return item;
+      return folder;
     });
-    AppState.setOrganizeItems(updatedOrganizeItems);
-    return updatedOrganizeItems;
+    AppState.setFolders(updatedFolders);
+    return updatedFolders;
   }
 
-  function toggleOrganizeItemClean(organizeItemId, mediaType) {
-    const updatedOrganizeItems = updateOrganizeItemState(organizeItemId, mediaType, item => {
+  function toggleFolderClean(folderId, mediaType) {
+    const updatedFolders = updateFolderState(folderId, mediaType, folder => {
       if (mediaType === "screenshots") {
-        item.autoClean.ss.on = !item.autoClean.ss.on;
+        folder.autoClean.ss.on = !folder.autoClean.ss.on;
       } else if (mediaType === "recordings") {
-        item.autoClean.sr.on = !item.autoClean.sr.on;
+        folder.autoClean.sr.on = !folder.autoClean.sr.on;
       }
     });
 
-    const item = updatedOrganizeItems.find(f => f.id === organizeItemId);
-    if (item) {
+    const folder = updatedFolders.find(f => f.id === folderId);
+    if (folder) {
       const actionType = mediaType === "screenshots" ? "screenshots" : "recordings";
-      const isEnabled = mediaType === "screenshots" ? item.autoClean.ss.on : item.autoClean.sr.on;
+      const isEnabled = mediaType === "screenshots" ? folder.autoClean.ss.on : folder.autoClean.sr.on;
 
       AppState.addActivity({
         type: "feature-toggle",
-        feature: `auto-clean-organize-${actionType}`,
-        itemName: item.name,
+        feature: `auto-clean-folder-${actionType}`,
+        folderName: folder.name,
         enabled: isEnabled
       });
     }
   }
 
-  function setOrganizeItemDays(organizeItemId, mediaType, days) {
-    updateOrganizeItemState(organizeItemId, mediaType, item => {
+  function setFolderDays(folderId, mediaType, days) {
+    updateFolderState(folderId, mediaType, folder => {
       if (mediaType === "screenshots") {
-        item.autoClean.ss.days = days;
+        folder.autoClean.ss.days = days;
       } else if (mediaType === "recordings") {
-        item.autoClean.sr.days = days;
+        folder.autoClean.sr.days = days;
       }
     });
   }
@@ -59,8 +59,8 @@ const AutoCleanModel = (function() {
     return newValue;
   }
 
-  function getOrganizeItems() {
-    return AppState.getOrganizeItems();
+  function getFolders() {
+    return AppState.getFolders();
   }
 
   function getState() {
@@ -71,10 +71,10 @@ const AutoCleanModel = (function() {
   }
 
   return {
-    toggleOrganizeItemClean,
-    setOrganizeItemDays,
+    toggleFolderClean,
+    setFolderDays,
     toggleAutoCleanup,
-    getOrganizeItems,
+    getFolders,
     getState
   };
 })();

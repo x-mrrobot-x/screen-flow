@@ -4,20 +4,20 @@ const DashboardModel = (function() {
   let state = {};
 
   function getTotalOrganized() {
-    const organizeItems = AppState.getOrganizeItems();
-    return organizeItems.reduce((sum, item) => sum + item.stats.ss + item.stats.sr, 0);
+    const folders = AppState.getFolders();
+    return folders.reduce((sum, folder) => sum + folder.stats.ss + folder.stats.sr, 0);
   }
 
   function getTopOrganizedApp() {
-    const organizeItems = AppState.getOrganizeItems();
-    if (organizeItems.length === 0) return null;
+    const folders = AppState.getFolders();
+    if (folders.length === 0) return null;
 
-    const organizeItemsWithTotals = organizeItems.map(item => ({
-      ...item,
-      totalFiles: item.stats.ss + item.stats.sr
+    const foldersWithTotals = folders.map(folder => ({
+      ...folder,
+      totalFiles: folder.stats.ss + folder.stats.sr
     }));
 
-    return organizeItemsWithTotals.reduce((top, current) =>
+    return foldersWithTotals.reduce((top, current) =>
       current.totalFiles > top.totalFiles ? current : top
     );
   }

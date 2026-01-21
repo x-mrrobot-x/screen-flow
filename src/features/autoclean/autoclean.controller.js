@@ -4,18 +4,18 @@ const AutoCleanController = (function() {
   let isInitialized = false;
 
   function render() {
-    const organizeItems = AutoCleanModel.getOrganizeItems();
+    const folders = AutoCleanModel.getFolders();
     const state = AutoCleanModel.getState();
-    AutoCleanView.render.autoclean(organizeItems, state.autoCleanup);
+    AutoCleanView.render.autoclean(folders, state.autoCleanup);
   }
 
   const handlers = {
     handleEvent: (e) => {
-      const organizeItemCard = e.target.closest(".organize-item-clean-card");
-      if (!organizeItemCard) return;
+      const folderCard = e.target.closest(".folder-clean-card");
+      if (!folderCard) return;
 
-      const organizeItemId = organizeItemCard.getAttribute("data-organize-item-id");
-      if (!organizeItemId) return;
+      const folderId = folderCard.getAttribute("data-folder-id");
+      if (!folderId) return;
 
       const actionBtn = e.target.closest('[data-action]');
       if (!actionBtn) return;
@@ -25,13 +25,13 @@ const AutoCleanController = (function() {
       const mediaType = actionBtn.getAttribute("data-media-type");
 
       switch (action) {
-        case "toggleOrganizeItemClean":
-          AutoCleanModel.toggleOrganizeItemClean(organizeItemId, mediaType);
+        case "toggleFolderClean":
+          AutoCleanModel.toggleFolderClean(folderId, mediaType);
           render();
           break;
-        case "setOrganizeItemDays":
+        case "setFolderDays":
           const days = parseInt(actionBtn.getAttribute("data-days"));
-          AutoCleanModel.setOrganizeItemDays(organizeItemId, mediaType, days);
+          AutoCleanModel.setFolderDays(folderId, mediaType, days);
           render();
           break;
       }

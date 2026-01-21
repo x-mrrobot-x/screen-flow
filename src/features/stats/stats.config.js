@@ -3,7 +3,7 @@ const StatsConfig = {
     CONTAINER: "#tab-stats",
     mediaTypeButtons: ".media-type-button",
     weeklyChart: "#weeklyChart",
-    organizeChart: "#organizeChart",
+    foldersChart: "#organizeChart",
     activityCard: ".activity-card",
     activityList: ".activity-list",
     weeklyChartTitle: "#weekly-chart-title"

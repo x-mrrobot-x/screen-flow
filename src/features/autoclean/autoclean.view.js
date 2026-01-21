@@ -5,18 +5,18 @@ const AutoCleanView = (function() {
   const elements = {};
 
   const templates = {
-    organizeOptions: (item, mediaType) => {
+    folderOptions: (folder, mediaType) => {
       const config = AutoCleanConfig;
-      const isActive = mediaType === "screenshots" ? item.autoClean.ss.on : item.autoClean.sr.on;
+      const isActive = mediaType === "screenshots" ? folder.autoClean.ss.on : folder.autoClean.sr.on;
       if (!isActive) return "";
 
-      const optionId = `option-group-${item.id}-${mediaType}`;
+      const optionId = `option-group-${folder.id}-${mediaType}`;
       const label = mediaType === "screenshots" ? "Capturas" : "Gravações";
-      const currentDays = mediaType === "screenshots" ? item.autoClean.ss.days : item.autoClean.sr.days;
+      const currentDays = mediaType === "screenshots" ? folder.autoClean.ss.days : folder.autoClean.sr.days;
 
       let optionsHtml = config.DAY_OPTIONS.map(days => {
         const activeClass = currentDays === days ? "active" : "";
-        return `<button class="day-button tap-scale ${activeClass}" data-action="setOrganizeItemDays" data-media-type="${mediaType}" data-days="${days}">${days} dias</button>`;
+        return `<button class="day-button tap-scale ${activeClass}" data-action="setFolderDays" data-media-type="${mediaType}" data-days="${days}">${days} dias</button>`;
       }).join('');
 
       return `
@@ -26,31 +26,31 @@ const AutoCleanView = (function() {
         </div>
       `;
     },
-    organizeCard: (item, index) => {
-      const isEnabled = item.autoClean.ss.on || item.autoClean.sr.on;
+    folderCard: (folder, index) => {
+      const isEnabled = folder.autoClean.ss.on || folder.autoClean.sr.on;
       const enabledClass = isEnabled ? "enabled" : "";
 
       return `
-        <div class="organize-item-clean-card ${enabledClass} animate-fade-in-left delay-${index % 10}" data-organize-item-id="${item.id}">
-          <div class="organize-item-clean-header">
-            <div class="organize-item-clean-info">
-              ${Icons.getOrganizeIcon(item)}
-              <span>${item.name}</span>
+        <div class="folder-clean-card ${enabledClass} animate-fade-in-left delay-${index % 10}" data-folder-id="${folder.id}">
+          <div class="folder-clean-header">
+            <div class="folder-clean-info">
+              ${Icons.getOrganizeIcon(folder)}
+              <span>${folder.name}</span>
             </div>
-            <div class="organize-item-clean-switches">
+            <div class="folder-clean-switches">
               <div class="clean-switch-container" data-action="toggleDayConfigVisibility" data-media-type="screenshots">
                 <span class="switch-label">Capturas</span>
-                <button class="switch ${item.autoClean.ss.on ? "active" : ""}" data-action="toggleOrganizeItemClean" data-media-type="screenshots"></button>
+                <button class="switch ${folder.autoClean.ss.on ? "active" : ""}" data-action="toggleFolderClean" data-media-type="screenshots"></button>
               </div>
               <div class="clean-switch-container" data-action="toggleDayConfigVisibility" data-media-type="recordings">
                 <span class="switch-label">Gravações</span>
-                <button class="switch ${item.autoClean.sr.on ? "active" : ""}" data-action="toggleOrganizeItemClean" data-media-type="recordings"></button>
+                <button class="switch ${folder.autoClean.sr.on ? "active" : ""}" data-action="toggleFolderClean" data-media-type="recordings"></button>
               </div>
             </div>
           </div>
-          ${isEnabled ? `<div class="organize-item-clean-options">
-            ${templates.organizeOptions(item, "screenshots")}
-            ${templates.organizeOptions(item, "recordings")}
+          ${isEnabled ? `<div class="folder-clean-options">
+            ${templates.folderOptions(folder, "screenshots")}
+            ${templates.folderOptions(folder, "recordings")}
           </div>` : ""}
         </div>
       `;
@@ -68,14 +68,14 @@ const AutoCleanView = (function() {
         elements.autocleanCountText.textContent = "Limpe pastas automaticamente";
       }
     },
-    organizeList: (organizeItems) => {
-      elements.organizeItemCleanList.innerHTML = organizeItems.map((item, index) => templates.organizeCard(item, index)).join("");
+    folderList: (folders) => {
+      elements.folderCleanList.innerHTML = folders.map((folder, index) => templates.folderCard(folder, index)).join("");
     },
-    autoclean: (organizeItems, autoCleanup) => {
-      render.counts(organizeItems, autoCleanup);
-      render.organizeList(organizeItems);
+    autoclean: (folders, autoCleanup) => {
+      render.counts(folders, autoCleanup);
+      render.folderList(folders);
       elements.autoCleanupSwitch.classList.toggle("active", autoCleanup);
-      elements.organizeItemCleanList.style.display = autoCleanup ? "flex" : "none";
+      elements.folderCleanList.style.display = autoCleanup ? "flex" : "none";
     }
   };
 
@@ -86,7 +86,7 @@ const AutoCleanView = (function() {
     for (const key in AutoCleanConfig.SELECTORS) {
       if (key !== "CONTAINER") {
         if (key === "folderCleanList") {
-          elements.organizeItemCleanList = DOM.qs(AutoCleanConfig.SELECTORS[key]);
+          elements.folderCleanList = DOM.qs(AutoCleanConfig.SELECTORS[key]);
         } else {
           elements[key] = DOM.qs(AutoCleanConfig.SELECTORS[key]);
         }

@@ -4,7 +4,7 @@ const StatsModel = (function() {
   let state = {
     activeMediaType: "screenshots",
     weeklyData: {},
-    topOrganizeItems: []
+    topFolders: []
   };
 
   const weeklyData = {
@@ -30,13 +30,13 @@ const StatsModel = (function() {
     return Object.keys(weeklyData);
   }
 
-  function getTopOrganizeItems(mediaType) {
-    return AppState.getTopOrganizeItemsByType(mediaType);
+  function getTopFolders(mediaType) {
+    return AppState.getTopFoldersByType(mediaType);
   }
 
   function getState() {
     state.weeklyData = getWeeklyData(state.activeMediaType);
-    state.topOrganizeItems = getTopOrganizeItems(state.activeMediaType);
+    state.topFolders = getTopFolders(state.activeMediaType);
     return { ...state };
   }
 

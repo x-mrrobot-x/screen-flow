@@ -130,14 +130,14 @@
   height: var(--icon-xs);
 }
 
-.organize-grid {
+.folders-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(40%, 1fr));
   gap: var(--space-sm);
 }
 
-/* Componente Organize (Item de Organização) */
-.organize-card {
+/* Componente Folder (Pasta) */
+.folder-card {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -152,8 +152,8 @@
   background: hsl(var(--card));
 }
 
-/* Parte Superior do Item de Organização (Visualização/Ícone) */
-.organize-top {
+/* Parte Superior da Pasta (Visualização/Ícone) */
+.folder-top {
   background-color: hsl(var(--card));
   flex-grow: 1;
   display: flex;
@@ -163,7 +163,7 @@
 }
 
 /* Badge de Categoria (Gravação/Screenshots + Qtd) */
-.organize-badges {
+.folder-badges {
   display: flex;
   align-items: center;
   margin-top: var(--space-md);
@@ -173,7 +173,7 @@
 
 }
 
-.organize-badge {
+.folder-badge {
   display: flex;
   background-color: hsl(var(--secondary));
   color: hsl(var(--muted-foreground));
@@ -192,7 +192,7 @@
 }
 
 /* Wrapper do Ícone Principal do App */
-.organize-app-icon {
+.folder-app-icon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -201,13 +201,13 @@
   /* margin-top: 10px; */
 }
 
-.organize-app-icon .organize-icon {
+.folder-app-icon .folder-icon {
   width: 5rem;
   height: 5rem;
 }
 
-/* Parte Inferior do Item de Organização (Detalhes) */
-.organize-bottom {
+/* Parte Inferior da Pasta (Detalhes) */
+.folder-bottom {
   background-color: hsl(var(--secondary) / 0.8);
   display: flex;
   flex-direction: column;
@@ -218,14 +218,14 @@
 }
 
 /* Linha de Informação (Nome + Menu) */
-.organize-info-row {
+.folder-info-row {
   display: flex;
   justify-content: space-between;
   width: 100%;
 }
 
-/* Nome do Item de Organização/App */
-.organize-name {
+/* Nome da Pasta/App */
+.folder-name {
   font-size: 15px;
   font-weight: 600;
   color: hsl(var(--foreground));
@@ -235,7 +235,7 @@
 }
 
 /* Menu de Ações (3 pontinhos) */
-.organize-menu-dots svg {
+.folder-menu-dots svg {
   width: 20px;
   height: 20px;
   fill: hsl(var(--muted-foreground));
@@ -247,8 +247,8 @@
   fill: hsl(var(--foreground));
 }
 
-/* Organize Actions Popup */
-.organize-actions-popup {
+/* Folder Actions Popup */
+.folder-actions-popup {
   position: absolute;
   top: 0; /*  in javascript */
   left: 50%;
@@ -266,7 +266,7 @@
   filter: brightness(150%);
 }
 
-.organize-action-item {
+.folder-action-item {
   border-radius: var(--radius-sm);
   display: flex;
   align-items: center;

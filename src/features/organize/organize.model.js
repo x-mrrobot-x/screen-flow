@@ -2,23 +2,23 @@ const OrganizeModel = (function() {
   'use strict';
 
   let state = {
-    organizeItems: [],
+    folders: [],
     activeFilter: 'all',
     searchTerm: ''
   };
 
-  function getOrganizeItems() {
-    state.organizeItems = AppState.getOrganizeItems();
+  function getFolders() {
+    state.folders = AppState.getFolders();
 
-    let filteredOrganizeItems = state.organizeItems;
+    let filteredFolders = state.folders;
 
     if (state.searchTerm) {
-      filteredOrganizeItems = filteredOrganizeItems.filter(item =>
-        item.name.toLowerCase().includes(state.searchTerm.toLowerCase())
+      filteredFolders = filteredFolders.filter(folder =>
+        folder.name.toLowerCase().includes(state.searchTerm.toLowerCase())
       );
     }
 
-    return filteredOrganizeItems;
+    return filteredFolders;
   }
 
   function setFilter(filter) {
@@ -29,43 +29,43 @@ const OrganizeModel = (function() {
     state.searchTerm = term;
   }
 
-  function deleteOrganizeItem(id) {
-    const organizeItems = AppState.getOrganizeItems();
-    const updatedOrganizeItems = organizeItems.filter(f => f.id !== id);
-    AppState.setOrganizeItems(updatedOrganizeItems);
+  function deleteFolder(id) {
+    const folders = AppState.getFolders();
+    const updatedFolders = folders.filter(f => f.id !== id);
+    AppState.setFolders(updatedFolders);
   }
 
-  function clearOrganizeStats(organizeId, type) {
-    const organizeItems = AppState.getOrganizeItems();
-    const itemIndex = organizeItems.findIndex(f => f.id === organizeId);
+  function clearFolderStats(folderId, type) {
+    const folders = AppState.getFolders();
+    const folderIndex = folders.findIndex(f => f.id === folderId);
 
-    if (itemIndex !== -1) {
-      const item = organizeItems[itemIndex];
+    if (folderIndex !== -1) {
+      const folder = folders[folderIndex];
       let removedCount = 0;
       if (type === 'ss') {
-        removedCount = item.stats.ss;
-        item.stats.ss = 0;
+        removedCount = folder.stats.ss;
+        folder.stats.ss = 0;
       } else if (type === 'sr') {
-        removedCount = item.stats.sr;
-        item.stats.sr = 0;
+        removedCount = folder.stats.sr;
+        folder.stats.sr = 0;
       } else if (type === 'both') {
-        removedCount = item.stats.ss + item.stats.sr;
-        item.stats.ss = 0;
-        item.stats.sr = 0;
+        removedCount = folder.stats.ss + folder.stats.sr;
+        folder.stats.ss = 0;
+        folder.stats.sr = 0;
       }
-      item.stats.lu = Date.now();
-      AppState.setOrganizeItems(organizeItems);
+      folder.stats.lu = Date.now();
+      AppState.setFolders(folders);
       return removedCount;
     }
     return 0;
   }
 
   return {
-    getOrganizeItems,
+    getFolders,
     setFilter,
     setSearchTerm,
-    deleteOrganizeItem,
-    clearOrganizeStats,
+    deleteFolder,
+    clearFolderStats,
     getState: () => ({...state})
   };
 })();
