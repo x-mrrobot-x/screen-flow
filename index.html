@@ -664,43 +664,40 @@
     </nav>
 
     <!--  MODAL  -->
-    <aside id="process-modal" class="modal-overlay">
-      <article class="modal animate-scale-in">
-        <header class="modal-header">
-          <h2 class="modal-title" id="modal-title">Processando</h2>
-        </header>
-        <div class="modal-body">
-          <div class="progress-bar-container">
-            <div
-              id="modal-progress-bar"
-              class="progress-bar"
-              style="width: 0%"
-            ></div>
-          </div>
-          <div class="progress-info">
-            <span id="modal-step-label">Iniciando...</span>
-            <span id="modal-percent">0%</span>
-          </div>
-          <div id="modal-steps-container" class="process-steps"></div>
+    <dialog id="process-modal" class="modal">
+      <header class="modal-header">
+        <h2 class="modal-title" id="modal-title">Processando</h2>
+      </header>
+      
+      <div class="modal-body">
+        <div class="progress-bar-container">
           <div
-            id="modal-completion"
-            class="process-complete animate-fade-in-up"
-            style="display: none"
-          >
-            <div class="process-complete-icon">
-              <i data-icon="check"></i>
-            </div>
-            <p class="process-complete-title">Processo Concluído!</p>
-            <p id="modal-result-text" class="process-complete-stats"></p>
-          </div>
+            id="modal-progress-bar"
+            class="progress-bar"
+            style="width: 0%"
+          ></div>
         </div>
-      </article>
-    </aside>
+        <div class="progress-info">
+          <span id="modal-step-label">Iniciando...</span>
+          <span id="modal-percent">0%</span>
+        </div>
+        <div id="modal-steps-container" class="process-steps"></div>
+        <div
+          id="modal-completion"
+          class="process-complete animate-fade-in-up"
+          style="display: none"
+        >
+          <div class="process-complete-icon">
+            <i data-icon="check"></i>
+          </div>
+          <p class="process-complete-title">Processo Concluído!</p>
+          <p id="modal-result-text" class="process-complete-stats"></p>
+        </div>
+      </div>
+    </dialog>
 
     <!-- Confirmation Modal -->
-
-    <div id="confirmation-modal" class="modal">
-      <div class="modal-content">
+    <dialog id="confirmation-modal" class="modal">
         <header class="modal-header">
           <h2 class="modal-title" id="confirmation-modal-title">Confirmação</h2>
 
@@ -731,8 +728,7 @@
             Confirmar
           </button>
         </footer>
-      </div>
-    </div>
+    </dialog>
 
     <!-- 1. Utilitários (sem dependências) -->
     <script src="src/lib/constants.js"></script>

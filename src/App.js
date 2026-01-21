@@ -27,7 +27,8 @@ const App = (function() {
   }
   
   return {
-    init
+    init,
+    goBack: Modal.goBack
   };
 })();
 
