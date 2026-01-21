@@ -22,7 +22,7 @@
     <link rel="stylesheet" href="src/features/dashboard/dashboard.css" />
     <link rel="stylesheet" href="src/features/stats/stats.css" />
     <link rel="stylesheet" href="src/features/autoclean/autoclean.css" />
-    <link rel="stylesheet" href="src/features/folders/folders.css" />
+    <link rel="stylesheet" href="src/features/organize/organize.css" />
     <link rel="stylesheet" href="src/features/settings/settings.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -170,9 +170,9 @@
         </section>
       </main>
 
-      <!--  FOLDERS TAB  -->
+      <!--  ORGANIZE TAB  -->
       <main
-        id="tab-folders"
+        id="tab-organize"
         class="tab-content page-container page-enter animate-fade-in"
       >
         <header class="page-header animate-fade-in-down">
@@ -181,9 +181,9 @@
               <i data-icon="folder-open"></i>
             </div>
             <div class="header-text">
-              <h1 class="page-title">Pastas</h1>
+              <h1 class="page-title">Organizar</h1>
               <p class="page-subtitle">
-                Gerencie suas capturas e gravações de tela
+                Organize suas capturas e gravações de tela
               </p>
             </div>
           </div>
@@ -255,8 +255,8 @@
         </header>
 
         <section
-          id="folders-grid"
-          class="folders-grid animate-fade-in delay-3"
+          id="organize-grid"
+          class="organize-grid animate-fade-in delay-3"
         ></section>
       </main>
 
@@ -302,8 +302,8 @@
         </section>
 
         <section
-          id="folder-clean-list"
-          class="folder-clean-list animate-fade-in delay-4"
+          id="organize-item-clean-list"
+          class="organize-item-clean-list animate-fade-in delay-4"
         ></section>
       </main>
 
@@ -364,7 +364,7 @@
             <h3 class="chart-title">Por Pasta</h3>
           </header>
           <div class="chart-container">
-            <canvas id="foldersChart"></canvas>
+            <canvas id="organizeChart"></canvas>
           </div>
         </article>
 
@@ -629,13 +629,13 @@
           <span class="nav-label">Início</span>
         </button>
         <button
-          id="nav-folders"
+          id="nav-organize"
           class="nav-button tap-scale"
-          data-tab="folders"
+          data-tab="organize"
         >
           <div class="nav-bg"></div>
           <i class="nav-icon" data-icon="folder-open"></i>
-          <span class="nav-label">Pastas</span>
+          <span class="nav-label">Organizar</span>
         </button>
         <button
           id="nav-autoclean"

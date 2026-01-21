@@ -20,7 +20,7 @@ const ACTIVITY_CONFIG = {
 
 const STORAGE_KEYS = {
   PREFIX: "@screenflow",
-  FOLDERS: "@screenflow:folders",
+  ORGANIZE: "@screenflow:organize",
   STATE: "@screenflow:state",
   ACTIVITIES: "@screenflow:activities",
   SETTINGS: "@screenflow:settings",

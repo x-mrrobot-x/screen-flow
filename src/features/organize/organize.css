@@ -130,14 +130,14 @@
   height: var(--icon-xs);
 }
 
-.folders-grid {
+.organize-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(40%, 1fr));
   gap: var(--space-sm);
 }
 
-/* Componente Folder (Pasta) */
-.folder-card {
+/* Componente Organize (Item de Organização) */
+.organize-card {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -152,8 +152,8 @@
   background: hsl(var(--card));
 }
 
-/* Parte Superior da Pasta (Visualização/Ícone) */
-.folder-top {
+/* Parte Superior do Item de Organização (Visualização/Ícone) */
+.organize-top {
   background-color: hsl(var(--card));
   flex-grow: 1;
   display: flex;
@@ -163,17 +163,17 @@
 }
 
 /* Badge de Categoria (Gravação/Screenshots + Qtd) */
-.folder-badges {
+.organize-badges {
   display: flex;
   align-items: center;
   margin-top: var(--space-md);
   border-radius: 20px;
   /* gap: var(--space-sm); */
   background-color: hsl(var(--secondary));
-  
+
 }
 
-.folder-badge {
+.organize-badge {
   display: flex;
   background-color: hsl(var(--secondary));
   color: hsl(var(--muted-foreground));
@@ -186,13 +186,13 @@
   box-shadow: 0 2px 5px hsl(var(--black) / 0.1);
 }
 
-.folder-badge svg {
+.organize-badge svg {
   width: var(--icon-md);
   height: var(--icon-sm);
 }
 
 /* Wrapper do Ícone Principal do App */
-.folder-app-icon {
+.organize-app-icon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -201,13 +201,13 @@
   /* margin-top: 10px; */
 }
 
-.folder-app-icon .folder-icon {
+.organize-app-icon .organize-icon {
   width: 5rem;
   height: 5rem;
 }
 
-/* Parte Inferior da Pasta (Detalhes) */
-.folder-bottom {
+/* Parte Inferior do Item de Organização (Detalhes) */
+.organize-bottom {
   background-color: hsl(var(--secondary) / 0.8);
   display: flex;
   flex-direction: column;
@@ -218,14 +218,14 @@
 }
 
 /* Linha de Informação (Nome + Menu) */
-.folder-info-row {
+.organize-info-row {
   display: flex;
   justify-content: space-between;
   width: 100%;
 }
 
-/* Nome da Pasta/App */
-.folder-name {
+/* Nome do Item de Organização/App */
+.organize-name {
   font-size: 15px;
   font-weight: 600;
   color: hsl(var(--foreground));
@@ -235,7 +235,7 @@
 }
 
 /* Menu de Ações (3 pontinhos) */
-.folder-menu-dots svg {
+.organize-menu-dots svg {
   width: 20px;
   height: 20px;
   fill: hsl(var(--muted-foreground));
@@ -243,12 +243,12 @@
   transition: fill 0.2s;
 }
 
-.folder-menu-dots svg:hover {
+.organize-menu-dots svg:hover {
   fill: hsl(var(--foreground));
 }
 
-/* Folder Actions Popup */
-.folder-actions-popup {
+/* Organize Actions Popup */
+.organize-actions-popup {
   position: absolute;
   top: 0; /*  in javascript */
   left: 50%;
@@ -262,11 +262,11 @@
   z-index: 1000;
 }
 
-.folder-actions-popup:active {
+.organize-actions-popup:active {
   filter: brightness(150%);
 }
 
-.folder-action-item {
+.organize-action-item {
   border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
@@ -280,17 +280,17 @@
 }
 
 
-.folder-action-item:hover {
+.organize-action-item:hover {
   background: hsl(var(--secondary));
 }
 
-.folder-action-item svg {
+.organize-action-item svg {
   width: var(--icon-sm);
   height: var(--icon-sm);
   flex-shrink: 0;
 }
 
-.folder-action-item span {
+.organize-action-item span {
   font-size: var(--font-xs);
   white-space: nowrap;
 }

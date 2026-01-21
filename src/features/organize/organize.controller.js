@@ -1,37 +1,37 @@
-const FoldersController = (function() {
+const OrganizeController = (function() {
   'use strict';
-  
+
   let isInitialized = false;
 
   function render() {
-    const folders = FoldersModel.getFolders();
-    const state = FoldersModel.getState();
-    FoldersView.render.folders(folders, state.activeFilter);
-    FoldersView.render.mediaCounter(folders, state.activeFilter);
-    FoldersView.render.filters(state.activeFilter);
+    const organizeItems = OrganizeModel.getOrganizeItems();
+    const state = OrganizeModel.getState();
+    OrganizeView.render.organizeItems(organizeItems, state.activeFilter);
+    OrganizeView.render.mediaCounter(organizeItems, state.activeFilter);
+    OrganizeView.render.filters(state.activeFilter);
   }
 
   const handlers = {
     onSearch: (e) => {
-      FoldersModel.setSearchTerm(e.target.value);
+      OrganizeModel.setSearchTerm(e.target.value);
       render();
     },
     onFilterClick: (e) => {
       const filter = e.target.closest('[data-filter]').dataset.filter;
-      FoldersModel.setFilter(filter);
+      OrganizeModel.setFilter(filter);
       render();
     },
     onCardClick: (e) => {
-      const folderCard = e.target.closest(FoldersConfig.SELECTORS.folderCard);
-      if (!folderCard) return;
-      
-      const folderId = folderCard.dataset.folderId;
-      if (!folderId) return;
+      const organizeCard = e.target.closest(OrganizeConfig.SELECTORS.organizeCard);
+      if (!organizeCard) return;
 
-      const menuDots = e.target.closest(FoldersConfig.SELECTORS.folderMenuDots);
+      const organizeId = organizeCard.dataset.organizeId;
+      if (!organizeId) return;
+
+      const menuDots = e.target.closest(OrganizeConfig.SELECTORS.organizeMenuDots);
       if (menuDots) {
         e.stopPropagation();
-        const menu = FoldersView.showActionsMenu(folderId, folderCard);
+        const menu = OrganizeView.showActionsMenu(organizeId, organizeCard);
         if(menu) {
           menu.addEventListener('click', handlers.onMenuClick);
         }
@@ -43,13 +43,13 @@ const FoldersController = (function() {
       if(!actionItem) return;
 
       const action = actionItem.dataset.action;
-      const popup = actionItem.closest(FoldersConfig.SELECTORS.folderActionsPopup);
-      const folderId = popup.dataset.folderId;
+      const popup = actionItem.closest(OrganizeConfig.SELECTORS.organizeActionsPopup);
+      const organizeId = popup.dataset.organizeId;
 
       if (action === 'clear') {
-        const activeFilter = FoldersModel.getState().activeFilter;
+        const activeFilter = OrganizeModel.getState().activeFilter;
         const type = activeFilter === 'all' ? 'both' : (activeFilter === 'screenshots' ? 'ss' : 'sr');
-        const removedCount = FoldersModel.clearFolderStats(folderId, type);
+        const removedCount = OrganizeModel.clearOrganizeStats(organizeId, type);
         if (removedCount > 0) {
           Toast.success(`${removedCount} item(ns) removido(s) com sucesso!`);
         }
@@ -58,26 +58,26 @@ const FoldersController = (function() {
       popup.remove();
     }
   };
-  
+
   function attachEventListeners() {
-    const searchInput = DOM.qs(FoldersConfig.SELECTORS.searchInput);
+    const searchInput = DOM.qs(OrganizeConfig.SELECTORS.searchInput);
     if(searchInput) searchInput.addEventListener('input', handlers.onSearch);
 
-    const filterButtons = DOM.qsa(FoldersConfig.SELECTORS.filterButtons);
+    const filterButtons = DOM.qsa(OrganizeConfig.SELECTORS.filterButtons);
     filterButtons.forEach(btn => btn.addEventListener('click', handlers.onFilterClick));
 
-    const grid = DOM.qs(FoldersConfig.SELECTORS.foldersGrid);
+    const grid = DOM.qs(OrganizeConfig.SELECTORS.organizeGrid);
     if(grid) grid.addEventListener('click', handlers.onCardClick);
   }
 
   function init() {
     if (isInitialized) return;
-    FoldersView.init(FoldersConfig.SELECTORS.CONTAINER);
+    OrganizeView.init(OrganizeConfig.SELECTORS.CONTAINER);
     render();
     attachEventListeners();
     isInitialized = true;
   }
-  
+
   return {
     init
   };

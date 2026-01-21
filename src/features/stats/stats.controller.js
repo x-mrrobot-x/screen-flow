@@ -28,7 +28,7 @@ const StatsController = (function() {
   function refresh() {
     const data = StatsModel.getState();
     StatsView.render.weeklyChart(data);
-    StatsView.render.foldersChart(data);
+    StatsView.render.organizeChart(data);
   }
 
   const handlers = {

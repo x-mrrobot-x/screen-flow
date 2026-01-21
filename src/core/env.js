@@ -1,13 +1,13 @@
 const STORAGE_CONFIG = {
-  FOLDERS: {
+  ORGANIZE: {
     web: {
       type: "localStorage",
-      key: "folders",
-      default: DEFAULT_FOLDERS
+      key: "organize",
+      default: DEFAULT_ORGANIZE_ITEMS
     },
     tasker: {
       type: "file",
-      path: "folders.json",
+      path: "organize.json",
       default: []
     }
   },

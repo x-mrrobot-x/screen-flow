@@ -12,13 +12,13 @@
   color: hsl(var(--muted-foreground));
 }
 
-.folder-clean-list {
+.organize-item-clean-list {
   display: flex;
   flex-direction: column;
   margin-top: var(--space-lg);
 }
 
-.folder-clean-card {
+.organize-item-clean-card {
   background: hsl(var(--card));
   border: 1px solid hsl(var(--border));
   border-radius: var(--radius-lg);
@@ -27,33 +27,33 @@
   margin-top: var(--space-md);
 }
 
-.folder-clean-card.enabled {
+.organize-item-clean-card.enabled {
   box-shadow: 0 0 0 1px hsl(var(--primary) / 0.2);
 }
 
-.folder-clean-header {
+.organize-item-clean-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.folder-clean-info {
+.organize-item-clean-info {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
 }
 
-.folder-clean-info .folder-icon {
+.organize-item-clean-info .organize-icon {
   width: 5rem;
   height: 5rem;
 }
 
-.folder-clean-info span {
+.organize-item-clean-info span {
   font-weight: 500;
   color: hsl(var(--foreground));
 }
 
-.folder-clean-switches {
+.organize-item-clean-switches {
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
@@ -103,12 +103,12 @@
   font-size: var(--font-sm);
 }
 
-.folder-clean-options {
+.organize-item-clean-options {
   margin-top: var(--space-sm);
   border-top: 1px solid hsl(var(--border));
 }
 
-.folder-clean-options p {
+.organize-item-clean-options p {
   font-size: var(--font-xs);
   color: hsl(var(--muted-foreground));
   margin-bottom: var(--space-xs);

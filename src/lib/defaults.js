@@ -74,7 +74,7 @@ const DEFAULT_ACTIVITIES = [
   }
 ];
 
-const DEFAULT_FOLDERS = [
+const DEFAULT_ORGANIZE_ITEMS = [
   {
     id: "1",
     name: "YouTube",

@@ -115,25 +115,25 @@ const StatsView = (function () {
       }
       });
     },
-    foldersChart: data => {
-      if (charts.folders) {
-        charts.folders.destroy();
+    organizeChart: data => {
+      if (charts.organize) {
+        charts.organize.destroy();
       }
       const colors = getThemeColors();
-      const topFolders = data.topFolders.map(({ name, count }, index) => ({
+      const topOrganizeItems = data.topOrganizeItems.map(({ name, count }, index) => ({
         name,
         count,
         color:
           StatsConfig.COLOR_PALETTE[index % StatsConfig.COLOR_PALETTE.length]
       }));
-      charts.folders = new Chart(elements.foldersChart, {
+      charts.organize = new Chart(elements.organizeChart, {
         type: "bar",
         data: {
-          labels: topFolders.map(f => f.name),
+          labels: topOrganizeItems.map(f => f.name),
           datasets: [
             {
-              data: topFolders.map(f => f.count),
-              backgroundColor: topFolders.map(f => f.color),
+              data: topOrganizeItems.map(f => f.count),
+              backgroundColor: topOrganizeItems.map(f => f.color),
               borderWidth: 1,
               borderColor: colors.border,
               borderRadius: 4,
@@ -188,7 +188,7 @@ const StatsView = (function () {
     complete: data => {
       render.mediaTypeUI(data.activeMediaType);
       render.weeklyChart(data);
-      render.foldersChart(data);
+      render.organizeChart(data);
       const activities = AppState.getActivities();
       render.activityCard(activities);
     }

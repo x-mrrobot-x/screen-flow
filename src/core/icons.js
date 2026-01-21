@@ -99,10 +99,10 @@ const Icons = (function () {
     return buildSvg(content, mergedAttrs);
   }
 
-  function getFolderIcon(folder, attrs = {}) {
+  function getOrganizeIcon(item, attrs = {}) {
     const className = attrs.class ? ` ${attrs.class}` : "";
 
-    return `<img src="src/assets/icons/${folder.pkg}.png" alt="${folder.name}" class="folder-icon${className}" onerror="this.onerror=null; this.src='src/assets/icons/default.png';"
+    return `<img src="src/assets/icons/${item.pkg}.png" alt="${item.name}" class="organize-icon${className}" onerror="this.onerror=null; this.src='src/assets/icons/default.png';"
     />`;
   }
 
@@ -122,7 +122,7 @@ const Icons = (function () {
 
   return {
     get: getIcon,
-    getFolderIcon,
+    getOrganizeIcon,
     init
   };
 })();

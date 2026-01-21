@@ -4,18 +4,18 @@ const AutoCleanController = (function() {
   let isInitialized = false;
 
   function render() {
-    const folders = AutoCleanModel.getFolders();
+    const organizeItems = AutoCleanModel.getOrganizeItems();
     const state = AutoCleanModel.getState();
-    AutoCleanView.render.autoclean(folders, state.autoCleanup);
+    AutoCleanView.render.autoclean(organizeItems, state.autoCleanup);
   }
 
   const handlers = {
     handleEvent: (e) => {
-      const folderCard = e.target.closest(".folder-clean-card");
-      if (!folderCard) return;
+      const organizeItemCard = e.target.closest(".organize-item-clean-card");
+      if (!organizeItemCard) return;
 
-      const folderId = folderCard.getAttribute("data-folder-id");
-      if (!folderId) return;
+      const organizeItemId = organizeItemCard.getAttribute("data-organize-item-id");
+      if (!organizeItemId) return;
 
       const actionBtn = e.target.closest('[data-action]');
       if (!actionBtn) return;
@@ -25,13 +25,13 @@ const AutoCleanController = (function() {
       const mediaType = actionBtn.getAttribute("data-media-type");
 
       switch (action) {
-        case "toggleFolderClean":
-          AutoCleanModel.toggleFolderClean(folderId, mediaType);
+        case "toggleOrganizeItemClean":
+          AutoCleanModel.toggleOrganizeItemClean(organizeItemId, mediaType);
           render();
           break;
-        case "setFolderDays":
+        case "setOrganizeItemDays":
           const days = parseInt(actionBtn.getAttribute("data-days"));
-          AutoCleanModel.setFolderDays(folderId, mediaType, days);
+          AutoCleanModel.setOrganizeItemDays(organizeItemId, mediaType, days);
           render();
           break;
       }
@@ -48,9 +48,9 @@ const AutoCleanController = (function() {
       autoCleanupSwitch.addEventListener("click", handlers.toggleAutoCleanup);
     }
 
-    const folderCleanList = DOM.qs(AutoCleanConfig.SELECTORS.folderCleanList);
-    if (folderCleanList) {
-      folderCleanList.addEventListener("click", handlers.handleEvent);
+    const organizeItemCleanList = DOM.qs(AutoCleanConfig.SELECTORS.folderCleanList);
+    if (organizeItemCleanList) {
+      organizeItemCleanList.addEventListener("click", handlers.handleEvent);
     }
   }
 

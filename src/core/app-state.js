@@ -4,12 +4,12 @@ const AppState = (() => {
   let stats = {};
   let settings = {};
   let activities = [];
-  let folders = [];
+  let organizeItems = [];
 
   function init() {
     settings = ENV.get("SETTINGS");
     stats = ENV.get("STATS");
-    folders = ENV.get("FOLDERS");
+    organizeItems = ENV.get("ORGANIZE");
     activities = ENV.get("ACTIVITIES");
   }
 
@@ -18,7 +18,7 @@ const AppState = (() => {
   let settingsTimer = null;
 
   const persist = {
-    folders: () => ENV.set("FOLDERS", folders),
+    organizeItems: () => ENV.set("ORGANIZE", organizeItems),
 
     settings: () => {
       clearTimeout(settingsTimer);
@@ -36,11 +36,11 @@ const AppState = (() => {
   return {
     init,
 
-    // Folders
-    getFolders: () => [...folders],
-    setFolders(newFolders) {
-      folders = [...newFolders];
-      persist.folders();
+    // Organize Items
+    getOrganizeItems: () => [...organizeItems],
+    setOrganizeItems(newOrganizeItems) {
+      organizeItems = [...newOrganizeItems];
+      persist.organizeItems();
     },
 
     // Activities
@@ -98,12 +98,12 @@ const AppState = (() => {
     resetConfig() {
       settings = DEFAULT_SETTINGS;
       stats = JSON.parse(JSON.stringify(DEFAULT_STATS));
-      folders = JSON.parse(JSON.stringify(DEFAULT_FOLDERS));
+      organizeItems = JSON.parse(JSON.stringify(DEFAULT_ORGANIZE_ITEMS));
       activities = JSON.parse(JSON.stringify(DEFAULT_ACTIVITIES));
 
       persist.settings();
       persist.stats();
-      persist.folders();
+      persist.organizeItems();
       persist.activities();
     },
 
@@ -111,12 +111,12 @@ const AppState = (() => {
       try {
         settings = DEFAULT_SETTINGS;
         stats = JSON.parse(JSON.stringify(DEFAULT_STATS));
-        folders = JSON.parse(JSON.stringify(DEFAULT_FOLDERS));
+        organizeItems = JSON.parse(JSON.stringify(DEFAULT_ORGANIZE_ITEMS));
         activities = JSON.parse(JSON.stringify(DEFAULT_ACTIVITIES));
 
         persist.settings();
         persist.stats();
-        persist.folders();
+        persist.organizeItems();
         persist.activities();
         return true;
       } catch (error) {
@@ -126,9 +126,9 @@ const AppState = (() => {
     },
 
     // Utils
-    getTopFoldersByType(type) {
+    getTopOrganizeItemsByType(type) {
       const key = type === "screenshots" ? "ss" : "sr";
-      return [...folders]
+      return [...organizeItems]
         .sort((a, b) => b.stats[key] - a.stats[key])
         .slice(0, 5)
         .map(f => ({ name: f.name, count: f.stats[key] }));
