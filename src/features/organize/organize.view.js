@@ -126,7 +126,7 @@ const OrganizeView = (function () {
 
   function showActionsMenu(folderId, folderCard) {
     const existingMenu = DOM.qs(
-      `.organize-actions-popup[data-folder-id="${folderId}"]`
+      `.folder-actions-popup[data-folder-id="${folderId}"]`
     );
     if (existingMenu) {
       existingMenu.remove();

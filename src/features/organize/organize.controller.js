@@ -11,6 +11,8 @@ const OrganizeController = (function() {
     OrganizeView.render.filters(state.activeFilter);
   }
 
+  let currentPopupMenu = null;
+
   const handlers = {
     onSearch: (e) => {
       OrganizeModel.setSearchTerm(e.target.value);
@@ -31,8 +33,16 @@ const OrganizeController = (function() {
       const menuDots = e.target.closest(OrganizeConfig.SELECTORS.folderMenuDots);
       if (menuDots) {
         e.stopPropagation();
+
+        // Close any existing popup menu
+        if (currentPopupMenu) {
+          currentPopupMenu.remove();
+          currentPopupMenu = null;
+        }
+
         const menu = OrganizeView.showActionsMenu(folderId, folderCard);
         if(menu) {
+          currentPopupMenu = menu;
           menu.addEventListener('click', handlers.onMenuClick);
         }
       }
@@ -56,6 +66,14 @@ const OrganizeController = (function() {
         render();
       }
       popup.remove();
+      currentPopupMenu = null;
+    },
+    onDocumentClick: (e) => {
+      // Close popup if clicked outside
+      if (currentPopupMenu && !currentPopupMenu.contains(e.target)) {
+        currentPopupMenu.remove();
+        currentPopupMenu = null;
+      }
     }
   };
 
@@ -68,6 +86,14 @@ const OrganizeController = (function() {
 
     const grid = DOM.qs(OrganizeConfig.SELECTORS.foldersGrid);
     if(grid) grid.addEventListener('click', handlers.onCardClick);
+
+    // Add document click listener to close popup when clicking outside
+    document.addEventListener('click', handlers.onDocumentClick);
+  }
+
+  function cleanupEventListeners() {
+    // Remove document click listener when cleaning up
+    document.removeEventListener('click', handlers.onDocumentClick);
   }
 
   function init() {
@@ -78,7 +104,15 @@ const OrganizeController = (function() {
     isInitialized = true;
   }
 
+  function destroy() {
+    if (!isInitialized) return;
+    cleanupEventListeners();
+    currentPopupMenu = null;
+    isInitialized = false;
+  }
+
   return {
-    init
+    init,
+    destroy
   };
 })();

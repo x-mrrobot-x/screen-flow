@@ -186,7 +186,7 @@
   box-shadow: 0 2px 5px hsl(var(--black) / 0.1);
 }
 
-.organize-badge svg {
+.folder-badge svg {
   width: var(--icon-md);
   height: var(--icon-sm);
 }
@@ -243,7 +243,7 @@
   transition: fill 0.2s;
 }
 
-.organize-menu-dots svg:hover {
+.folder-menu-dots svg:hover {
   fill: hsl(var(--foreground));
 }
 
@@ -262,7 +262,7 @@
   z-index: 1000;
 }
 
-.organize-actions-popup:active {
+.folder-actions-popup:active {
   filter: brightness(150%);
 }
 
@@ -280,17 +280,17 @@
 }
 
 
-.organize-action-item:hover {
+.folder-action-item:hover {
   background: hsl(var(--secondary));
 }
 
-.organize-action-item svg {
+.folder-action-item svg {
   width: var(--icon-sm);
   height: var(--icon-sm);
   flex-shrink: 0;
 }
 
-.organize-action-item span {
+.folder-action-item span {
   font-size: var(--font-xs);
   white-space: nowrap;
 }
