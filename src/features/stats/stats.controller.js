@@ -33,7 +33,8 @@ const StatsController = (function() {
 
   const handlers = {
     onMediaTypeChange: (e) => {
-      const mediaType = e.target.dataset.mediaType;
+      const button = e.target.closest('.media-type-button');
+      const mediaType = button?.dataset.mediaType;
       if (mediaType) {
         StatsModel.setMediaType(mediaType);
         const data = StatsModel.getState();
