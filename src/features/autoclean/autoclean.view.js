@@ -34,7 +34,7 @@ const AutoCleanView = (function() {
         <div class="folder-clean-card ${enabledClass} animate-fade-in-left delay-${index % 10}" data-folder-id="${folder.id}">
           <div class="folder-clean-header">
             <div class="folder-clean-info">
-              ${Icons.getOrganizeIcon(folder)}
+              ${Icons.getFolderIcon(folder)}
               <span>${folder.name}</span>
             </div>
             <div class="folder-clean-switches">
@@ -58,9 +58,9 @@ const AutoCleanView = (function() {
   };
 
   const render = {
-    counts: (organizeItems, autoCleanup) => {
-      const screenshotsCount = organizeItems.filter(f => f.autoClean.ss.on).length;
-      const recordingsCount = organizeItems.filter(f => f.autoClean.sr.on).length;
+    counts: (folders, autoCleanup) => {
+      const screenshotsCount = folders.filter(f => f.autoClean.ss.on).length;
+      const recordingsCount = folders.filter(f => f.autoClean.sr.on).length;
 
       if (autoCleanup) {
         elements.autocleanCountText.innerHTML = `<span class="subtitle-item"><span class="dot dot-screenshot"></span>${screenshotsCount} pastas com limpeza de capturas</span>, <span class="subtitle-item"><span class="dot dot-recording"></span>${recordingsCount} com limpeza de gravações</span>`;

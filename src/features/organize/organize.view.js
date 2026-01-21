@@ -38,7 +38,7 @@ const OrganizeView = (function () {
             ${templates.organizeBadges(folder, activeFilter)}
           </div>
           <div class="folder-app-icon">
-            ${Icons.getOrganizeIcon(folder)}
+            ${Icons.getFolderIcon(folder)}
           </div>
         </div>
         <div class="folder-bottom">
