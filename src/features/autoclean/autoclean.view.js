@@ -16,13 +16,13 @@ const AutoCleanView = (function() {
 
       let optionsHtml = config.DAY_OPTIONS.map(days => {
         const activeClass = currentDays === days ? "active" : "";
-        return `<button class="day-button tap-scale ${activeClass}" data-action="setFolderDays" data-media-type="${mediaType}" data-days="${days}">${days} dias</button>`;
+        return `<button class="clean-day-button tap-scale ${activeClass}" data-action="setFolderDays" data-media-type="${mediaType}" data-days="${days}">${days} dias</button>`;
       }).join('');
 
       return `
-        <div class="clean-option-group" id="${optionId}">
+        <div class="folder-clean-group" id="${optionId}">
           <p>${label} - Remover após:</p>
-          <div class="days-options">${optionsHtml}</div>
+          <div class="clean-days-options">${optionsHtml}</div>
         </div>
       `;
     },

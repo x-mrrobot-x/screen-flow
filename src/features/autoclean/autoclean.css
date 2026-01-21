@@ -114,29 +114,28 @@
   margin-bottom: var(--space-xs);
 }
 
-.clean-option-group {
+.folder-clean-group {
   padding-top: var(--space-xs);
   transition: all 0.3s ease;
   opacity: 1;
 }
 
-.days-options {
+.clean-days-options {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-xs);
 }
 
-.day-button {
+.clean-day-button {
+  flex: 1;
   padding: 0.6rem var(--space-sm);
   border-radius: var(--radius-xs);
-  font-size: var(--font-sm);
+  font-size: var(--font-xs);
   font-weight: 500;
   transition: all 0.2s ease;
-  border: none;
-  cursor: pointer;
 }
 
-.day-button.active {
+.clean-day-button.active {
   background: linear-gradient(
     135deg,
     hsl(var(--primary)) 0%,
@@ -145,7 +144,7 @@
   color: hsl(var(--primary-foreground));
 }
 
-.day-button:not(.active) {
+.clean-day-button:not(.active) {
   background: hsl(var(--secondary));
   color: hsl(var(--muted-foreground));
 }
