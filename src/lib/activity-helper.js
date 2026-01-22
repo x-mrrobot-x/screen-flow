@@ -14,6 +14,13 @@ const ActivityHelper = (() => {
           data.execution === "manual" ? "removidos por usuário" : "removidos"
         }`
     },
+    "clean-folder": {
+      icon: "folder-minus",
+      color: "orange",
+      getTitle: data => "Limpeza de Pasta",
+      getDescription: data =>
+        `${data.count || 0} arquivos removidos da pasta "${data.folder}"`
+    },
     organize: {
       icon: "folder",
       color: "orange",

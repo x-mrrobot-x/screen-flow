@@ -3,6 +3,10 @@ const ACTIVITY_CONFIG = {
     icon: "sparkles",
     color: "yellow"
   },
+  "clean-folder": {
+    icon: "folder-minus",
+    color: "orange"
+  },
   organize: {
     icon: "folder",
     color: "orange"

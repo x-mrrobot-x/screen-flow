@@ -60,11 +60,18 @@ const OrganizeController = (function() {
         const activeFilter = OrganizeModel.getState().activeFilter;
         const type = activeFilter === 'all' ? 'both' : (activeFilter === 'screenshots' ? 'ss' : 'sr');
         const removedCount = OrganizeModel.clearFolderStats(folderId, type);
+
+        // Get folder name for the activity
+        const folders = OrganizeModel.getFolders();
+        const folder = folders.find(f => f.id === folderId);
+        const folderName = folder ? folder.name : 'Unknown';
+
         if (removedCount > 0) {
           AppState.addActivity({
-            type: "clean",
+            type: "clean-folder",
             count: removedCount,
             execution: "manual",
+            folder: folderName,
             timestamp: Date.now()
           });
 
