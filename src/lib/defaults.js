@@ -29,6 +29,7 @@ const DEFAULT_ACTIVITIES = [
     type: "organize",
     count: 34,
     execution: "manual",
+    mediaType: "screenshots",
     timestamp: Date.now() - 5 * 60 * 60 * 1000
   },
   {
@@ -36,6 +37,7 @@ const DEFAULT_ACTIVITIES = [
     type: "organize",
     count: 245,
     execution: "auto",
+    mediaType: "recordings",
     timestamp: Date.now() - 8 * 60 * 60 * 1000
   },
   {

@@ -7,7 +7,7 @@ const STORAGE_CONFIG = {
     },
     tasker: {
       type: "file",
-      path: "folders.json",
+      path: "data/folders.json",
       default: []
     }
   },
@@ -19,7 +19,7 @@ const STORAGE_CONFIG = {
     },
     tasker: {
       type: "file",
-      path: "settings.json",
+      path: "data/settings.json",
       default: {}
     }
   },
@@ -31,7 +31,7 @@ const STORAGE_CONFIG = {
     },
     tasker: {
       type: "file",
-      path: "stats.json",
+      path: "data/stats.json",
       default: {}
     }
   },
@@ -43,7 +43,7 @@ const STORAGE_CONFIG = {
     },
     tasker: {
       type: "file",
-      path: "activities.json",
+      path: "data/activities.json",
       default: []
     }
   },
@@ -55,7 +55,7 @@ const STORAGE_CONFIG = {
     },
     tasker: {
       type: "file",
-      pathTemplate: "translations/{lang}.json",
+      pathTemplate: "i18n/{lang}.json",
       default: {}
     }
   }
@@ -77,13 +77,13 @@ const ENV = (() => {
 
   // ===== AMBIENTE WEB =====
   const web = {
+    getWorkDir: () => "",
     get(key, params = {}) {
       try {
         const cfg = STORAGE_CONFIG[key].web;
         if (cfg.type === "fetch") {
           throw new Error(`Use getAsync para ${key}`);
         }
-
         const content = localStorage.getItem(storagePrefix + cfg.key);
         return content ? JSON.parse(content) : getDefault(key);
       } catch (e) {
@@ -131,14 +131,14 @@ const ENV = (() => {
 
   // ===== AMBIENTE TASKER =====
   const tasker = {
-    WORKDIR: "/sdcard/Tasker/app_data/",
+    getWorkDir: () => tk.local("%work_dir") + "/",
 
     getPath(key, params = {}) {
       const cfg = STORAGE_CONFIG[key].tasker;
       const relative = cfg.pathTemplate
         ? resolvePath(cfg.pathTemplate, params)
         : cfg.path;
-      return this.WORKDIR + relative;
+      return this.getWorkDir() + relative;
     },
 
     get(key, params = {}) {
@@ -172,6 +172,7 @@ const ENV = (() => {
     isWeb,
     get: (key, params) => env.get(key, params),
     getAsync: (key, params) => env.getAsync(key, params),
-    set: (key, data, params) => env.set(key, data, params)
+    set: (key, data, params) => env.set(key, data, params),
+    getWorkDir: env.getWorkDir
   };
 })();

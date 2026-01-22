@@ -24,14 +24,17 @@ const ActivityHelper = (() => {
     organize: {
       icon: "folder",
       color: "orange",
-      getTitle: data =>
-        data.execution === "auto"
-          ? "Organização automática"
-          : "Organização manual",
-      getDescription: data => {
-        const base = `${data.count || 0} arquivos`;
+      getTitle: data => {
+        const mediaType = data.mediaType === "recordings" ? "gravações" : "capturas";
         return data.execution === "auto"
-          ? `${base} organizados automaticamente`
+          ? `Organização automática de ${mediaType}`
+          : `Organização manual de ${mediaType}`;
+      },
+      getDescription: data => {
+        const mediaType = data.mediaType === "recordings" ? "gravações" : "capturas";
+        const base = `${data.count || 0} ${mediaType} organizadas`;
+        return data.execution === "auto"
+          ? `${base} organizadas automaticamente`
           : base;
       }
     },
@@ -50,6 +53,18 @@ const ActivityHelper = (() => {
       },
       getIcon: data => (data.enabled ? "toggle-right" : "toggle-left"),
       getColor: data => (data.enabled ? "green" : "gray")
+    },
+    "auto-clean-folder-toggle": {
+      icon: "toggle-right",
+      color: "blue",
+      getTitle: data =>
+        data.enabled ? "Limpeza automática ativada" : "Limpeza automática desativada",
+      getDescription: data => {
+        const mediaType = data.feature.includes("screenshots") ? "capturas de tela" : "gravações de tela";
+        return `Limpeza automática de ${mediaType} ${data.enabled ? "ativada" : "desativada"} na pasta "${data.folder}"`;
+      },
+      getIcon: data => (data.enabled ? "toggle-right" : "toggle-left"),
+      getColor: data => (data.enabled ? "blue" : "gray")
     }
   };
 

@@ -30,9 +30,9 @@ const AutoCleanModel = (function() {
       const isEnabled = mediaType === "screenshots" ? folder.autoClean.ss.on : folder.autoClean.sr.on;
 
       AppState.addActivity({
-        type: "feature-toggle",
+        type: "auto-clean-folder-toggle",
         feature: `auto-clean-folder-${actionType}`,
-        folderName: folder.name,
+        folder: folder.name,
         enabled: isEnabled
       });
     }

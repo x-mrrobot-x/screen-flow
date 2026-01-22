@@ -64,6 +64,7 @@ const ProcessController = (function() {
         type: "organize",
         count: organizedCount,
         execution: "manual", // Since these are quick actions initiated by user
+        mediaType: processType, // screenshots or recordings
         timestamp: Date.now()
       });
 
