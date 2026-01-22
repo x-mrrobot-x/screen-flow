@@ -7,7 +7,8 @@ const ProcessConfig = {
     percent: "#modal-percent",
     stepsContainer: "#modal-steps-container",
     completion: "#modal-completion",
-    resultText: "#modal-result-text"
+    resultText: "#modal-result-text",
+    closeBtn: "#process-modal-close"
   },
   PROCESS_TYPES: {
     screenshots: {

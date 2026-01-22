@@ -20,6 +20,7 @@
 
     <!-- Feature CSS -->
     <link rel="stylesheet" href="src/features/dashboard/dashboard.css" />
+    <link rel="stylesheet" href="src/features/dashboard/process/process.css" />
     <link rel="stylesheet" href="src/features/stats/stats.css" />
     <link rel="stylesheet" href="src/features/autoclean/autoclean.css" />
     <link rel="stylesheet" href="src/features/organize/organize.css" />
@@ -667,8 +668,11 @@
     <dialog id="process-modal" class="modal">
       <header class="modal-header">
         <h2 class="modal-title" id="modal-title">Processando</h2>
+        <button type="button" id="process-modal-close" class="modal-close">
+          <i data-icon="x"></i>
+        </button>
       </header>
-      
+
       <div class="modal-body">
         <div class="progress-bar-container">
           <div
@@ -681,17 +685,16 @@
           <span id="modal-step-label">Iniciando...</span>
           <span id="modal-percent">0%</span>
         </div>
-        <div id="modal-steps-container" class="process-steps"></div>
+        <div id="modal-steps-container" class="process-steps-container"></div>
         <div
           id="modal-completion"
-          class="process-complete animate-fade-in-up"
-          style="display: none"
+          class="process-completion"
         >
-          <div class="process-complete-icon">
+          <div class="completion-icon">
             <i data-icon="check"></i>
           </div>
-          <p class="process-complete-title">Processo Concluído!</p>
-          <p id="modal-result-text" class="process-complete-stats"></p>
+          <p class="completion-title">Processo Finalizado!</p>
+          <p id="modal-result-text" class="completion-text"></p>
         </div>
       </div>
     </dialog>

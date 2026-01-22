@@ -1,12 +1,25 @@
 const ProcessView = (function() {
   'use strict';
-  
+
   const elements = {};
 
   function init() {
     for (const key in ProcessConfig.SELECTORS) {
       elements[key] = DOM.qs(ProcessConfig.SELECTORS[key]);
     }
+    // Add close button event listener
+    if (elements.closeBtn) {
+      elements.closeBtn.addEventListener('click', () => {
+        Modal.hide(elements.modal);
+      });
+    }
+
+    // Add backdrop click event listener to close modal
+    elements.modal.addEventListener('click', (e) => {
+      if (e.target === elements.modal) {
+        Modal.hide(elements.modal);
+      }
+    });
   }
 
   function show() {
@@ -14,6 +27,12 @@ const ProcessView = (function() {
   }
 
   function hide() {
+    // Notify controller that the process should be cancelled
+    if (typeof ProcessController !== 'undefined' && ProcessController.cancelCurrentProcess) {
+      ProcessController.cancelCurrentProcess();
+    }
+    // Reset the modal to initial state when hiding to prevent interference
+    reset();
     Modal.hide(elements.modal);
   }
 
@@ -23,7 +42,7 @@ const ProcessView = (function() {
     elements.stepLabel.textContent = "Iniciando...";
     elements.percent.textContent = "0%";
     elements.stepsContainer.innerHTML = "";
-    elements.completion.style.display = "none";
+    elements.completion.classList.remove("show");
   }
 
   function updateProgress(percent) {
@@ -31,20 +50,17 @@ const ProcessView = (function() {
     elements.percent.textContent = `${Math.round(percent)}%`;
   }
 
+  function updateStepLabel(label) {
+    elements.stepLabel.textContent = label;
+  }
+
   function addStep(step, isCompleted) {
-    const stepClass = isCompleted ? "step-item completed" : "step-item";
-    const icon = isCompleted ? Icons.get('check') : Icons.get('loader');
-    const stepHtml = `
-      <div class="${stepClass}">
-        <div class="step-icon">${icon}</div>
-        <span>${step.label}</span>
-      </div>
-    `;
-    elements.stepsContainer.innerHTML += stepHtml;
+    // This function is kept for compatibility but the actual step creation
+    // is handled in the controller to show all steps as incomplete first
   }
 
   function showCompletion(resultText) {
-    elements.completion.style.display = "block";
+    elements.completion.classList.add("show");
     elements.resultText.textContent = resultText;
   }
 
@@ -54,6 +70,7 @@ const ProcessView = (function() {
     hide,
     reset,
     updateProgress,
+    updateStepLabel,
     addStep,
     showCompletion
   };
