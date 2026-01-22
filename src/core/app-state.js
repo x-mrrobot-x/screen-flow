@@ -94,6 +94,31 @@ const AppState = (() => {
       persist.stats();
     },
 
+    updateStatsFromProcess(result) {
+      const {
+        organizedCount = 0,
+        cleanedCount = 0,
+        pendingFiles,
+        processType
+      } = result;
+
+      if (processType === "organize") {
+        stats.lastOrganized = Date.now();
+        stats.organizedCaptures =
+          (stats.organizedCaptures || 0) + organizedCount;
+      } else if (processType === "cleanup") {
+        stats.lastCleanup = Date.now();
+        stats.removedCaptures = (stats.removedCaptures || 0) + cleanedCount;
+      }
+
+      if (pendingFiles !== undefined) {
+        stats.pendingFiles = pendingFiles;
+      }
+
+      persist.stats();
+      EventBus.emit("stats:updated");
+    },
+
     // Reset & Delete
     resetConfig() {
       settings = DEFAULT_SETTINGS;

@@ -43,19 +43,36 @@ const ProcessController = (function() {
   function finishProcess() {
     let completionText = "Processo finalizado com sucesso!";
     const processType = state.processType;
+    
+    let organizedCount = 0;
+    let cleanedCount = 0;
+    
+    const pendingFiles = Math.floor(Math.random() * 50);
 
-    if (processType === 'screenshots') {
-      completionText = `Organização de capturas concluída! 42 arquivos organizados.`;
-    } else if (processType === 'recordings') {
-      completionText = `Organização de gravações concluída! 18 arquivos organizados.`;
+    if (processType === 'screenshots' || processType === 'recordings') {
+      organizedCount = Math.floor(Math.random() * 50) + 10;
+      completionText = `Organização concluída! ${organizedCount} arquivos organizados.`;
+      
+      AppState.updateStatsFromProcess({
+        organizedCount,
+        pendingFiles,
+        processType: 'organize',
+      });
+
     } else if (processType === 'cleanup') {
-      completionText = `Limpeza concluída! 25 arquivos removidos.`;
+      cleanedCount = Math.floor(Math.random() * 30) + 5;
+      completionText = `Limpeza concluída! ${cleanedCount} arquivos removidos.`;
+      
+      AppState.updateStatsFromProcess({
+        cleanedCount,
+        pendingFiles,
+        processType: 'cleanup'
+      });
     }
 
     ProcessView.showCompletion(completionText);
     ProcessView.updateStepLabel("Processo concluído!");
 
-    // Mark process as not running, but don't close the modal
     state.isRunning = false;
     clearTimeout(state.timeoutId);
     state.timeoutId = null;

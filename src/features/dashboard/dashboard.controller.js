@@ -31,9 +31,11 @@ const DashboardController = (function() {
   }
   
   function attachEventListeners() {
+    EventBus.on("stats:updated", refresh);
   }
 
   function detachEventListeners() {
+    EventBus.off("stats:updated", refresh);
   }
   
   function destroy() {
