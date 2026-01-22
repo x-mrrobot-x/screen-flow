@@ -55,6 +55,7 @@ const AppState = (() => {
         ...activities.slice(0, 9)
       ];
       persist.activities();
+      EventBus.emit("appstate:changed", { key: "activities" });
     },
 
     // Settings (configurações do usuário)

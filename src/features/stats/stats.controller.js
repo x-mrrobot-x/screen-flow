@@ -56,6 +56,7 @@ const StatsController = (function() {
     mediaButtons.forEach(btn => {
       btn.addEventListener('click', handlers.onMediaTypeChange);
     });
+    EventBus.on("appstate:changed", handlers.onStateChange);
   }
   
   function detachEventListeners() {
@@ -63,6 +64,7 @@ const StatsController = (function() {
     mediaButtons.forEach(btn => {
       btn.removeEventListener('click', handlers.onMediaTypeChange);
     });
+    EventBus.off("appstate:changed", handlers.onStateChange);
   }
   
   function destroy() {
