@@ -30,13 +30,8 @@ const SettingsModel = (function() {
         feature: "auto-organize",
         enabled: value
       });
-    } else {
-      AppState.addActivity({
-        type: "settings",
-        setting: key,
-        value: value
-      });
     }
+    // Skip logging other settings since we removed the settings type
   }
 
   function resetAllSettings() {

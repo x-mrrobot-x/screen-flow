@@ -6,43 +6,26 @@ const ActivityHelper = (() => {
       icon: "sparkles",
       color: "yellow",
       getTitle: data => {
-        if (data.scheduled) return "Limpeza agendada";
-        if (data.manual) return "Limpeza manual";
+        if (data.execution === "manual") return "Limpeza manual";
         return "Limpeza automática";
       },
       getDescription: data =>
         `${data.count || 0} arquivos ${
-          data.manual
-            ? "removidos por usuário"
-            : data.scheduled
-            ? "antigos removidos"
-            : "removidos"
+          data.execution === "manual" ? "removidos por usuário" : "removidos"
         }`
     },
     organize: {
       icon: "folder",
       color: "orange",
-      getTitle: data => (data.auto ? "Organização em massa" : "Organização"),
+      getTitle: data =>
+        data.execution === "auto"
+          ? "Organização automática"
+          : "Organização manual",
       getDescription: data => {
-        const base = `${data.count || 0} ${data.category || "arquivos"}`;
-        return data.auto ? `${base} organizados automaticamente` : base;
-      }
-    },
-    settings: {
-      icon: "settings",
-      color: "blue",
-      getTitle: () => "Alteração de configurações",
-      getDescription: data => {
-        const settingNames = {
-          "dark-mode": "Modo escuro",
-          notifications: "Notificações",
-          "auto-backup": "Backup automático",
-          "auto-organize": "Auto-organização",
-          "auto-cleanup": "Auto-limpeza",
-          "animations-enabled": "Animações"
-        };
-        const name = settingNames[data.setting] || data.setting;
-        return `${name} ${data.value ? "ativado" : "desativado"}`;
+        const base = `${data.count || 0} arquivos`;
+        return data.execution === "auto"
+          ? `${base} organizados automaticamente`
+          : base;
       }
     },
     "feature-toggle": {
@@ -52,11 +35,8 @@ const ActivityHelper = (() => {
         data.enabled ? "Recursos ativados" : "Recursos desativados",
       getDescription: data => {
         const featureNames = {
-          "auto-organize": "Auto-organização",
-          "auto-clean": "Auto-limpeza",
-          "smart-sort": "Ordenação inteligente",
-          notifications: "Notificações",
-          animations: "Animações"
+          "auto-organize": "Organização Automática",
+          "auto-clean": "Limpeza Automática"
         };
         const name = featureNames[data.feature] || data.feature;
         return `${name} ${data.enabled ? "ativada" : "desativada"}`;

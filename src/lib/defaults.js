@@ -21,52 +21,46 @@ const DEFAULT_ACTIVITIES = [
     id: "1",
     type: "clean",
     count: 156,
+    execution: "auto",
     timestamp: Date.now() - 2 * 60 * 60 * 1000
   },
   {
     id: "2",
     type: "organize",
     count: 34,
-    category: "screenshots do Instagram",
+    execution: "manual",
     timestamp: Date.now() - 5 * 60 * 60 * 1000
   },
   {
     id: "3",
     type: "organize",
     count: 245,
-    auto: true,
+    execution: "auto",
     timestamp: Date.now() - 8 * 60 * 60 * 1000
   },
   {
     id: "4",
     type: "clean",
     count: 12,
-    scheduled: true,
+    execution: "auto",
     timestamp: Date.now() - 1 * 24 * 60 * 60 * 1000
   },
   {
     id: "5",
     type: "clean",
     count: 67,
-    manual: true,
+    execution: "manual",
     timestamp: Date.now() - 1.5 * 24 * 60 * 60 * 1000
   },
   {
     id: "6",
-    type: "settings",
-    setting: "dark-mode",
-    value: true,
-    timestamp: Date.now() - 2 * 24 * 60 * 60 * 1000
-  },
-  {
-    id: "7",
     type: "feature-toggle",
     feature: "auto-organize",
     enabled: true,
     timestamp: Date.now() - 3 * 24 * 60 * 60 * 1000
   },
   {
-    id: "8",
+    id: "7",
     type: "feature-toggle",
     feature: "auto-clean",
     enabled: false,

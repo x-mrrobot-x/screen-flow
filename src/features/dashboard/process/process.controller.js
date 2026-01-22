@@ -43,30 +43,46 @@ const ProcessController = (function() {
   function finishProcess() {
     let completionText = "Processo finalizado com sucesso!";
     const processType = state.processType;
-    
+
     let organizedCount = 0;
     let cleanedCount = 0;
-    
+
     const pendingFiles = Math.floor(Math.random() * 50);
 
     if (processType === 'screenshots' || processType === 'recordings') {
       organizedCount = Math.floor(Math.random() * 50) + 10;
       completionText = `Organização concluída! ${organizedCount} arquivos organizados.`;
-      
+
       AppState.updateStatsFromProcess({
         organizedCount,
         pendingFiles,
         processType: 'organize',
       });
 
+      // Add activity for organization
+      AppState.addActivity({
+        type: "organize",
+        count: organizedCount,
+        execution: "manual", // Since these are quick actions initiated by user
+        timestamp: Date.now()
+      });
+
     } else if (processType === 'cleanup') {
       cleanedCount = Math.floor(Math.random() * 30) + 5;
       completionText = `Limpeza concluída! ${cleanedCount} arquivos removidos.`;
-      
+
       AppState.updateStatsFromProcess({
         cleanedCount,
         pendingFiles,
         processType: 'cleanup'
+      });
+
+      // Add activity for cleanup
+      AppState.addActivity({
+        type: "clean",
+        count: cleanedCount,
+        execution: "manual", // Since these are quick actions initiated by user
+        timestamp: Date.now()
       });
     }
 

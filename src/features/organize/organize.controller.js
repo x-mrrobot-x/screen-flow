@@ -61,6 +61,13 @@ const OrganizeController = (function() {
         const type = activeFilter === 'all' ? 'both' : (activeFilter === 'screenshots' ? 'ss' : 'sr');
         const removedCount = OrganizeModel.clearFolderStats(folderId, type);
         if (removedCount > 0) {
+          AppState.addActivity({
+            type: "clean",
+            count: removedCount,
+            execution: "manual",
+            timestamp: Date.now()
+          });
+
           Toast.success(`${removedCount} item(ns) removido(s) com sucesso!`);
         }
         render();
