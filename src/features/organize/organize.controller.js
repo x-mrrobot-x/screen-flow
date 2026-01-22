@@ -72,6 +72,7 @@ const OrganizeController = (function() {
             count: removedCount,
             execution: "manual",
             folder: folderName,
+            mediaType: type,
             timestamp: Date.now()
           });
 

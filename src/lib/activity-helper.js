@@ -17,9 +17,16 @@ const ActivityHelper = (() => {
     "clean-folder": {
       icon: "folder-minus",
       color: "orange",
-      getTitle: data => "Limpeza de Pasta",
-      getDescription: data =>
-        `${data.count || 0} arquivos removidos da pasta "${data.folder}"`
+      getTitle: data => {
+        const mediaType = data.mediaType === "ss" ? "capturas" :
+                         data.mediaType === "sr" ? "gravações" : "arquivos";
+        return `Limpeza de Pasta (${mediaType})`;
+      },
+      getDescription: data => {
+        const mediaType = data.mediaType === "ss" ? "capturas de tela" :
+                         data.mediaType === "sr" ? "gravações de tela" : "arquivos";
+        return `${data.count || 0} ${mediaType} removidos da pasta "${data.folder}"`;
+      }
     },
     organize: {
       icon: "folder",
