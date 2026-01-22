@@ -1,123 +1,109 @@
 const ProcessController = (function() {
   'use strict';
 
-  let shouldCancel = false;
+  const state = {
+    isRunning: false,
+    timeoutId: null,
+    processType: null,
+    currentStepIndex: 0,
+    accumulatedDuration: 0,
+  };
 
-  function runStep(step, index, totalSteps, processType, onComplete) {
-    // Check if process should be cancelled
-    if (shouldCancel) {
-      onComplete();
+  function executeNextStep() {
+    if (!state.isRunning) return;
+
+    const steps = ProcessModel.getSteps();
+    if (state.currentStepIndex >= steps.length) {
+      finishProcess();
       return;
     }
 
-    // Update the step label to current step
+    const step = steps[state.currentStepIndex];
+
+    // Update view for the current step
     ProcessView.updateStepLabel(step.label);
+    ProcessView.updateStepStatus(state.currentStepIndex, 'running');
 
-    // Update the step to running state
-    const stepElements = document.querySelectorAll('.step-item');
-    if (stepElements[index]) {
-      // Mark as running
-      setTimeout(() => {
-        if (!shouldCancel) {
-          stepElements[index].classList.remove('incomplete');
-          stepElements[index].classList.add('running');
-        }
-      }, 100);
-    }
+    // Set timeout for step completion
+    state.timeoutId = setTimeout(() => {
+      if (!state.isRunning) return;
+      
+      // Mark step as complete
+      ProcessView.updateStepStatus(state.currentStepIndex, 'completed');
+      state.accumulatedDuration += step.duration;
+      const progress = (state.accumulatedDuration / ProcessModel.getTotalDuration()) * 100;
+      ProcessView.updateProgress(progress);
 
-    // Wait for the step duration then mark as completed
-    setTimeout(() => {
-      if (!shouldCancel && stepElements[index]) {
-        stepElements[index].classList.remove('running');
-        stepElements[index].classList.add('completed');
-        stepElements[index].querySelector('.step-icon').innerHTML = Icons.get('check');
-      }
-      onComplete();
+      // Move to next step
+      state.currentStepIndex++;
+      executeNextStep();
     }, step.duration);
   }
 
-  function start(processType) {
-    // Reset the cancel flag for new process
-    shouldCancel = false;
+  function finishProcess() {
+    let completionText = "Processo finalizado com sucesso!";
+    const processType = state.processType;
 
-    ProcessModel.startProcess(processType);
+    if (processType === 'screenshots') {
+      completionText = `Organização de capturas concluída! 42 arquivos organizados.`;
+    } else if (processType === 'recordings') {
+      completionText = `Organização de gravações concluída! 18 arquivos organizados.`;
+    } else if (processType === 'cleanup') {
+      completionText = `Limpeza concluída! 25 arquivos removidos.`;
+    }
+
+    ProcessView.showCompletion(completionText);
+    ProcessView.updateStepLabel("Processo concluído!");
+
+    // Mark process as not running, but don't close the modal
+    state.isRunning = false;
+    clearTimeout(state.timeoutId);
+    state.timeoutId = null;
+  }
+
+  function start(processType) {
+    if (state.isRunning) return;
+
+    // 1. Setup state and model
+    state.isRunning = true;
+    state.processType = processType;
+    ProcessModel.setup(processType);
+
+    const processData = ProcessConfig.PROCESS_TYPES[processType];
+    const steps = ProcessModel.getSteps();
+
+    // 2. Reset and prepare view
     ProcessView.reset();
+    ProcessView.updateTitle(processData.title);
+    ProcessView.renderInitialSteps(steps);
     ProcessView.show();
 
-    const steps = ProcessConfig.PROCESS_TYPES[processType].steps;
-    let currentDuration = 0;
-
-    // First, add all steps as incomplete
-    const stepsContainer = document.querySelector(ProcessConfig.SELECTORS.stepsContainer);
-    stepsContainer.innerHTML = '';
-
-    steps.forEach((s, idx) => {
-      const stepElement = document.createElement('div');
-      stepElement.className = 'step-item incomplete';
-      stepElement.innerHTML = `
-        <div class="step-icon">
-          ${Icons.get('loader')}
-        </div>
-        <span class="step-label">${s.label}</span>
-      `;
-      stepsContainer.appendChild(stepElement);
-    });
-
-    function next(index) {
-      // Check if process should be cancelled before proceeding
-      if (shouldCancel) {
-        ProcessView.hide();
-        return;
-      }
-
-      if (index < steps.length) {
-        const step = steps[index];
-        runStep(step, index, steps.length, processType, () => {
-          if (!shouldCancel) {
-            currentDuration += step.duration;
-            const progress = (currentDuration / ProcessModel.getTotalDuration()) * 100;
-            ProcessView.updateProgress(progress);
-          }
-          if (!shouldCancel) {
-            next(index + 1);
-          }
-        });
-      } else {
-        // Generate completion text with statistics
-        let completionText = "Processo finalizado com sucesso!";
-
-        // Simulate getting stats - in a real app this would come from the actual process
-        if (processType === 'screenshots') {
-          completionText = `Organização de capturas concluída! 42 arquivos organizados.`;
-        } else if (processType === 'recordings') {
-          completionText = `Organização de gravações concluída! 18 arquivos organizados.`;
-        } else if (processType === 'cleanup') {
-          completionText = `Limpeza concluída! 25 arquivos removidos.`;
-        }
-
-        setTimeout(() => {
-          if (!shouldCancel) {
-            ProcessView.showCompletion(completionText);
-            // Hide the modal after showing completion for a few seconds
-            setTimeout(() => {
-              // The hide function now handles reset internally
-              ProcessView.hide();
-            }, 3000);
-          } else {
-            ProcessView.hide();
-          }
-        }, 500);
-      }
-    }
-    next(0);
+    // 3. Start execution
+    executeNextStep();
   }
 
   function cancelCurrentProcess() {
-    shouldCancel = true;
+    // Stop any pending operations
+    clearTimeout(state.timeoutId);
+
+    // Reset all states
+    state.isRunning = false;
+    state.timeoutId = null;
+    state.processType = null;
+    state.currentStepIndex = 0;
+    state.accumulatedDuration = 0;
+
+    ProcessModel.reset();
+
+    // Hide and reset the view
+    ProcessView.hide();
+    ProcessView.reset();
   }
 
   function init() {
-    ProcessView.init();
+    ProcessView.init({
+      onCancel: cancelCurrentProcess
+    });
     const quickActionButtons = DOM.qsa("[data-process-type]");
     quickActionButtons.forEach(btn => {
       btn.addEventListener("click", () => {

@@ -1,38 +1,44 @@
 const ProcessModel = (function() {
   'use strict';
-  
-  let processType = null;
-  let currentStep = 0;
-  let totalDuration = 0;
 
-  function startProcess(type) {
-    processType = type;
-    currentStep = 0;
-    totalDuration = ProcessConfig.PROCESS_TYPES[type].steps.reduce((acc, step) => acc + step.duration, 0);
-  }
+  const state = {
+    processType: null,
+    totalDuration: 0,
+    steps: [],
+  };
 
-  function getNextStep() {
-    const steps = ProcessConfig.PROCESS_TYPES[processType].steps;
-    if (currentStep < steps.length) {
-      const step = steps[currentStep];
-      currentStep++;
-      return step;
+  function setup(processType) {
+    const processConfig = ProcessConfig.PROCESS_TYPES[processType];
+    if (!processConfig) {
+      console.error(`Process type "${processType}" not found.`);
+      state.steps = [];
+      state.totalDuration = 0;
+      return;
     }
-    return null;
+
+    state.processType = processType;
+    state.steps = processConfig.steps;
+    state.totalDuration = state.steps.reduce((acc, step) => acc + step.duration, 0);
   }
 
-  function getProcessType() {
-    return processType;
+  function reset() {
+    state.processType = null;
+    state.totalDuration = 0;
+    state.steps = [];
+  }
+
+  function getSteps() {
+    return state.steps;
   }
 
   function getTotalDuration() {
-    return totalDuration;
+    return state.totalDuration;
   }
 
   return {
-    startProcess,
-    getNextStep,
-    getProcessType,
-    getTotalDuration
+    setup,
+    reset,
+    getSteps,
+    getTotalDuration,
   };
 })();

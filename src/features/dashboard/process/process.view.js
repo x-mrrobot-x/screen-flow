@@ -2,22 +2,20 @@ const ProcessView = (function() {
   'use strict';
 
   const elements = {};
+  let handleCancel = () => {};
 
-  function init() {
+  function init(options) {
     for (const key in ProcessConfig.SELECTORS) {
       elements[key] = DOM.qs(ProcessConfig.SELECTORS[key]);
     }
-    // Add close button event listener
-    if (elements.closeBtn) {
-      elements.closeBtn.addEventListener('click', () => {
-        Modal.hide(elements.modal);
-      });
-    }
+    handleCancel = options.onCancel;
 
-    // Add backdrop click event listener to close modal
+    if (elements.closeBtn) {
+      elements.closeBtn.addEventListener('click', handleCancel);
+    }
     elements.modal.addEventListener('click', (e) => {
       if (e.target === elements.modal) {
-        Modal.hide(elements.modal);
+        handleCancel();
       }
     });
   }
@@ -27,12 +25,6 @@ const ProcessView = (function() {
   }
 
   function hide() {
-    // Notify controller that the process should be cancelled
-    if (typeof ProcessController !== 'undefined' && ProcessController.cancelCurrentProcess) {
-      ProcessController.cancelCurrentProcess();
-    }
-    // Reset the modal to initial state when hiding to prevent interference
-    reset();
     Modal.hide(elements.modal);
   }
 
@@ -45,6 +37,37 @@ const ProcessView = (function() {
     elements.completion.classList.remove("show");
   }
 
+  function updateTitle(title) {
+    elements.title.textContent = title;
+  }
+
+  function renderInitialSteps(steps) {
+    elements.stepsContainer.innerHTML = '';
+    steps.forEach((step) => {
+      const stepElement = document.createElement('div');
+      stepElement.className = 'step-item incomplete';
+      stepElement.innerHTML = `
+        <div class="step-icon">${Icons.get('loader')}</div>
+        <span class="step-label">${step.label}</span>
+      `;
+      elements.stepsContainer.appendChild(stepElement);
+    });
+  }
+
+  function updateStepStatus(index, status) {
+    const stepElements = elements.stepsContainer.children;
+    if (!stepElements[index]) return;
+
+    stepElements[index].classList.remove('incomplete', 'running', 'completed');
+    stepElements[index].classList.add(status);
+
+    if (status === 'completed') {
+      stepElements[index].querySelector('.step-icon').innerHTML = Icons.get('check');
+    } else {
+      stepElements[index].querySelector('.step-icon').innerHTML = Icons.get('loader');
+    }
+  }
+
   function updateProgress(percent) {
     elements.progressBar.style.width = `${percent}%`;
     elements.percent.textContent = `${Math.round(percent)}%`;
@@ -52,11 +75,6 @@ const ProcessView = (function() {
 
   function updateStepLabel(label) {
     elements.stepLabel.textContent = label;
-  }
-
-  function addStep(step, isCompleted) {
-    // This function is kept for compatibility but the actual step creation
-    // is handled in the controller to show all steps as incomplete first
   }
 
   function showCompletion(resultText) {
@@ -69,9 +87,11 @@ const ProcessView = (function() {
     show,
     hide,
     reset,
+    updateTitle,
+    renderInitialSteps,
+    updateStepStatus,
     updateProgress,
     updateStepLabel,
-    addStep,
     showCompletion
   };
 })();
