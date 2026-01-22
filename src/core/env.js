@@ -64,6 +64,7 @@ const STORAGE_CONFIG = {
 const ENV = (() => {
   const isWeb = typeof tk === "undefined";
   const storagePrefix = "@screenflow:";
+  const processState = { id: null };
 
   function resolvePath(pathTemplate, params = {}) {
     return pathTemplate.replace(/\{(\w+)\}/g, (_, key) => params[key] || _);
@@ -126,6 +127,23 @@ const ENV = (() => {
         console.error(`Erro ao salvar ${key}:`, e);
         return false;
       }
+    },
+
+    runProcess() {
+      const loop = () => {
+        const step = ProcessController.executeNextStep();
+        if (step) {
+          processState.id = setTimeout(loop, step.duration);
+        }
+      };
+      loop();
+    },
+
+    cancelProcess() {
+      if (processState.id) {
+        clearTimeout(processState.id);
+        processState.id = null;
+      }
     }
   };
 
@@ -163,6 +181,28 @@ const ENV = (() => {
         console.error(`Erro ao salvar ${key}:`, e);
         return false;
       }
+    },
+
+    runProcess() {
+      const step = ProcessController.executeNextStep();
+      if (step) {
+        tk.performTask(
+          "SO - PROCESS NEXT STEP",
+          50,
+          "",
+          step.duration,
+          "",
+          true,
+          true,
+          "",
+          true
+        );
+      }
+    },
+
+    cancelProcess() {
+      // Assuming the Tasker task can be stopped by name.
+      tk.stop("SO - PROCESS NEXT STEP");
     }
   };
 
@@ -173,6 +213,8 @@ const ENV = (() => {
     get: (key, params) => env.get(key, params),
     getAsync: (key, params) => env.getAsync(key, params),
     set: (key, data, params) => env.set(key, data, params),
-    getWorkDir: env.getWorkDir
+    getWorkDir: env.getWorkDir,
+    runProcess: env.runProcess,
+    cancelProcess: env.cancelProcess
   };
 })();
