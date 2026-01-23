@@ -7,10 +7,10 @@ const AppState = (() => {
   let folders = [];
 
   function init() {
-    settings = ENV.get("SETTINGS");
-    stats = ENV.get("STATS");
-    folders = ENV.get("FOLDERS");
-    activities = ENV.get("ACTIVITIES");
+    settings = ENV.getData("SETTINGS");
+    stats = ENV.getData("STATS");
+    folders = ENV.getData("FOLDERS");
+    activities = ENV.getData("ACTIVITIES");
   }
 
   // Auto-save com debounce
@@ -18,19 +18,19 @@ const AppState = (() => {
   let settingsTimer = null;
 
   const persist = {
-    folders: () => ENV.set("FOLDERS", folders),
+    folders: () => ENV.setData("FOLDERS", folders),
 
     settings: () => {
       clearTimeout(settingsTimer);
-      settingsTimer = setTimeout(() => ENV.set("SETTINGS", settings), 500);
+      settingsTimer = setTimeout(() => ENV.setData("SETTINGS", settings), 500);
     },
 
     stats: () => {
       clearTimeout(statsTimer);
-      statsTimer = setTimeout(() => ENV.set("STATS", stats), 500);
+      statsTimer = setTimeout(() => ENV.setData("STATS", stats), 500);
     },
 
-    activities: () => ENV.set("ACTIVITIES", activities)
+    activities: () => ENV.setData("ACTIVITIES", activities)
   };
 
   return {
