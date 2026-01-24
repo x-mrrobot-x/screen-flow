@@ -17,7 +17,7 @@ const App = (function() {
       OrganizeController.init();
       StatsController.init();
       SettingsController.init();
-      AutoCleanController.init();
+      CleanerController.init();
       
       console.log('✓ Application initialized successfully');
       

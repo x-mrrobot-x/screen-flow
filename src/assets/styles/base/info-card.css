@@ -1,13 +1,13 @@
-/* Shared styles for info cards used in both setting and autoclean */
+/* Shared styles for info cards used in both setting and cleaner */
 
-.autoclean-info,
+.cleaner-info,
 .setting-info {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
 }
 
-.autoclean-info svg,
+.cleaner-info svg,
 .setting-info svg {
   width: var(--icon-lg);
   height: var(--icon-lg);
@@ -15,7 +15,7 @@
   margin-top: 0.2rem;
 }
 
-.autoclean-info h4,
+.cleaner-info h4,
 .setting-info h4 {
   font-size: var(--font-sm);
   font-weight: 500;
@@ -23,14 +23,14 @@
   margin-bottom: var(--space-xxs);
 }
 
-.autoclean-info p,
+.cleaner-info p,
 .setting-info p {
   font-size: var(--font-xs);
   color: hsl(var(--muted-foreground));
 }
 
 /* Shared styles for setting rows */
-.autoclean-row,
+.cleaner-row,
 .setting-row {
   display: flex;
   align-items: center;
@@ -39,67 +39,67 @@
   border-bottom: 1px solid hsl(var(--border));
 }
 
-.autoclean-row:last-child,
+.cleaner-row:last-child,
 .setting-row:last-child {
   border-bottom: none;
 }
 
-.autoclean-content,
+.cleaner-content,
 .setting-content {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
 }
 
-.autoclean-icon,
+.cleaner-icon,
 .setting-icon {
   padding: var(--space-xs);
   border-radius: var(--radius-md);
 }
 
-.autoclean-icon.primary,
+.cleaner-icon.primary,
 .setting-icon.primary {
   background: hsl(var(--primary) / 0.2);
 }
 
-.autoclean-icon.primary svg,
+.cleaner-icon.primary svg,
 .setting-icon.primary svg {
   color: hsl(var(--primary));
 }
 
-.autoclean-icon.accent,
+.cleaner-icon.accent,
 .setting-icon.accent {
   background: hsl(var(--accent) / 0.2);
 }
 
-.autoclean-icon.accent svg,
+.cleaner-icon.accent svg,
 .setting-icon.accent svg {
   color: hsl(var(--accent));
 }
 
-.autoclean-icon.warning,
+.cleaner-icon.warning,
 .setting-icon.warning {
   background: hsl(var(--warning) / 0.2);
 }
 
-.autoclean-icon.warning svg,
+.cleaner-icon.warning svg,
 .setting-icon.warning svg {
   color: hsl(var(--warning));
 }
 
-.autoclean-icon svg,
+.cleaner-icon svg,
 .setting-icon svg {
   width: var(--icon-lg);
   height: var(--icon-lg);
 }
 
-.autoclean-text h4,
+.cleaner-text h4,
 .setting-text h4 {
   font-weight: 500;
   color: hsl(var(--foreground));
 }
 
-.autoclean-text p,
+.cleaner-text p,
 .setting-text p {
   font-size: var(--font-sm);
   color: hsl(var(--muted-foreground));

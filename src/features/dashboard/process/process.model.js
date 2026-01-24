@@ -16,7 +16,7 @@ const ProcessModel = (function() {
   }
 
   // Carrega a configuração de limpeza automática a partir dos dados das pastas.
-  async function loadAutoCleanConfig() {
+  async function loadCleanerConfig() {
     const folders = await ENV.getDataAsync('FOLDERS');
     const config = {
       screenshots: [],
@@ -24,11 +24,11 @@ const ProcessModel = (function() {
     };
 
     folders.forEach(folder => {
-      if (folder.autoClean.ss.on) {
-        config.screenshots.push({ folder: folder.path, days: folder.autoClean.ss.days });
+      if (folder.cleaner.ss.on) {
+        config.screenshots.push({ folder: folder.path, days: folder.cleaner.ss.days });
       }
-      if (folder.autoClean.sr.on) {
-        config.recordings.push({ folder: folder.path, days: folder.autoClean.sr.days });
+      if (folder.cleaner.sr.on) {
+        config.recordings.push({ folder: folder.path, days: folder.cleaner.sr.days });
       }
     });
     return config;
@@ -60,16 +60,16 @@ const ProcessModel = (function() {
   }
 
   // Verifica se existem configurações de limpeza automática ativas.
-  async function hasAutoCleanConfigs() {
+  async function hasCleanerConfigs() {
     const folders = await ENV.getDataAsync('FOLDERS');
-    return folders.some(folder => folder.autoClean.ss.on || folder.autoClean.sr.on);
+    return folders.some(folder => folder.cleaner.ss.on || folder.cleaner.sr.on);
   }
 
   return {
     extractAppNames,
-    loadAutoCleanConfig,
+    loadCleanerConfig,
     listAllExpired,
     updateProcessData,
-    hasAutoCleanConfigs,
+    hasCleanerConfigs,
   };
 })();

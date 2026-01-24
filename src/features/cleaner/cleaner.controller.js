@@ -1,12 +1,12 @@
-const AutoCleanController = (function() {
+const CleanerController = (function() {
   'use strict';
   
   let isInitialized = false;
 
   function render() {
-    const folders = AutoCleanModel.getFolders();
-    const state = AutoCleanModel.getState();
-    AutoCleanView.render.autoclean(folders, state.autoCleanup);
+    const folders = CleanerModel.getFolders();
+    const state = CleanerModel.getState();
+    CleanerView.render.cleaner(folders, state.autoCleaning);
   }
 
   const handlers = {
@@ -26,29 +26,29 @@ const AutoCleanController = (function() {
 
       switch (action) {
         case "toggleFolderClean":
-          AutoCleanModel.toggleFolderClean(folderId, mediaType);
+          CleanerModel.toggleFolderClean(folderId, mediaType);
           render();
           break;
         case "setFolderDays":
           const days = parseInt(actionBtn.getAttribute("data-days"));
-          AutoCleanModel.setFolderDays(folderId, mediaType, days);
+          CleanerModel.setFolderDays(folderId, mediaType, days);
           render();
           break;
       }
     },
-    toggleAutoCleanup: () => {
-      AutoCleanModel.toggleAutoCleanup();
+    toggleAutoCleaning: () => {
+      CleanerModel.toggleAutoCleaning();
       render();
     }
   };
   
   function attachEventListeners() {
-    const autoCleanupSwitch = DOM.qs(AutoCleanConfig.SELECTORS.autoCleanupSwitch);
-    if (autoCleanupSwitch) {
-      autoCleanupSwitch.addEventListener("click", handlers.toggleAutoCleanup);
+    const autoCleaningSwitch = DOM.qs(CleanerConfig.SELECTORS.autoCleaningSwitch);
+    if (autoCleaningSwitch) {
+      autoCleaningSwitch.addEventListener("click", handlers.toggleAutoCleaning);
     }
 
-    const organizeItemCleanList = DOM.qs(AutoCleanConfig.SELECTORS.folderCleanList);
+    const organizeItemCleanList = DOM.qs(CleanerConfig.SELECTORS.folderCleanList);
     if (organizeItemCleanList) {
       organizeItemCleanList.addEventListener("click", handlers.handleEvent);
     }
@@ -56,7 +56,7 @@ const AutoCleanController = (function() {
 
   function init() {
     if(isInitialized) return;
-    AutoCleanView.init(AutoCleanConfig.SELECTORS.CONTAINER);
+    CleanerView.init(CleanerConfig.SELECTORS.CONTAINER);
     render();
     attachEventListeners();
     isInitialized = true;

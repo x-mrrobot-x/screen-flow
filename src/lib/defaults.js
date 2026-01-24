@@ -9,7 +9,7 @@ const DEFAULT_STATS = {
 const DEFAULT_SETTINGS = {
   theme: "system",
   autoOrganize: true,
-  autoCleanup: false,
+  autoCleaning: false,
   notifications: true,
   animationsEnabled: true
 };
@@ -64,7 +64,7 @@ const DEFAULT_ACTIVITIES = [
   {
     id: "7",
     type: "feature-toggle",
-    feature: "auto-clean",
+    feature: "cleaner",
     enabled: false,
     timestamp: Date.now() - 4 * 24 * 60 * 60 * 1000
   }
@@ -80,7 +80,7 @@ const DEFAULT_FOLDERS = [
       sr: 32,
       lu: Date.now()
     },
-    autoClean: {
+    cleaner: {
       ss: { on: false, days: 30 },
       sr: { on: true, days: 30 }
     }
@@ -94,7 +94,7 @@ const DEFAULT_FOLDERS = [
       sr: 0,
       lu: Date.now() - 3 * 24 * 60 * 60 * 1000
     },
-    autoClean: {
+    cleaner: {
       ss: { on: false, days: 30 },
       sr: { on: false, days: 30 }
     }
@@ -108,7 +108,7 @@ const DEFAULT_FOLDERS = [
       sr: 2,
       lu: Date.now() - 1 * 24 * 60 * 60 * 1000
     },
-    autoClean: {
+    cleaner: {
       ss: { on: false, days: 14 },
       sr: { on: false, days: 14 }
     }
@@ -122,7 +122,7 @@ const DEFAULT_FOLDERS = [
       sr: 5,
       lu: Date.now() - 2 * 60 * 60 * 1000
     },
-    autoClean: {
+    cleaner: {
       ss: { on: true, days: 7 },
       sr: { on: false, days: 7 }
     }
@@ -136,7 +136,7 @@ const DEFAULT_FOLDERS = [
       sr: 15,
       lu: Date.now()
     },
-    autoClean: {
+    cleaner: {
       ss: { on: true, days: 30 },
       sr: { on: false, days: 30 }
     }
@@ -150,7 +150,7 @@ const DEFAULT_FOLDERS = [
       sr: 15,
       lu: Date.now() - 5 * 24 * 60 * 60 * 1000
     },
-    autoClean: {
+    cleaner: {
       ss: { on: false, days: 14 },
       sr: { on: true, days: 14 }
     }
@@ -164,7 +164,7 @@ const DEFAULT_FOLDERS = [
       sr: 89,
       lu: Date.now() - 4 * 24 * 60 * 60 * 1000
     },
-    autoClean: {
+    cleaner: {
       ss: { on: true, days: 14 },
       sr: { on: true, days: 14 }
     }
@@ -178,7 +178,7 @@ const DEFAULT_FOLDERS = [
       sr: 0,
       lu: Date.now() - 24 * 60 * 60 * 1000
     },
-    autoClean: {
+    cleaner: {
       ss: { on: true, days: 14 },
       sr: { on: false, days: 14 }
     }
@@ -192,7 +192,7 @@ const DEFAULT_FOLDERS = [
       sr: 12,
       lu: Date.now() - 2 * 60 * 60 * 1000
     },
-    autoClean: {
+    cleaner: {
       ss: { on: false, days: 7 },
       sr: { on: false, days: 7 }
     }
@@ -206,7 +206,7 @@ const DEFAULT_FOLDERS = [
       sr: 45,
       lu: Date.now() - 2 * 24 * 60 * 60 * 1000
     },
-    autoClean: {
+    cleaner: {
       ss: { on: true, days: 7 },
       sr: { on: true, days: 7 }
     }
@@ -220,7 +220,7 @@ const DEFAULT_FOLDERS = [
       sr: 8,
       lu: Date.now() - 6 * 24 * 60 * 60 * 1000
     },
-    autoClean: {
+    cleaner: {
       ss: { on: true, days: 14 },
       sr: { on: false, days: 14 }
     }
@@ -234,7 +234,7 @@ const DEFAULT_FOLDERS = [
       sr: 3,
       lu: Date.now() - 7 * 24 * 60 * 60 * 1000
     },
-    autoClean: {
+    cleaner: {
       ss: { on: true, days: 7 },
       sr: { on: false, days: 7 }
     }

@@ -1,4 +1,4 @@
-const AutoCleanModel = (function() {
+const CleanerModel = (function() {
   'use strict';
   
   function updateFolderState(folderId, mediaType, updateFn) {
@@ -18,20 +18,20 @@ const AutoCleanModel = (function() {
   function toggleFolderClean(folderId, mediaType) {
     const updatedFolders = updateFolderState(folderId, mediaType, folder => {
       if (mediaType === "screenshots") {
-        folder.autoClean.ss.on = !folder.autoClean.ss.on;
+        folder.cleaner.ss.on = !folder.cleaner.ss.on;
       } else if (mediaType === "recordings") {
-        folder.autoClean.sr.on = !folder.autoClean.sr.on;
+        folder.cleaner.sr.on = !folder.cleaner.sr.on;
       }
     });
 
     const folder = updatedFolders.find(f => f.id === folderId);
     if (folder) {
       const actionType = mediaType === "screenshots" ? "screenshots" : "recordings";
-      const isEnabled = mediaType === "screenshots" ? folder.autoClean.ss.on : folder.autoClean.sr.on;
+      const isEnabled = mediaType === "screenshots" ? folder.cleaner.ss.on : folder.cleaner.sr.on;
 
       AppState.addActivity({
-        type: "auto-clean-folder-toggle",
-        feature: `auto-clean-folder-${actionType}`,
+        type: "cleaner-folder-toggle",
+        feature: `cleaner-folder-${actionType}`,
         folder: folder.name,
         enabled: isEnabled
       });
@@ -41,19 +41,19 @@ const AutoCleanModel = (function() {
   function setFolderDays(folderId, mediaType, days) {
     updateFolderState(folderId, mediaType, folder => {
       if (mediaType === "screenshots") {
-        folder.autoClean.ss.days = days;
+        folder.cleaner.ss.days = days;
       } else if (mediaType === "recordings") {
-        folder.autoClean.sr.days = days;
+        folder.cleaner.sr.days = days;
       }
     });
   }
 
-  function toggleAutoCleanup() {
-    const newValue = AppState.toggleSetting('autoCleanup');
+  function toggleAutoCleaning() {
+    const newValue = AppState.toggleSetting('autoCleaning');
 
     AppState.addActivity({
       type: "feature-toggle",
-      feature: "auto-clean",
+      feature: "cleaner",
       enabled: newValue
     });
     return newValue;
@@ -65,7 +65,7 @@ const AutoCleanModel = (function() {
 
   function getState() {
     return {
-      autoCleanup: AppState.getSetting('autoCleanup'),
+      autoCleaning: AppState.getSetting('autoCleaning'),
       ...AppState.getStats()
     };
   }
@@ -73,7 +73,7 @@ const AutoCleanModel = (function() {
   return {
     toggleFolderClean,
     setFolderDays,
-    toggleAutoCleanup,
+    toggleAutoCleaning,
     getFolders,
     getState
   };

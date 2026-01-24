@@ -22,7 +22,7 @@
     <link rel="stylesheet" href="src/features/dashboard/dashboard.css" />
     <link rel="stylesheet" href="src/features/dashboard/process/process.css" />
     <link rel="stylesheet" href="src/features/stats/stats.css" />
-    <link rel="stylesheet" href="src/features/autoclean/autoclean.css" />
+    <link rel="stylesheet" href="src/features/cleaner/cleaner.css" />
     <link rel="stylesheet" href="src/features/organize/organize.css" />
     <link rel="stylesheet" href="src/features/settings/settings.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -261,9 +261,9 @@
         ></section>
       </main>
 
-      <!--  AUTOCLEAN TAB  -->
+      <!--  CLEANER TAB  -->
       <main
-        id="tab-autoclean"
+        id="tab-cleaner"
         class="tab-content page-container page-enter animate-fade-in"
       >
         <header class="page-header animate-fade-in-down">
@@ -272,31 +272,31 @@
               <i data-icon="trash"></i>
             </div>
             <div class="header-text">
-              <h1 class="page-title">Limpeza Automática</h1>
-              <p class="page-subtitle" id="autoclean-count-text">
+              <h1 class="page-title">Limpeza</h1>
+              <p class="page-subtitle" id="cleaner-count-text">
                 Limpe pastas automaticamente
               </p>
             </div>
           </div>
         </header>
 
-        <section class="autoclean-card card-glow animate-fade-in-up delay-1">
-          <div class="autoclean-row">
-            <div class="autoclean-content">
-              <div class="autoclean-icon accent">
+        <section class="cleaner-card card-glow animate-fade-in-up delay-1">
+          <div class="cleaner-row">
+            <div class="cleaner-content">
+              <div class="cleaner-icon accent">
                 <i data-icon="sparkles"></i>
               </div>
-              <div class="autoclean-text">
+              <div class="cleaner-text">
                 <h4>Limpeza Automática</h4>
               </div>
             </div>
             <button
               class="switch active"
-              id="switch-autoCleanup"
-              data-action="toggleAutoCleanup"
+              id="switch-autoCleaning"
+              data-action="toggleAutoCleaning"
             ></button>
           </div>
-          <aside class="autoclean-info">
+          <aside class="cleaner-info">
             Ao habilitar nas pastas, screenshots e gravações que ultrapassarem o
             dia limite serão automaticamente apagados.
           </aside>
@@ -637,15 +637,15 @@
           <div class="nav-bg"></div>
           <i class="nav-icon" data-icon="folder-open"></i>
           <span class="nav-label">Organizar</span>
-        </button>
+        </.button>
         <button
-          id="nav-autoclean"
+          id="nav-cleaner"
           class="nav-button tap-scale"
-          data-tab="autoclean"
+          data-tab="cleaner"
         >
           <div class="nav-bg"></div>
           <i class="nav-icon" data-icon="trash"></i>
-          <span class="nav-label">Clean</span>
+          <span class="nav-label">Limpeza</span>
         </button>
         <button id="nav-stats" class="nav-button tap-scale" data-tab="stats">
           <div class="nav-bg"></div>
@@ -771,11 +771,11 @@
     <script src="src/features/stats/stats.view.js"></script>
     <script src="src/features/stats/stats.controller.js"></script>
 
-    <!-- AutoClean -->
-    <script src="src/features/autoclean/autoclean.config.js"></script>
-    <script src="src/features/autoclean/autoclean.model.js"></script>
-    <script src="src/features/autoclean/autoclean.view.js"></script>
-    <script src="src/features/autoclean/autoclean.controller.js"></script>
+    <!-- Cleaner -->
+    <script src="src/features/cleaner/cleaner.config.js"></script>
+    <script src="src/features/cleaner/cleaner.model.js"></script>
+    <script src="src/features/cleaner/cleaner.view.js"></script>
+    <script src="src/features/cleaner/cleaner.controller.js"></script>
 
     <!-- Organize -->
     <script src="src/features/organize/organize.config.js"></script>

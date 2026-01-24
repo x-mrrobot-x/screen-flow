@@ -34,7 +34,7 @@ const ProcessConfig = {
     clean_old_files: {
       title: "Limpando Arquivos Antigos",
       steps: [
-        { id: "load_config", label: "Carregando configurações de limpeza", type: "js", func: "loadAutoCleanConfig", params: () => [] },
+        { id: "load_config", label: "Carregando configurações de limpeza", type: "js", func: "loadCleanerConfig", params: () => [] },
         { id: "list_ss", label: "Listando capturas expiradas", type: "js", func: "listAllExpired", params: (ctx) => [ctx.load_config.screenshots, "jpg"] },
         { id: "list_sr", label: "Listando gravações expiradas", type: "js", func: "listAllExpired", params: (ctx) => [ctx.load_config.recordings, "mp4"] },
         { id: "remove_ss", label: "Removendo capturas expiradas", type: "shell", func: "remove_files", params: (ctx) => [JSON.stringify(ctx.list_ss)] },

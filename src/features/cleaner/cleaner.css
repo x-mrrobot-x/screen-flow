@@ -1,11 +1,11 @@
-.autoclean-card {
+.cleaner-card {
   background: hsl(var(--card));
   border: 1px solid hsl(var(--border));
   border-radius: var(--radius-lg);
   overflow: hidden;
 }
 
-.autoclean-info {
+.cleaner-info {
   font-size: var(--font-sm);
   background: hsl(var(--card));
   padding: var(--space-md);

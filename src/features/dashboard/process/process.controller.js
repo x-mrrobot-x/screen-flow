@@ -75,7 +75,7 @@ const ProcessController = (function() {
     if (state.isRunning) return;
 
     if (processType === 'clean_old_files') {
-      const hasConfigs = await ProcessModel.hasAutoCleanConfigs();
+      const hasConfigs = await ProcessModel.hasCleanerConfigs();
       if (!hasConfigs) {
         Toast.info("Nenhuma pasta configurada para limpeza automática.");
         return;
