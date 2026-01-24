@@ -135,25 +135,40 @@ const ENV = (() => {
       }
     }
 
-    function runProcess() {
-      const loop = () => {
-        const step = ProcessController.executeNextStep();
-        if (step) {
-          processState.id = setTimeout(loop, step.duration);
-        }
+    async function runProcess(command, ...args) {
+      // Mocked web environment for testing
+      console.log(`[WEB MOCK] ENV.runProcess: ${command}`, args);
+      await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
+
+      const MOCK_FILES = {
+        jpg: ["/storage/emulated/0/DCIM/Screenshots/_com.app1.jpg", "/storage/emulated/0/DCIM/Screenshots/_com.app2.jpg"],
+        mp4: ["/storage/emulated/0/DCIM/ScreenRecorder/_com.app3.mp4"]
       };
-      loop();
+
+      switch (command) {
+        case "list_files":
+          return MOCK_FILES[args[0]] || [];
+        case "create_app_folders":
+          return { created: JSON.parse(args[0]).length };
+        case "move_files":
+          return { moved: JSON.parse(args[0]).length };
+        case "list_expired_in_folder":
+          return []; // Assume no expired files in web mock
+        case "remove_files":
+          const numFiles = JSON.parse(args[0]).length;
+          return { removed: numFiles };
+        default:
+          throw new Error(`Unknown mock command: ${command}`);
+      }
     }
 
     function cancelProcess() {
-      if (processState.id) {
-        clearTimeout(processState.id);
-        processState.id = null;
-      }
+      // No process to cancel in web mock, but keep the function for API consistency
     }
 
     return {
       workDir,
+      isWeb: true,
       resolveIconPath,
       getData,
       getDataAsync,
@@ -207,29 +222,38 @@ const ENV = (() => {
       }
     }
 
-    function runProcess() {
-      const step = ProcessController.executeNextStep();
-      if (step) {
-        tk.performTask(
-          "SO - PROCESS NEXT STEP",
-          50,
-          "",
-          step.duration,
-          "",
-          true,
-          true,
-          "",
-          true
-        );
+    async function runProcess(command, ...args) {
+      const scriptPath = `${workDir}src/features/dashboard/process/script.sh`;
+      const quotedArgs = args.map(arg => `'${arg}'`).join(' ');
+      const fullCommand = `${scriptPath} ${command} ${quotedArgs}`;
+
+      try {
+        const result = tk.shell(fullCommand, false, 5000);
+        if (!result) {
+          throw new Error("Comando shell retornou resultado vazio.");
+        }
+        
+        const parsed = JSON.parse(result);
+        if (parsed.success) {
+          return parsed.data;
+        } else {
+          throw new Error(parsed.error || "Erro desconhecido no script shell.");
+        }
+      } catch (e) {
+        console.error(`Erro ao executar comando de processo: ${command}`, e);
+        throw new Error(`Falha ao executar '${command}': ${e.message}`);
       }
     }
 
     function cancelProcess() {
-      // tk.stop("SO - PROCESS NEXT STEP");
+      // Tasker process is synchronous per-step, but we can have a global flag
+      // For now, cancellation will be handled in the controller between steps
+      // tk.stop(...) could be used if we had a long-running task name
     }
 
     return {
       workDir,
+      isWeb: false,
       resolveIconPath,
       getPath,
       getData,

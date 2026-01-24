@@ -11,31 +11,35 @@ const ProcessConfig = {
     closeBtn: "#process-modal-close"
   },
   PROCESS_TYPES: {
-    screenshots: {
-      title: "Organizando Capturas",
+    organize_screenshots: {
+      title: "Organizando Capturas de Tela",
       steps: [
-        { label: "Analisando capturas...", duration: 1000 },
-        { label: "Identificando apps...", duration: 1500 },
-        { label: "Movendo arquivos...", duration: 2000 },
-        { label: "Atualizando database...", duration: 500 }
+        { id: "list", label: "Listando capturas de tela", type: "shell", func: "list_files", params: () => ["jpg", "/storage/emulated/0/DCIM/Screenshots"] },
+        { id: "extract", label: "Extraindo nomes dos apps", type: "js", func: "extractAppNames", params: (ctx) => [ctx.list, "jpg"] },
+        { id: "create_folders", label: "Criando pastas dos apps", type: "shell", func: "create_app_folders", params: (ctx) => [JSON.stringify(ctx.extract), "/storage/emulated/0/OrganizedMedia/Screenshots"] },
+        { id: "move", label: "Movendo capturas de tela", type: "shell", func: "move_files", params: (ctx) => [JSON.stringify(ctx.list), "/storage/emulated/0/OrganizedMedia/Screenshots"] },
+        { id: "update_data", label: "Finalizando organização", type: "js", func: "updateProcessData", params: (ctx) => ["organize_screenshots", { moved: ctx.move.moved, created: ctx.create_folders.created }] }
       ]
     },
-    recordings: {
-      title: "Organizando Gravações",
+    organize_recordings: {
+      title: "Organizando Gravações de Tela",
       steps: [
-        { label: "Analisando gravações...", duration: 1000 },
-        { label: "Identificando apps...", duration: 1500 },
-        { label: "Movendo arquivos...", duration: 2000 },
-        { label: "Atualizando database...", duration: 500 }
+        { id: "list", label: "Listando gravações de tela", type: "shell", func: "list_files", params: () => ["mp4", "/storage/emulated/0/DCIM/ScreenRecorder"] },
+        { id: "extract", label: "Extraindo nomes dos apps", type: "js", func: "extractAppNames", params: (ctx) => [ctx.list, "mp4"] },
+        { id: "create_folders", label: "Criando pastas dos apps", type: "shell", func: "create_app_folders", params: (ctx) => [JSON.stringify(ctx.extract), "/storage/emulated/0/OrganizedMedia/Recordings"] },
+        { id: "move", label: "Movendo gravações de tela", type: "shell", func: "move_files", params: (ctx) => [JSON.stringify(ctx.list), "/storage/emulated/0/OrganizedMedia/Recordings"] },
+        { id: "update_data", label: "Finalizando organização", type: "js", func: "updateProcessData", params: (ctx) => ["organize_recordings", { moved: ctx.move.moved, created: ctx.create_folders.created }] }
       ]
     },
-    cleanup: {
-      title: "Executando Limpeza",
+    clean_old_files: {
+      title: "Limpando Arquivos Antigos",
       steps: [
-        { label: "Verificando regras...", duration: 1000 },
-        { label: "Buscando arquivos antigos...", duration: 2000 },
-        { label: "Removendo arquivos...", duration: 1500 },
-        { label: "Finalizando...", duration: 500 }
+        { id: "load_config", label: "Carregando configurações de limpeza", type: "js", func: "loadAutoCleanConfig", params: () => [] },
+        { id: "list_ss", label: "Listando capturas expiradas", type: "js", func: "listAllExpired", params: (ctx) => [ctx.load_config.screenshots, "jpg"] },
+        { id: "list_sr", label: "Listando gravações expiradas", type: "js", func: "listAllExpired", params: (ctx) => [ctx.load_config.recordings, "mp4"] },
+        { id: "remove_ss", label: "Removendo capturas expiradas", type: "shell", func: "remove_files", params: (ctx) => [JSON.stringify(ctx.list_ss)] },
+        { id: "remove_sr", label: "Removendo gravações expiradas", type: "shell", func: "remove_files", params: (ctx) => [JSON.stringify(ctx.list_sr)] },
+        { id: "update_data", label: "Finalizando limpeza", type: "js", func: "updateProcessData", params: (ctx) => ["clean_old_files", { ss_removed: ctx.remove_ss.removed, sr_removed: ctx.remove_sr.removed, total_removed: ctx.remove_ss.removed + ctx.remove_sr.removed }] }
       ]
     }
   }

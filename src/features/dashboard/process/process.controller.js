@@ -4,98 +4,106 @@ const ProcessController = (function() {
   const state = {
     isRunning: false,
     processType: null,
-    currentStepIndex: 0,
-    accumulatedDuration: 0,
+    context: {},
   };
 
-  function executeNextStep() {
-    if (!state.isRunning) return null;
+  //======= MOTOR DE EXECUÇÃO DE PROCESSOS =======//
 
-    // Mark previous step as completed
-    if (state.currentStepIndex > 0) {
-      const prevStep = ProcessModel.getSteps()[state.currentStepIndex - 1];
-      ProcessView.updateStepStatus(state.currentStepIndex - 1, 'completed');
-      state.accumulatedDuration += prevStep.duration;
-      const progress = (state.accumulatedDuration / ProcessModel.getTotalDuration()) * 100;
+  async function run() {
+    const processData = ProcessConfig.PROCESS_TYPES[state.processType];
+    const steps = processData.steps;
+
+    for (let i = 0; i < steps.length; i++) {
+      if (!state.isRunning) {
+        console.log("Processo cancelado.");
+        return;
+      }
+
+      const step = steps[i];
+      const progress = (i / steps.length) * 100;
+
+      ProcessView.updateStepStatus(i, 'running');
+      ProcessView.updateStepLabel(step.label);
       ProcessView.updateProgress(progress);
+      
+      try {
+        const params = step.params(state.context);
+        let result;
+
+        if (step.type === 'shell') {
+          result = await ENV.runProcess(step.func, ...params);
+        } else if (step.type === 'js') {
+          // Chama a função JS diretamente do Model
+          result = await ProcessModel[step.func](...params);
+        }
+        
+        state.context[step.id] = result;
+        ProcessView.updateStepStatus(i, 'completed');
+
+      } catch (error) {
+        console.error(`Erro na etapa ${step.id}:`, error);
+        ProcessView.updateStepStatus(i, 'failed');
+        ProcessView.showCompletion(`Erro em: ${step.label}`);
+        state.isRunning = false;
+        return;
+      }
     }
-
-    const steps = ProcessModel.getSteps();
-    if (state.currentStepIndex >= steps.length) {
-      finishProcess();
-      return null;
-    }
-
-    const step = steps[state.currentStepIndex];
-
-    ProcessView.updateStepLabel(step.label);
-    ProcessView.updateStepStatus(state.currentStepIndex, 'running');
-
-    state.currentStepIndex++;
-    return step;
+    
+    finishProcess();
   }
 
   function finishProcess() {
     if (!state.isRunning) return;
 
-    if (state.currentStepIndex > 0 && state.currentStepIndex <= ProcessModel.getSteps().length) {
-      ProcessView.updateStepStatus(state.currentStepIndex - 1, 'completed');
-    }
     ProcessView.updateProgress(100);
-
+    ProcessView.updateStepLabel("Processo concluído!");
+    
+    const stats = state.context.update_data?.savedStats || {};
     let completionText = "Processo finalizado com sucesso!";
-    const processType = state.processType;
-    let organizedCount = 0;
-    let cleanedCount = 0;
-    const pendingFiles = Math.floor(Math.random() * 50);
 
-    if (processType === 'screenshots' || processType === 'recordings') {
-      organizedCount = Math.floor(Math.random() * 50) + 10;
-      completionText = `Organização concluída! ${organizedCount} arquivos organizados.`;
-      AppState.updateStatsFromProcess({ organizedCount, pendingFiles, processType: 'organize' });
-      AppState.addActivity({ type: "organize", count: organizedCount, execution: "manual", mediaType: processType, timestamp: Date.now() });
-    } else if (processType === 'cleanup') {
-      cleanedCount = Math.floor(Math.random() * 30) + 5;
-      completionText = `Limpeza concluída! ${cleanedCount} arquivos removidos.`;
-      AppState.updateStatsFromProcess({ cleanedCount, pendingFiles, processType: 'cleanup' });
-      AppState.addActivity({ type: "clean", count: cleanedCount, execution: "manual", timestamp: Date.now() });
+    if (state.processType === 'organize_screenshots' || state.processType === 'organize_recordings') {
+      completionText = `Organização concluída! ${stats.moved || 0} arquivos movidos.`;
+    } else if (state.processType === 'clean_old_files') {
+      completionText = `Limpeza concluída! ${stats.total_removed || 0} arquivos removidos.`;
     }
 
     ProcessView.showCompletion(completionText);
-    ProcessView.updateStepLabel("Processo concluído!");
-
     state.isRunning = false;
   }
 
-  function start(processType) {
+  async function start(processType) {
     if (state.isRunning) return;
+
+    if (processType === 'clean_old_files') {
+      const hasConfigs = await ProcessModel.hasAutoCleanConfigs();
+      if (!hasConfigs) {
+        Toast.info("Nenhuma pasta configurada para limpeza automática.");
+        return;
+      }
+    }
+
+    const processData = ProcessConfig.PROCESS_TYPES[processType];
+    if (!processData) {
+      console.error(`Tipo de processo "${processType}" não encontrado.`);
+      return;
+    }
 
     state.isRunning = true;
     state.processType = processType;
-    state.currentStepIndex = 0;
-    state.accumulatedDuration = 0;
-    ProcessModel.setup(processType);
-
-    const processData = ProcessConfig.PROCESS_TYPES[processType];
-    const steps = ProcessModel.getSteps();
+    state.context = {};
 
     ProcessView.reset();
     ProcessView.updateTitle(processData.title);
-    ProcessView.renderInitialSteps(steps);
+    ProcessView.renderInitialSteps(processData.steps);
     ProcessView.show();
 
-    ENV.runProcess();
+    run();
   }
 
   function cancelCurrentProcess() {
-    ENV.cancelProcess();
-
+    if (!state.isRunning) return;
+    
     state.isRunning = false;
-    state.processType = null;
-    state.currentStepIndex = 0;
-    state.accumulatedDuration = 0;
-
-    ProcessModel.reset();
     ProcessView.hide();
     ProcessView.reset();
   }
@@ -104,18 +112,13 @@ const ProcessController = (function() {
     ProcessView.init({ onCancel: cancelCurrentProcess });
     const quickActionButtons = DOM.qsa("[data-process-type]");
     quickActionButtons.forEach(btn => {
-      btn.addEventListener("click", () => {
-        const processType = btn.dataset.processType;
-        start(processType);
-      });
+      const processType = btn.dataset.processType;
+      btn.addEventListener("click", () => start(processType));
     });
   }
 
   return {
     init,
     start,
-    cancelCurrentProcess,
-    executeNextStep,
-    finishProcess,
   };
 })();
