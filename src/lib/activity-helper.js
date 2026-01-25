@@ -2,62 +2,53 @@ const ActivityHelper = (() => {
   "use strict";
 
   const ACTIVITY_CONFIG = {
-    clean: {
+    cleaner: {
       icon: "sparkles",
       color: "yellow",
-      getTitle: data => {
-        if (data.execution === "manual") return "Limpeza manual";
-        return "Limpeza automática";
-      },
-      getDescription: data =>
-        `${data.count || 0} arquivos ${
-          data.execution === "manual" ? "removidos por usuário" : "removidos"
-        }`
+      getTitle: data =>
+        data.execution === "manual" ? "Limpeza Manual" : "Limpeza Automática",
+      getDescription: data => `${data.count || 0} arquivos excluídos.`
     },
     "cleaner-folder": {
       icon: "folder-minus",
       color: "orange",
       getTitle: data => {
-        const mediaType = data.mediaType === "ss" ? "capturas" :
-                         data.mediaType === "sr" ? "gravações" : "arquivos";
+        const mediaType = data.mediaType === "ss" ? "Capturas" :
+                         data.mediaType === "sr" ? "Gravações" : "Arquivos";
         return `Limpeza de Pasta (${mediaType})`;
       },
       getDescription: data => {
         const mediaType = data.mediaType === "ss" ? "capturas de tela" :
                          data.mediaType === "sr" ? "gravações de tela" : "arquivos";
-        return `${data.count || 0} ${mediaType} removidos da pasta "${data.folder}"`;
+        return `${data.count || 0} ${mediaType} removidos da pasta "${data.folder}".`;
       }
     },
     organizer: {
       icon: "folder",
       color: "orange",
       getTitle: data => {
-        const mediaType = data.mediaType === "recordings" ? "gravações" : "capturas";
+        const mediaType = data.mediaType === "recordings" ? "Gravações" : "Capturas";
         return data.execution === "auto"
-          ? `Organização automática de ${mediaType}`
-          : `Organização manual de ${mediaType}`;
+          ? `Organização Automática de ${mediaType}`
+          : `Organização Manual de ${mediaType}`;
       },
       getDescription: data => {
         const mediaType = data.mediaType === "recordings" ? "gravações" : "capturas";
-        const base = `${data.count || 0} ${mediaType} organizadas`;
-        return data.execution === "auto"
-          ? `${base} organizadas automaticamente`
-          : base;
+        return `${data.count || 0} ${mediaType} organizadas.`;
       }
     },
     "feature-toggle": {
       icon: "toggle-right",
       color: "green",
-      getTitle: data =>
-        data.enabled ? "Recursos ativados" : "Recursos desativados",
-      getDescription: data => {
+      getTitle: data => {
         const featureNames = {
           "auto-organizer": "Organização Automática",
           "auto-cleaner": "Limpeza Automática"
         };
-        const name = featureNames[data.feature] || data.feature;
-        return `${name} ${data.enabled ? "ativada" : "desativada"}`;
+        return featureNames[data.feature] || data.feature;
       },
+      getDescription: data =>
+        `Recurso ${data.enabled ? "ativado" : "desativado"}.`,
       getIcon: data => (data.enabled ? "toggle-right" : "toggle-left"),
       getColor: data => (data.enabled ? "green" : "gray")
     },
@@ -65,10 +56,12 @@ const ActivityHelper = (() => {
       icon: "toggle-right",
       color: "blue",
       getTitle: data =>
-        data.enabled ? "Limpeza automática ativada" : "Limpeza automática desativada",
+        data.enabled
+          ? "Limpeza de Pasta Ativada"
+          : "Limpeza de Pasta Desativada",
       getDescription: data => {
         const mediaType = data.feature.includes("screenshots") ? "capturas de tela" : "gravações de tela";
-        return `Limpeza automática de ${mediaType} ${data.enabled ? "ativada" : "desativada"} na pasta "${data.folder}"`;
+        return `Limpeza automática de ${mediaType} na pasta "${data.folder}" foi ${data.enabled ? "ativada" : "desativada"}.`;
       },
       getIcon: data => (data.enabled ? "toggle-right" : "toggle-left"),
       getColor: data => (data.enabled ? "blue" : "gray")

@@ -19,7 +19,7 @@ const DEFAULT_TRANSLATIONS = {};
 const DEFAULT_ACTIVITIES = [
   {
     id: "1",
-    type: "clean",
+    type: "cleaner",
     count: 156,
     execution: "auto",
     timestamp: Date.now() - 2 * 60 * 60 * 1000
@@ -42,14 +42,14 @@ const DEFAULT_ACTIVITIES = [
   },
   {
     id: "4",
-    type: "clean",
+    type: "cleaner",
     count: 12,
     execution: "auto",
     timestamp: Date.now() - 1 * 24 * 60 * 60 * 1000
   },
   {
     id: "5",
-    type: "clean",
+    type: "cleaner",
     count: 67,
     execution: "manual",
     timestamp: Date.now() - 1.5 * 24 * 60 * 60 * 1000
