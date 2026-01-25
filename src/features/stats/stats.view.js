@@ -34,16 +34,18 @@ const StatsView = (function () {
   const templates = {
     activityItem: activity => `
       <li class="activity-item">
-        <div class="item-left">
-          <div class="icon-box ${activity.color || "yellow"}">
-            ${Icons.get(activity.icon)}
-          </div>
-          <div class="item-info">
-            <h3>${activity.title}</h3>
-            <p>${activity.description}</p>
-          </div>
+        <div class="icon-box ${activity.color || "yellow"}">
+          ${Icons.get(activity.icon)}
+          <span>${activity.execution ? activity.execution : ""}</span>
         </div>
-        <span class="item-time">${formatTimeAgo(activity.timestamp)}</span>
+          
+        <div class="item-content">
+          <div class="item-header">
+            <h3>${activity.title}</h3>
+            <span class="item-time">${formatTimeAgo(activity.timestamp)}</span>
+          </div>
+          <p>${activity.description}</p>
+        </div>
       </li>`,
     activityList: activities =>
       activities.slice(0, 5).map(templates.activityItem).join(""),
@@ -59,7 +61,7 @@ const StatsView = (function () {
 
   const render = {
     activityCard: activities => {
-      const card = DOM.get(StatsConfig.SELECTORS.activityCard);
+      const card = DOM.qs(StatsConfig.SELECTORS.activityCard);
       if (card) {
         const list = card.querySelector(StatsConfig.SELECTORS.activityList);
         if (list) list.innerHTML = templates.activityList(activities);
@@ -178,7 +180,7 @@ const StatsView = (function () {
         btn => btn.dataset.mediaType === mediaType
       );
       if (activeButton) activeButton.classList.add("active");
-      const title = DOM.get(StatsConfig.SELECTORS.weeklyChartTitle);
+      const title = DOM.qs(StatsConfig.SELECTORS.weeklyChartTitle);
       if (title)
         title.textContent =
           mediaType === "screenshots"
@@ -195,7 +197,7 @@ const StatsView = (function () {
   };
 
   function init(containerSelector) {
-    container = DOM.get(containerSelector);
+    container = DOM.qs(containerSelector);
     if (!container) throw new Error(`Container ${containerSelector} not found`);
 
     for (const key in StatsConfig.SELECTORS) {

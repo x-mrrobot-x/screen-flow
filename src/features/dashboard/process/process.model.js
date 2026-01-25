@@ -52,10 +52,38 @@ const ProcessModel = (function() {
 
   // Atualiza os dados do processo (estatísticas, atividades).
   async function updateProcessData(processType, stats) {
-    console.log("Atualizando dados do processo:", processType, stats);
-    // Aqui é onde o estado global seria atualizado e salvo.
-    // AppState.updateStats(stats);
-    // AppState.addActivity({ type: processType, ...stats });
+    const isOrganizer = processType.startsWith('organizer');
+    const isCleaner = processType.startsWith('clean');
+
+    // 1. Atualiza as estatísticas globais
+    const statsPayload = {
+      processType: isOrganizer ? 'organizer' : (isCleaner ? 'cleanup' : 'unknown'),
+      organizerCount: stats.moved || 0,
+      cleanedCount: stats.total_removed || 0,
+    };
+    AppState.updateStatsFromProcess(statsPayload);
+
+    // 2. Adiciona a atividade correspondente
+    let activityPayload = { execution: 'manual' };
+    if (isOrganizer) {
+      activityPayload = {
+        ...activityPayload,
+        type: 'organizer',
+        count: stats.moved || 0,
+        mediaType: processType.includes('recordings') ? 'recordings' : 'screenshots',
+      };
+    } else if (isCleaner) {
+      activityPayload = {
+        ...activityPayload,
+        type: 'cleaner',
+        count: stats.total_removed || 0,
+      };
+    }
+    
+    if (activityPayload.type) {
+      AppState.addActivity(activityPayload);
+    }
+
     return { success: true, savedStats: stats };
   }
 

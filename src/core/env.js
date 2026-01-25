@@ -180,6 +180,9 @@ const ENV = (() => {
 
   // ===== TASKER ENVIRONMENT CONFIG =====
   function TaskerEnvironment() {
+    // The 'tk' object is a global provided by the Tasker environment.
+    // It offers access to Tasker's functionalities like running shell commands
+    // and accessing local variables.
     const workDir = `${tk.local("%work_dir")}/`;
 
     function resolveIconPath(pkg) {

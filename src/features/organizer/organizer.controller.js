@@ -76,7 +76,7 @@ const OrganizerController = (function() {
             timestamp: Date.now()
           });
 
-          Toast.success(`${removedCount} item(ns) removido(s) com sucesso!`);
+          Toast.success(`${removedCount} ${removedCount > 1 ? 'itens removidos' : 'item removido'} com sucesso!`);
         }
         render();
       }

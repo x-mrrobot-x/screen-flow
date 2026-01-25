@@ -33,6 +33,14 @@ const AppState = (() => {
     activities: () => ENV.setData("ACTIVITIES", activities)
   };
 
+  const EVENTS = {
+    STATE_CHANGED: "appstate:changed"
+  };
+
+  function emitChange(key) {
+    EventBus.emit(EVENTS.STATE_CHANGED, { key });
+  }
+
   return {
     init,
 
@@ -41,6 +49,7 @@ const AppState = (() => {
     setFolders(newFolders) {
       folders = [...newFolders];
       persist.folders();
+      emitChange("folders");
     },
 
     // Activities
@@ -55,7 +64,7 @@ const AppState = (() => {
         ...activities.slice(0, 9)
       ];
       persist.activities();
-      EventBus.emit("appstate:changed", { key: "activities" });
+      emitChange("activities");
     },
 
     // Settings (configurações do usuário)
@@ -64,14 +73,17 @@ const AppState = (() => {
     setSetting(key, value) {
       settings = { ...settings, [key]: value };
       persist.settings();
+      emitChange("settings");
     },
     setSettings(newSettings) {
-      Object.assign(settings, newSettings);
+      settings = { ...settings, ...newSettings };
       persist.settings();
+      emitChange("settings");
     },
     toggleSetting(key) {
-      settings[key] = !settings[key];
+      settings = { ...settings, [key]: !settings[key] };
       persist.settings();
+      emitChange("settings");
       return settings[key];
     },
 
@@ -81,18 +93,22 @@ const AppState = (() => {
     setStat(key, value) {
       stats = { ...stats, [key]: value };
       persist.stats();
+      emitChange("stats");
     },
     incrementStat(key, amount = 1) {
-      stats[key] = (stats[key] || 0) + amount;
+      stats = { ...stats, [key]: (stats[key] || 0) + amount };
       persist.stats();
+      emitChange("stats");
     },
     updateLastOrganizer() {
-      stats.lastOrganizer = Date.now();
+      stats = { ...stats, lastOrganizer: Date.now() };
       persist.stats();
+      emitChange("stats");
     },
     updateLastCleanup() {
-      stats.lastCleanup = Date.now();
+      stats = { ...stats, lastCleanup: Date.now() };
       persist.stats();
+      emitChange("stats");
     },
 
     updateStatsFromProcess(result) {
@@ -103,21 +119,29 @@ const AppState = (() => {
         processType
       } = result;
 
+      let newStats = { ...stats };
+
       if (processType === "organizer") {
-        stats.lastOrganizer = Date.now();
-        stats.organizerCaptures =
-          (stats.organizerCaptures || 0) + organizerCount;
+        newStats = {
+          ...newStats,
+          lastOrganizer: Date.now(),
+          organizerCaptures: (newStats.organizerCaptures || 0) + organizerCount
+        };
       } else if (processType === "cleanup") {
-        stats.lastCleanup = Date.now();
-        stats.removedCaptures = (stats.removedCaptures || 0) + cleanedCount;
+        newStats = {
+          ...newStats,
+          lastCleanup: Date.now(),
+          removedCaptures: (newStats.removedCaptures || 0) + cleanedCount
+        };
       }
 
       if (pendingFiles !== undefined) {
-        stats.pendingFiles = pendingFiles;
+        newStats.pendingFiles = pendingFiles;
       }
 
+      stats = newStats;
       persist.stats();
-      EventBus.emit("stats:updated");
+      emitChange("stats");
     },
 
     // Reset & Delete
@@ -131,6 +155,11 @@ const AppState = (() => {
       persist.stats();
       persist.folders();
       persist.activities();
+
+      emitChange("settings");
+      emitChange("stats");
+      emitChange("folders");
+      emitChange("activities");
     },
 
     deleteAll() {
@@ -144,6 +173,12 @@ const AppState = (() => {
         persist.stats();
         persist.folders();
         persist.activities();
+
+        emitChange("settings");
+        emitChange("stats");
+        emitChange("folders");
+        emitChange("activities");
+
         return true;
       } catch (error) {
         console.error("Error deleting all data:", error);

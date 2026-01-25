@@ -5,8 +5,7 @@ const ActivityHelper = (() => {
     cleaner: {
       icon: "sparkles",
       color: "yellow",
-      getTitle: data =>
-        data.execution === "manual" ? "Limpeza Manual" : "Limpeza Automática",
+      getTitle: () => "Limpeza",
       getDescription: data => `${data.count || 0} arquivos excluídos.`
     },
     "cleaner-folder": {
@@ -15,7 +14,7 @@ const ActivityHelper = (() => {
       getTitle: data => {
         const mediaType = data.mediaType === "ss" ? "Capturas" :
                          data.mediaType === "sr" ? "Gravações" : "Arquivos";
-        return `Limpeza de Pasta (${mediaType})`;
+        return `Limpeza de Pasta`;
       },
       getDescription: data => {
         const mediaType = data.mediaType === "ss" ? "capturas de tela" :
@@ -28,9 +27,7 @@ const ActivityHelper = (() => {
       color: "orange",
       getTitle: data => {
         const mediaType = data.mediaType === "recordings" ? "Gravações" : "Capturas";
-        return data.execution === "auto"
-          ? `Organização Automática de ${mediaType}`
-          : `Organização Manual de ${mediaType}`;
+        return `Organização de ${mediaType}`;
       },
       getDescription: data => {
         const mediaType = data.mediaType === "recordings" ? "gravações" : "capturas";
@@ -57,8 +54,8 @@ const ActivityHelper = (() => {
       color: "blue",
       getTitle: data =>
         data.enabled
-          ? "Limpeza de Pasta Ativada"
-          : "Limpeza de Pasta Desativada",
+          ? "Limpeza de Pasta"
+          : "Limpeza de Pasta",
       getDescription: data => {
         const mediaType = data.feature.includes("screenshots") ? "capturas de tela" : "gravações de tela";
         return `Limpeza automática de ${mediaType} na pasta "${data.folder}" foi ${data.enabled ? "ativada" : "desativada"}.`;

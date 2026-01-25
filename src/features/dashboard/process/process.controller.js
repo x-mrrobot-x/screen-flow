@@ -37,6 +37,7 @@ const ProcessController = (function() {
           result = await ProcessModel[step.func](...params);
         }
         
+        console.log("Step result", step.id, result);
         state.context[step.id] = result;
         ProcessView.updateStepStatus(i, 'completed');
 
@@ -101,9 +102,7 @@ const ProcessController = (function() {
   }
 
   function cancelCurrentProcess() {
-    if (!state.isRunning) return;
-    
-    state.isRunning = false;
+    state.isRunning = false; // Garante que o processo em andamento pare
     ProcessView.hide();
     ProcessView.reset();
   }

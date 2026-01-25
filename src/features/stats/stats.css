@@ -73,7 +73,7 @@
 }
 
 .chart-title {
-  font-size: var(--font-xs);
+  font-size: var(--font-md);
   font-weight: 600;
   color: hsl(var(--foreground));
 }
@@ -89,64 +89,6 @@
   margin-bottom: var(--space-lg);
 }
 
-.summary-cards {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-md);
-  margin-bottom: var(--space-lg);
-}
-
-.summary-card {
-  background: hsl(var(--card));
-  border: 1px solid hsl(var(--border));
-  border-radius: var(--radius-lg);
-  padding: var(--space-md);
-}
-
-.summary-icon-wrapper {
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
-  margin-bottom: var(--space-sm);
-}
-
-.summary-icon {
-  padding: var(--space-xs);
-  border-radius: var(--radius-md);
-}
-
-.summary-icon.success {
-  background: hsl(var(--success) / 0.2);
-}
-
-.summary-icon.primary {
-  background: hsl(var(--primary) / 0.2);
-}
-
-.summary-icon svg {
-  width: var(--icon-md);
-  height: var(--icon-md);
-}
-
-.summary-icon.success svg {
-  color: hsl(var(--success));
-}
-
-.summary-icon.primary svg {
-  color: hsl(var(--primary));
-}
-
-.summary-value {
-  font-size: 2.4rem;
-  font-weight: 700;
-  color: hsl(var(--foreground));
-  margin-bottom: var(--space-xxs);
-}
-
-.summary-label {
-  font-size: var(--font-sm);
-  color: hsl(var(--muted-foreground));
-}
 
 /* CONTAINER PRINCIPAL */
 .activity-card {
@@ -163,7 +105,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 28px;
+  margin-bottom: var(--space-md);
 }
 
 .header-icon {
@@ -171,60 +113,48 @@
 }
 
 .card-title {
-  font-size: 1.5rem; /* Increased from 1.25rem */
+  font-size: var(--font-md); /* Increased from 1.25rem */
   font-weight: 600;
   letter-spacing: -0.02em;
   color: hsl(var(--foreground));
 }
 
 /* LISTA DE ATIVIDADES */
-.activity-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
 
-/* ITEM INDIVIDUAL */
 .activity-item {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 16px;
-  border-radius: 16px;
+  padding: var(--space-lg) 0;
+  border-top: 1px solid hsl(var(--border));
   background-color: transparent;
   transition: all 0.3s ease;
-  cursor: pointer;
-  border: 1px solid transparent;
 }
 
-/* EFEITO HOVER (Melhoria de UX) */
-.activity-item:hover {
-  background: hsl(var(--muted));
-  border-color: hsl(var(--border));
-  transform: translateY(-2px);
-}
-
-/* ÁREA ESQUERDA DO ITEM (Ícone + Texto) */
-.item-left {
-  display: flex;
-  align-items: center;
-  gap: 16px;
+.activity-item:first-child {
+  padding-top: var(--space-xs);
+  border-top: none;
 }
 
 /* ÍCONES COM FUNDO TRANSLÚCIDO */
 .icon-box {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  width: 4.2rem;
+  height: 4.2rem;
+  border-radius: 12px;
+  margin-right: var(--space-md);
+}
+
+.icon-box span {
+  font-size: .8rem;
 }
 
 .icon-box svg {
-  width: 24px;
-  height: 24px;
+  width: var(--icon-lg);
+  height: var(--icon-lg);
 }
 
 /* Variantes de cores para os ícones */
@@ -253,36 +183,35 @@
   color: hsl(215 16% 47%);
 }
 
+.item-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
 /* TEXTOS */
-.item-info h3 {
-  font-size: 1.125rem; /* Increased from 1rem */
+.item-header h3 {
+  font-size: var(--font-sm); 
   font-weight: 500;
   color: hsl(var(--foreground));
-  margin-bottom: 4px;
 }
 
-.item-info p {
-  font-size: 1rem; /* Increased from 0.875rem */
-  color: hsl(var(--muted-foreground));
-}
-
-/* HORÁRIO */
 .item-time {
-  font-size: 0.9rem; /* Increased from 0.8rem */
+  font-size: var(--font-xxs);
   color: hsl(var(--muted-foreground));
   white-space: nowrap;
-  align-self: flex-start;
-  margin-top: 4px;
+  margin-left: var(--space-xs);
 }
 
-/* RESPONSIVIDADE PARA TELAS MUITO PEQUENAS */
-@media (max-width: 380px) {
-  .activity-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
-  .item-time {
-    align-self: flex-end;
-  }
+.item-content p {
+  font-size: var(--font-xs);
+  color: hsl(var(--muted-foreground));
+  margin-top: var(--space-xs);
 }

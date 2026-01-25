@@ -36,7 +36,7 @@ const ProcessConfig = {
       steps: [
         { id: "load_config", label: "Carregando configurações de limpeza", type: "js", func: "loadCleanerConfig", params: () => [] },
         { id: "list_ss", label: "Listando capturas expiradas", type: "js", func: "listAllExpired", params: (ctx) => [ctx.load_config.screenshots, "jpg"] },
-        { id: "list_sr", label: "Listando gravações expiradas", type: "js", func: "listAllExpired", params: (ctx) => [ctx.load_config.recordings, "mp4"] },
+        { id: "list_sr", label: "Listando gravações expiradas", type: "js", func: "listAllExpired", params: (ctx) => [ctx.load_config?.recordings || [], "mp4"] },
         { id: "remove_ss", label: "Removendo capturas expiradas", type: "shell", func: "remove_files", params: (ctx) => [JSON.stringify(ctx.list_ss)] },
         { id: "remove_sr", label: "Removendo gravações expiradas", type: "shell", func: "remove_files", params: (ctx) => [JSON.stringify(ctx.list_sr)] },
         { id: "update_data", label: "Finalizando limpeza", type: "js", func: "updateProcessData", params: (ctx) => ["clean_old_files", { ss_removed: ctx.remove_ss.removed, sr_removed: ctx.remove_sr.removed, total_removed: ctx.remove_ss.removed + ctx.remove_sr.removed }] }

@@ -80,7 +80,7 @@ const CleanerView = (function() {
   };
 
   function init(containerSelector) {
-    container = DOM.get(containerSelector);
+    container = DOM.qs(containerSelector);
     if (!container) throw new Error(`Container ${containerSelector} not found`);
 
     for (const key in CleanerConfig.SELECTORS) {
