@@ -1,23 +1,23 @@
-const CleanerController = (function() {
-  'use strict';
-  
+const CleanerController = (function () {
+  "use strict";
+
   let isInitialized = false;
 
   function render() {
     const folders = CleanerModel.getFolders();
     const state = CleanerModel.getState();
-    CleanerView.render.cleaner(folders, state.autoCleaning);
+    CleanerView.render.cleaner(folders, state.autoCleaner);
   }
 
   const handlers = {
-    handleEvent: (e) => {
+    handleEvent: e => {
       const folderCard = e.target.closest(".folder-clean-card");
       if (!folderCard) return;
 
       const folderId = folderCard.getAttribute("data-folder-id");
       if (!folderId) return;
 
-      const actionBtn = e.target.closest('[data-action]');
+      const actionBtn = e.target.closest("[data-action]");
       if (!actionBtn) return;
 
       e.stopPropagation();
@@ -36,32 +36,41 @@ const CleanerController = (function() {
           break;
       }
     },
-    toggleAutoCleaning: () => {
-      CleanerModel.toggleAutoCleaning();
+    toggleAutoCleaner: () => {
+      CleanerModel.toggleAutoCleaner();
       render();
     }
   };
-  
+
   function attachEventListeners() {
-    const autoCleaningSwitch = DOM.qs(CleanerConfig.SELECTORS.autoCleaningSwitch);
-    if (autoCleaningSwitch) {
-      autoCleaningSwitch.addEventListener("click", handlers.toggleAutoCleaning);
+    const autoCleanerSwitch = DOM.qs(CleanerConfig.SELECTORS.autoCleanerSwitch);
+    if (autoCleanerSwitch) {
+      autoCleanerSwitch.addEventListener("click", handlers.toggleAutoCleaner);
     }
 
-    const organizeItemCleanList = DOM.qs(CleanerConfig.SELECTORS.folderCleanList);
-    if (organizeItemCleanList) {
-      organizeItemCleanList.addEventListener("click", handlers.handleEvent);
+    const organizerItemCleanList = DOM.qs(
+      CleanerConfig.SELECTORS.folderCleanList
+    );
+    if (organizerItemCleanList) {
+      organizerItemCleanList.addEventListener("click", handlers.handleEvent);
     }
   }
 
   function init() {
-    if(isInitialized) return;
+    if (isInitialized) return;
     CleanerView.init(CleanerConfig.SELECTORS.CONTAINER);
     render();
+    updateSwitchState();
     attachEventListeners();
     isInitialized = true;
   }
-  
+
+  function updateSwitchState() {
+    const state = CleanerModel.getState();
+    const autoCleanerSwitch = DOM.qs(CleanerConfig.SELECTORS.autoCleanerSwitch);
+    autoCleanerSwitch.classList.toggle("active", state.autoCleaner);
+  }
+
   return {
     init
   };

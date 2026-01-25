@@ -24,14 +24,13 @@ const SettingsModel = (function() {
   }
 
   function logSettingChange(key, value) {
-    if (key === "autoOrganize") {
+    if (key === "autoOrganizer") {
       AppState.addActivity({
         type: "feature-toggle",
-        feature: "auto-organize",
+        feature: "auto-organizer",
         enabled: value
       });
     }
-    // Skip logging other settings since we removed the settings type
   }
 
   function resetAllSettings() {

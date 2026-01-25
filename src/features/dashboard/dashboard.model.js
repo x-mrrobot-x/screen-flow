@@ -3,7 +3,7 @@ const DashboardModel = (function() {
   
   let state = {};
 
-  function getTopOrganizedApp() {
+  function getTopOrganizerApp() {
     const folders = AppState.getFolders();
     if (folders.length === 0) return null;
 
@@ -19,13 +19,13 @@ const DashboardModel = (function() {
 
   function getState() {
     const stats = AppState.getStats();
-    const topApp = getTopOrganizedApp();
+    const topApp = getTopOrganizerApp();
 
     state = {
-      organized: stats.organizedCaptures || 0,
+      organizer: stats.organizerCaptures || 0,
       removed: stats.removedCaptures || 0,
       pending: stats.pendingFiles || 0,
-      lastOrganized: stats.lastOrganized,
+      lastOrganizer: stats.lastOrganizer,
       lastCleanup: stats.lastCleanup,
       topApp: topApp ? {
         name: topApp.name,

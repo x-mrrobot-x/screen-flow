@@ -14,7 +14,7 @@ const ActivityHelper = (() => {
           data.execution === "manual" ? "removidos por usuário" : "removidos"
         }`
     },
-    "clean-folder": {
+    "cleaner-folder": {
       icon: "folder-minus",
       color: "orange",
       getTitle: data => {
@@ -28,7 +28,7 @@ const ActivityHelper = (() => {
         return `${data.count || 0} ${mediaType} removidos da pasta "${data.folder}"`;
       }
     },
-    organize: {
+    organizer: {
       icon: "folder",
       color: "orange",
       getTitle: data => {
@@ -52,8 +52,8 @@ const ActivityHelper = (() => {
         data.enabled ? "Recursos ativados" : "Recursos desativados",
       getDescription: data => {
         const featureNames = {
-          "auto-organize": "Organização Automática",
-          "auto-clean": "Limpeza Automática"
+          "auto-organizer": "Organização Automática",
+          "auto-cleaner": "Limpeza Automática"
         };
         const name = featureNames[data.feature] || data.feature;
         return `${name} ${data.enabled ? "ativada" : "desativada"}`;
@@ -61,7 +61,7 @@ const ActivityHelper = (() => {
       getIcon: data => (data.enabled ? "toggle-right" : "toggle-left"),
       getColor: data => (data.enabled ? "green" : "gray")
     },
-    "auto-clean-folder-toggle": {
+    "auto-cleaner-folder-toggle": {
       icon: "toggle-right",
       color: "blue",
       getTitle: data =>

@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no"
     />
-    <title>ScreenFlow — Organize Automaticamente</title>
+    <title>ScreenFlow — Organizer Automático</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -23,7 +23,7 @@
     <link rel="stylesheet" href="src/features/dashboard/process/process.css" />
     <link rel="stylesheet" href="src/features/stats/stats.css" />
     <link rel="stylesheet" href="src/features/cleaner/cleaner.css" />
-    <link rel="stylesheet" href="src/features/organize/organize.css" />
+    <link rel="stylesheet" href="src/features/organizer/organizer.css" />
     <link rel="stylesheet" href="src/features/settings/settings.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -63,7 +63,7 @@
                 <i class="stat-icon" data-icon="folder-check"></i>
               </div>
               <p class="stat-label">Capturas Organizadas</p>
-              <p class="stat-value" id="dash-stat-organized">...</p>
+              <p class="stat-value" id="dash-stat-organizer">...</p>
               <p class="stat-subtext">Este mês</p>
             </div>
           </article>
@@ -89,7 +89,7 @@
                 <i class="stat-icon" data-icon="clock"></i>
               </div>
               <p class="stat-label">Última Organização</p>
-              <p class="stat-value" id="dash-last-organized">...</p>
+              <p class="stat-value" id="dash-last-organizer">...</p>
               <p class="stat-subtext">Esta semana</p>
             </div>
           </article>
@@ -141,7 +141,7 @@
           <div class="quick-actions">
             <button
               class="btn-card btn-blue animate-fade-in-up delay-7"
-              data-process-type="organize_screenshots"
+              data-process-type="organizer_screenshots"
             >
               <div class="icon-wrapper">
                 <i data-icon="camera"></i>
@@ -151,7 +151,7 @@
 
             <button
               class="btn-card btn-purple animate-fade-in-up delay-8"
-              data-process-type="organize_recordings"
+              data-process-type="organizer_recordings"
             >
               <div class="icon-wrapper">
                 <i data-icon="video"></i>
@@ -171,9 +171,9 @@
         </section>
       </main>
 
-      <!--  ORGANIZE TAB  -->
+      <!--  ORGANIZER TAB  -->
       <main
-        id="tab-organize"
+        id="tab-organizer"
         class="tab-content page-container page-enter animate-fade-in"
       >
         <header class="page-header animate-fade-in-down">
@@ -182,10 +182,8 @@
               <i data-icon="folder-open"></i>
             </div>
             <div class="header-text">
-              <h1 class="page-title">Organizar</h1>
-              <p class="page-subtitle">
-                Organize suas capturas e gravações de tela
-              </p>
+              <h1 class="page-title">Organizer</h1>
+              <p class="page-subtitle">Visualize e gerencie suas mídias</p>
             </div>
           </div>
 
@@ -292,8 +290,8 @@
             </div>
             <button
               class="switch active"
-              id="switch-autoCleaning"
-              data-action="toggleAutoCleaning"
+              id="switch-autoCleaner"
+              data-action="toggleAutoCleaner"
             ></button>
           </div>
           <aside class="cleaner-info">
@@ -365,7 +363,7 @@
             <h3 class="chart-title">Por Pasta</h3>
           </header>
           <div class="chart-container">
-            <canvas id="organizeChart"></canvas>
+            <canvas id="organizerChart"></canvas>
           </div>
         </article>
 
@@ -499,8 +497,8 @@
               </div>
               <button
                 class="switch active"
-                id="switch-autoOrganize"
-                data-setting-key="autoOrganize"
+                id="switch-autoOrganizer"
+                data-setting-key="autoOrganizer"
               ></button>
             </div>
           </article>
@@ -630,14 +628,14 @@
           <span class="nav-label">Início</span>
         </button>
         <button
-          id="nav-organize"
+          id="nav-organizer"
           class="nav-button tap-scale"
-          data-tab="organize"
+          data-tab="organizer"
         >
           <div class="nav-bg"></div>
           <i class="nav-icon" data-icon="folder-open"></i>
-          <span class="nav-label">Organizar</span>
-        </.button>
+          <span class="nav-label">Organizer</span>
+        </button>
         <button
           id="nav-cleaner"
           class="nav-button tap-scale"
@@ -686,10 +684,7 @@
           <span id="modal-percent">0%</span>
         </div>
         <div id="modal-steps-container" class="process-steps-container"></div>
-        <div
-          id="modal-completion"
-          class="process-completion"
-        >
+        <div id="modal-completion" class="process-completion">
           <div class="completion-icon">
             <i data-icon="check"></i>
           </div>
@@ -701,36 +696,36 @@
 
     <!-- Confirmation Modal -->
     <dialog id="confirmation-modal" class="modal">
-        <header class="modal-header">
-          <h2 class="modal-title" id="confirmation-modal-title">Confirmação</h2>
+      <header class="modal-header">
+        <h2 class="modal-title" id="confirmation-modal-title">Confirmação</h2>
 
-          <button type="button" id="confirmation-modal-close" class="modal-close">
-            <i data-icon="x"></i>
-          </button>
-        </header>
+        <button type="button" id="confirmation-modal-close" class="modal-close">
+          <i data-icon="x"></i>
+        </button>
+      </header>
 
-        <div class="modal-body">
-          <p id="confirmation-modal-message">
-            Tem certeza de que deseja continuar?
-          </p>
-        </div>
+      <div class="modal-body">
+        <p id="confirmation-modal-message">
+          Tem certeza de que deseja continuar?
+        </p>
+      </div>
 
-        <footer class="modal-actions">
-          <button
-            id="confirmation-modal-cancel"
-            class="btn btn-outline-secondary"
-            type="button"
-          >
-            Cancelar
-          </button>
-          <button
-            id="confirmation-modal-confirm"
-            class="btn btn-danger"
-            type="button"
-          >
-            Confirmar
-          </button>
-        </footer>
+      <footer class="modal-actions">
+        <button
+          id="confirmation-modal-cancel"
+          class="btn btn-outline-secondary"
+          type="button"
+        >
+          Cancelar
+        </button>
+        <button
+          id="confirmation-modal-confirm"
+          class="btn btn-danger"
+          type="button"
+        >
+          Confirmar
+        </button>
+      </footer>
     </dialog>
 
     <!-- 1. Utilitários (sem dependências) -->
@@ -777,11 +772,11 @@
     <script src="src/features/cleaner/cleaner.view.js"></script>
     <script src="src/features/cleaner/cleaner.controller.js"></script>
 
-    <!-- Organize -->
-    <script src="src/features/organize/organize.config.js"></script>
-    <script src="src/features/organize/organize.model.js"></script>
-    <script src="src/features/organize/organize.view.js"></script>
-    <script src="src/features/organize/organize.controller.js"></script>
+    <!-- Organizer -->
+    <script src="src/features/organizer/organizer.config.js"></script>
+    <script src="src/features/organizer/organizer.model.js"></script>
+    <script src="src/features/organizer/organizer.view.js"></script>
+    <script src="src/features/organizer/organizer.controller.js"></script>
 
     <!-- Settings -->
     <script src="src/features/settings/settings.config.js"></script>

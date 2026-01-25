@@ -1,10 +1,10 @@
 const DashboardConfig = {
   SELECTORS: {
     CONTAINER: "#tab-dashboard",
-    dashStatOrganized: "#dash-stat-organized",
+    dashStatOrganizer: "#dash-stat-organizer",
     dashStatRemoved: "#dash-stat-removed",
     dashStatPending: "#dash-stat-pending",
-    dashLastOrganized: "#dash-last-organized",
+    dashLastOrganizer: "#dash-last-organizer",
     dashLastCleanup: "#dash-last-cleanup",
     dashTopAppName: "#dash-top-app-name",
     dashTopAppCount: "#dash-top-app-count"

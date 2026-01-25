@@ -14,7 +14,7 @@ const App = (function() {
       // 2. Initialize Features
       DashboardController.init();
       ProcessController.init();
-      OrganizeController.init();
+      OrganizerController.init();
       StatsController.init();
       SettingsController.init();
       CleanerController.init();

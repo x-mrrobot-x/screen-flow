@@ -3,7 +3,7 @@ const CleanerConfig = {
     CONTAINER: "#tab-cleaner",
     folderCleanList: "#folder-clean-list",
     cleanerCountText: "#cleaner-count-text",
-    autoCleaningSwitch: "#switch-autoCleaning"
+    autoCleanerSwitch: "#switch-autoCleaner"
   },
   DAY_OPTIONS: [7, 14, 30, 60, 90]
 };

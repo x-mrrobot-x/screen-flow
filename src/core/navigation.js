@@ -9,18 +9,20 @@ const Navigation = (function() {
   function navigateTo(tabId) {
   const activeBtn = document.querySelector(".nav-button.active");
   const activeTab = document.querySelector(".tab-content.active");
-  
+
   if (activeBtn) activeBtn.classList.remove("active");
   if (activeTab) activeTab.classList.remove("active", "page-enter");
-  
+
   const targetBtn = document.querySelector(`[data-tab="${tabId}"]`);
   const targetTab = document.getElementById(`tab-${tabId}`);
-  
+
   if (targetBtn) targetBtn.classList.add("active");
   if (targetTab) {
     targetTab.classList.add("active", "page-enter");
     targetTab.style.display = "";
   }
+
+  window.scrollTo({ top: 0 });
 }
 
   function attachListeners(callback) {

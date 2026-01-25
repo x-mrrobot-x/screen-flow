@@ -1,15 +1,15 @@
 const DEFAULT_STATS = {
-  lastOrganized: Date.now(),
+  lastOrganizer: Date.now(),
   lastCleanup: Date.now() - 2 * 60 * 60 * 1000,
   pendingFiles: 89,
-  organizedCaptures: 450,
+  organizerCaptures: 450,
   removedCaptures: 389
 };
 
 const DEFAULT_SETTINGS = {
   theme: "system",
-  autoOrganize: true,
-  autoCleaning: false,
+  autoOrganizer: true,
+  autoCleaner: false,
   notifications: true,
   animationsEnabled: true
 };
@@ -26,7 +26,7 @@ const DEFAULT_ACTIVITIES = [
   },
   {
     id: "2",
-    type: "organize",
+    type: "organizer",
     count: 34,
     execution: "manual",
     mediaType: "screenshots",
@@ -34,7 +34,7 @@ const DEFAULT_ACTIVITIES = [
   },
   {
     id: "3",
-    type: "organize",
+    type: "organizer",
     count: 245,
     execution: "auto",
     mediaType: "recordings",
@@ -57,14 +57,14 @@ const DEFAULT_ACTIVITIES = [
   {
     id: "6",
     type: "feature-toggle",
-    feature: "auto-organize",
+    feature: "auto-organizer",
     enabled: true,
     timestamp: Date.now() - 3 * 24 * 60 * 60 * 1000
   },
   {
     id: "7",
     type: "feature-toggle",
-    feature: "cleaner",
+    feature: "auto-cleaner",
     enabled: false,
     timestamp: Date.now() - 4 * 24 * 60 * 60 * 1000
   }

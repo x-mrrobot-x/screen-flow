@@ -61,7 +61,7 @@ const ProcessController = (function() {
     const stats = state.context.update_data?.savedStats || {};
     let completionText = "Processo finalizado com sucesso!";
 
-    if (state.processType === 'organize_screenshots' || state.processType === 'organize_recordings') {
+    if (state.processType === 'organizer_screenshots' || state.processType === 'organizer_recordings') {
       completionText = `Organização concluída! ${stats.moved || 0} arquivos movidos.`;
     } else if (state.processType === 'clean_old_files') {
       completionText = `Limpeza concluída! ${stats.total_removed || 0} arquivos removidos.`;

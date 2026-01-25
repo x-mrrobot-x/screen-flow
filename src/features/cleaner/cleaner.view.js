@@ -58,11 +58,11 @@ const CleanerView = (function() {
   };
 
   const render = {
-    counts: (folders, autoCleaning) => {
+    counts: (folders, autoCleaner) => {
       const screenshotsCount = folders.filter(f => f.cleaner.ss.on).length;
       const recordingsCount = folders.filter(f => f.cleaner.sr.on).length;
 
-      if (autoCleaning) {
+      if (autoCleaner) {
         elements.cleanerCountText.innerHTML = `<span class="subtitle-item"><span class="dot dot-screenshot"></span>${screenshotsCount} pastas com limpeza de capturas</span>, <span class="subtitle-item"><span class="dot dot-recording"></span>${recordingsCount} com limpeza de gravações</span>`;
       } else {
         elements.cleanerCountText.textContent = "Limpe pastas automaticamente";
@@ -71,11 +71,11 @@ const CleanerView = (function() {
     folderList: (folders) => {
       elements.folderCleanList.innerHTML = folders.map((folder, index) => templates.folderCard(folder, index)).join("");
     },
-    cleaner: (folders, autoCleaning) => {
-      render.counts(folders, autoCleaning);
+    cleaner: (folders, autoCleaner) => {
+      render.counts(folders, autoCleaner);
       render.folderList(folders);
-      elements.autoCleaningSwitch.classList.toggle("active", autoCleaning);
-      elements.folderCleanList.style.display = autoCleaning ? "flex" : "none";
+      elements.autoCleanerSwitch.classList.toggle("active", autoCleaner);
+      elements.folderCleanList.style.display = autoCleaner ? "flex" : "none";
     }
   };
 

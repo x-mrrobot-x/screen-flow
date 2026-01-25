@@ -11,24 +11,24 @@ const ProcessConfig = {
     closeBtn: "#process-modal-close"
   },
   PROCESS_TYPES: {
-    organize_screenshots: {
+    organizer_screenshots: {
       title: "Organizando Capturas de Tela",
       steps: [
         { id: "list", label: "Listando capturas de tela", type: "shell", func: "list_files", params: () => ["jpg", "/storage/emulated/0/DCIM/Screenshots"] },
         { id: "extract", label: "Extraindo nomes dos apps", type: "js", func: "extractAppNames", params: (ctx) => [ctx.list, "jpg"] },
         { id: "create_folders", label: "Criando pastas dos apps", type: "shell", func: "create_app_folders", params: (ctx) => [JSON.stringify(ctx.extract), "/storage/emulated/0/OrganizedMedia/Screenshots"] },
         { id: "move", label: "Movendo capturas de tela", type: "shell", func: "move_files", params: (ctx) => [JSON.stringify(ctx.list), "/storage/emulated/0/OrganizedMedia/Screenshots"] },
-        { id: "update_data", label: "Finalizando organização", type: "js", func: "updateProcessData", params: (ctx) => ["organize_screenshots", { moved: ctx.move.moved, created: ctx.create_folders.created }] }
+        { id: "update_data", label: "Finalizando organização", type: "js", func: "updateProcessData", params: (ctx) => ["organizer_screenshots", { moved: ctx.move.moved, created: ctx.create_folders.created }] }
       ]
     },
-    organize_recordings: {
+    organizer_recordings: {
       title: "Organizando Gravações de Tela",
       steps: [
         { id: "list", label: "Listando gravações de tela", type: "shell", func: "list_files", params: () => ["mp4", "/storage/emulated/0/DCIM/ScreenRecorder"] },
         { id: "extract", label: "Extraindo nomes dos apps", type: "js", func: "extractAppNames", params: (ctx) => [ctx.list, "mp4"] },
         { id: "create_folders", label: "Criando pastas dos apps", type: "shell", func: "create_app_folders", params: (ctx) => [JSON.stringify(ctx.extract), "/storage/emulated/0/OrganizedMedia/Recordings"] },
         { id: "move", label: "Movendo gravações de tela", type: "shell", func: "move_files", params: (ctx) => [JSON.stringify(ctx.list), "/storage/emulated/0/OrganizedMedia/Recordings"] },
-        { id: "update_data", label: "Finalizando organização", type: "js", func: "updateProcessData", params: (ctx) => ["organize_recordings", { moved: ctx.move.moved, created: ctx.create_folders.created }] }
+        { id: "update_data", label: "Finalizando organização", type: "js", func: "updateProcessData", params: (ctx) => ["organizer_recordings", { moved: ctx.move.moved, created: ctx.create_folders.created }] }
       ]
     },
     clean_old_files: {

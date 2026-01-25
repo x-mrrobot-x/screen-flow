@@ -6,12 +6,12 @@ const DashboardView = (function() {
 
   const templates = {
     stats: (data) => `
-      <p id="dash-stat-organized">${data.organized.toLocaleString()}</p>
+      <p id="dash-stat-organizer">${data.organizer.toLocaleString()}</p>
       <p id="dash-stat-removed">${data.removed.toLocaleString()}</p>
       <p id="dash-stat-pending">${data.pending}</p>
     `,
     lastActivity: (data) => `
-      <p id="dash-last-organized">${data.lastOrganized ? Utils.formatTimestamp(data.lastOrganized) : "Nenhum"}</p>
+      <p id="dash-last-organizer">${data.lastOrganizer ? Utils.formatTimestamp(data.lastOrganizer) : "Nenhum"}</p>
       <p id="dash-last-cleanup">${Utils.formatTimestamp(data.lastCleanup)}</p>
     `,
     topApp: (data) => `
@@ -22,13 +22,13 @@ const DashboardView = (function() {
   
   const render = {
     stats(data) {
-      elements.dashStatOrganized.textContent = data.organized.toLocaleString();
+      elements.dashStatOrganizer.textContent = data.organizer.toLocaleString();
       elements.dashStatRemoved.textContent = data.removed.toLocaleString();
       elements.dashStatPending.textContent = data.pending;
     },
     
     lastActivity(data) {
-      elements.dashLastOrganized.textContent = data.lastOrganized ? Utils.formatTimestamp(data.lastOrganized) : "Nenhum";
+      elements.dashLastOrganizer.textContent = data.lastOrganizer ? Utils.formatTimestamp(data.lastOrganizer) : "Nenhum";
       elements.dashLastCleanup.textContent = Utils.formatTimestamp(data.lastCleanup);
     },
 

@@ -86,8 +86,8 @@ const AppState = (() => {
       stats[key] = (stats[key] || 0) + amount;
       persist.stats();
     },
-    updateLastOrganized() {
-      stats.lastOrganized = Date.now();
+    updateLastOrganizer() {
+      stats.lastOrganizer = Date.now();
       persist.stats();
     },
     updateLastCleanup() {
@@ -97,16 +97,16 @@ const AppState = (() => {
 
     updateStatsFromProcess(result) {
       const {
-        organizedCount = 0,
+        organizerCount = 0,
         cleanedCount = 0,
         pendingFiles,
         processType
       } = result;
 
-      if (processType === "organize") {
-        stats.lastOrganized = Date.now();
-        stats.organizedCaptures =
-          (stats.organizedCaptures || 0) + organizedCount;
+      if (processType === "organizer") {
+        stats.lastOrganizer = Date.now();
+        stats.organizerCaptures =
+          (stats.organizerCaptures || 0) + organizerCount;
       } else if (processType === "cleanup") {
         stats.lastCleanup = Date.now();
         stats.removedCaptures = (stats.removedCaptures || 0) + cleanedCount;
