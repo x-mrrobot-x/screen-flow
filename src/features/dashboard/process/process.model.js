@@ -1,34 +1,40 @@
-const ProcessModel = (function() {
-  'use strict';
+const ProcessModel = (function () {
+  "use strict";
 
-  // Extrai nomes de aplicativos de uma lista de arquivos com base na extensão.
   async function extractAppNames(fileList, extension) {
-    if (!fileList || fileList.length === 0) {
-      return [];
-    }
-    const pattern = new RegExp(`_([^_]+)\.${extension}$`);
-    const appNames = fileList.map(file => {
-      const match = file.match(pattern);
-      return match ? match[1] : null;
-    }).filter(Boolean);
+    if (!fileList || fileList.length === 0) return [];
 
-    return [...new Set(appNames)];
+    const pattern = new RegExp(`_([^_]+)\.${extension}$`);
+    const uniqueNames = new Set();
+
+    for (let i = 0; i < fileList.length; i++) {
+      const match = fileList[i].match(pattern);
+      if (match) uniqueNames.add(match[1]);
+    }
+
+    return [...uniqueNames];
   }
 
   // Carrega a configuração de limpeza automática a partir dos dados das pastas.
   async function loadCleanerConfig() {
-    const folders = await ENV.getDataAsync('FOLDERS');
+    const folders = await ENV.getDataAsync("FOLDERS");
     const config = {
       screenshots: [],
-      recordings: [],
+      recordings: []
     };
 
     folders.forEach(folder => {
       if (folder.cleaner.ss.on) {
-        config.screenshots.push({ folder: folder.path, days: folder.cleaner.ss.days });
+        config.screenshots.push({
+          folder: folder.path,
+          days: folder.cleaner.ss.days
+        });
       }
       if (folder.cleaner.sr.on) {
-        config.recordings.push({ folder: folder.path, days: folder.cleaner.sr.days });
+        config.recordings.push({
+          folder: folder.path,
+          days: folder.cleaner.sr.days
+        });
       }
     });
     return config;
@@ -39,12 +45,20 @@ const ProcessModel = (function() {
     let allExpired = [];
     for (const config of configs) {
       try {
-        const expiredInFolder = await ENV.runProcess("list_expired_in_folder", config.folder, config.days, extension);
+        const expiredInFolder = await ENV.runProcess(
+          "list_expired_in_folder",
+          config.folder,
+          config.days,
+          extension
+        );
         if (expiredInFolder && expiredInFolder.length > 0) {
           allExpired = allExpired.concat(expiredInFolder);
         }
       } catch (e) {
-        console.error(`Falha ao listar arquivos expirados em ${config.folder}:`, e);
+        console.error(
+          `Falha ao listar arquivos expirados em ${config.folder}:`,
+          e
+        );
       }
     }
     return allExpired;
@@ -52,34 +66,40 @@ const ProcessModel = (function() {
 
   // Atualiza os dados do processo (estatísticas, atividades).
   async function updateProcessData(processType, stats) {
-    const isOrganizer = processType.startsWith('organizer');
-    const isCleaner = processType.startsWith('clean');
+    const isOrganizer = processType.startsWith("organizer");
+    const isCleaner = processType.startsWith("clean");
 
     // 1. Atualiza as estatísticas globais
     const statsPayload = {
-      processType: isOrganizer ? 'organizer' : (isCleaner ? 'cleanup' : 'unknown'),
+      processType: isOrganizer
+        ? "organizer"
+        : isCleaner
+        ? "cleanup"
+        : "unknown",
       organizerCount: stats.moved || 0,
-      cleanedCount: stats.total_removed || 0,
+      cleanedCount: stats.total_removed || 0
     };
     AppState.updateStatsFromProcess(statsPayload);
 
     // 2. Adiciona a atividade correspondente
-    let activityPayload = { execution: 'manual' };
+    let activityPayload = { execution: "manual" };
     if (isOrganizer) {
       activityPayload = {
         ...activityPayload,
-        type: 'organizer',
+        type: "organizer",
         count: stats.moved || 0,
-        mediaType: processType.includes('recordings') ? 'recordings' : 'screenshots',
+        mediaType: processType.includes("recordings")
+          ? "recordings"
+          : "screenshots"
       };
     } else if (isCleaner) {
       activityPayload = {
         ...activityPayload,
-        type: 'cleaner',
-        count: stats.total_removed || 0,
+        type: "cleaner",
+        count: stats.total_removed || 0
       };
     }
-    
+
     if (activityPayload.type) {
       AppState.addActivity(activityPayload);
     }
@@ -89,15 +109,32 @@ const ProcessModel = (function() {
 
   // Verifica se existem configurações de limpeza automática ativas.
   async function hasCleanerConfigs() {
-    const folders = await ENV.getDataAsync('FOLDERS');
+    const folders = await ENV.getDataAsync("FOLDERS");
     return folders.some(folder => folder.cleaner.ss.on || folder.cleaner.sr.on);
+  }
+
+  async function mapPackageNamesToAppNames(packageNames) {
+    const folders = await ENV.getDataAsync("FOLDERS");
+    const packageToAppNameMap = folders.reduce((map, folder) => {
+      map[folder.pkg] = folder.name;
+      return map;
+    }, {});
+
+    const resolvedMap = {};
+    for (const pkgName of packageNames) {
+      // Usa o nome do app encontrado ou o próprio nome do pacote como fallback
+      resolvedMap[pkgName] = packageToAppNameMap[pkgName] || pkgName;
+    }
+    
+    return resolvedMap;
   }
 
   return {
     extractAppNames,
+    mapPackageNamesToAppNames,
     loadCleanerConfig,
     listAllExpired,
     updateProcessData,
-    hasCleanerConfigs,
+    hasCleanerConfigs
   };
 })();

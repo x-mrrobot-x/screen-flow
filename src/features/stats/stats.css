@@ -46,8 +46,8 @@
 }
 
 .media-type-button svg {
-  width: var(--icon-lg);
-  height: var(--icon-lg);
+  width: var(--icon-md);
+  height: var(--icon-md);
 }
 
 

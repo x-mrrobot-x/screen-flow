@@ -30,6 +30,7 @@ const ProcessController = (function() {
         const params = step.params(state.context);
         let result;
 
+        if(step.id == "remove__ss" || step.id == "remove_sr") return
         if (step.type === 'shell') {
           result = await ENV.runProcess(step.func, ...params);
         } else if (step.type === 'js') {

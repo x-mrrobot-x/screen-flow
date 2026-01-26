@@ -180,9 +180,7 @@ const ENV = (() => {
 
   // ===== TASKER ENVIRONMENT CONFIG =====
   function TaskerEnvironment() {
-    // The 'tk' object is a global provided by the Tasker environment.
-    // It offers access to Tasker's functionalities like running shell commands
-    // and accessing local variables.
+    // The 'tk' object is a global provided by the Tasker environment. It offers access to Tasker's functionalities like running shell commands.
     const workDir = `${tk.local("%work_dir")}/`;
 
     function resolveIconPath(pkg) {
@@ -228,14 +226,15 @@ const ENV = (() => {
     async function runProcess(command, ...args) {
       const scriptPath = `${workDir}src/features/dashboard/process/script.sh`;
       const quotedArgs = args.map(arg => `'${arg}'`).join(' ');
-      const fullCommand = `${scriptPath} ${command} ${quotedArgs}`;
+      const fullCommand = `sh "${scriptPath}" ${command} ${quotedArgs}`;
 
       try {
+        console.log(`[FULL COMMANDO] ${fullCommand}`)
         const result = tk.shell(fullCommand, false, 5000);
         if (!result) {
           throw new Error("Comando shell retornou resultado vazio.");
         }
-        
+
         const parsed = JSON.parse(result);
         if (parsed.success) {
           return parsed.data;
