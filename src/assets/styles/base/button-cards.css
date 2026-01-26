@@ -1,42 +1,51 @@
 .btn-card {
   flex: 1;
-  border-radius: var(--radius-md);
-  border: none;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  position: relative;
   padding: var(--space-md);
-  outline: none;
+  border-radius: var(--radius-md);
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  box-shadow: 0 3px 0px hsla(var(--border) / 0.3) !important;
   transition: all 3s ease-out;
 }
 
-.btn-card:hover {
-  transform: translateY(-3px);
-  filter: brightness(1.15);
-}
-
 .btn-card:active {
-  transform: translateY(6px) !important;
-  box-shadow:
-    0px 0px 0px transparent,
-    inset 0px 4px 10px rgba(0, 0, 0, 0.4);
-  border-top: none;
+  transform: scale(0.95) !important;
 }
 
 .icon-wrapper {
-  width: 60px;
-  height: 60px;
-  border-radius: 18px;
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: var(--radius-md);
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: var(--space-xs);
+  margin-bottom: var(--space-sm);
   font-size: 26px;
   color: white;
-  background: rgba(255, 255, 255, 0.1);
+}
+
+.light {
+  --btn-card-opacity: 0.7;
+}
+
+.dark {
+  --btn-card-opacity: 0.4;
+}
+
+.btn-blue .icon-wrapper {
+  background-color: hsl(var(--primary) / var(--btn-card-opacity));
+}
+
+.btn-purple .icon-wrapper {
+  background-color: hsla(var(--accent) / var(--btn-card-opacity));
+}
+
+.btn-green .icon-wrapper {
+  background-color: hsla(var(--success) / var(--btn-card-opacity));
 }
 
 .icon-wrapper svg {
@@ -45,7 +54,7 @@
 }
 
 .btn-label {
-  color: #ffffff;
+  color: hsl(var(--foreground));
   font-size: var(--font-sm);
   font-weight: 600;
   text-align: center;
@@ -53,17 +62,10 @@
   letter-spacing: 0.5px;
 }
 
-.btn-blue {
-  background: rgba(59, 89, 152, 0.8);
-  box-shadow: 0px 3px 0px #0e1c42;
+.light .btn-card {
+  box-shadow: 0 4px 12px hsl(var(--foreground) / 0.05);
 }
 
-.btn-purple {
-  background: rgba(142, 68, 173, 0.8);
-  box-shadow: 0px 3px 0px #36174a;
-}
-
-.btn-green {
-  background: rgba(17, 153, 142, 0.8);
-  box-shadow: 0px 3px 0px #043630;
+.dark .btn-card {
+  box-shadow: 0 4px 24px -8px hsl(var(--primary) / 0.15);
 }

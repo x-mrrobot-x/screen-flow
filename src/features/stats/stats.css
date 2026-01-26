@@ -45,6 +45,11 @@
   border-color: hsl(var(--border));
 }
 
+.media-type-button svg {
+  width: var(--icon-lg);
+  height: var(--icon-lg);
+}
+
 
 .chart-card {
   background: hsl(var(--card));

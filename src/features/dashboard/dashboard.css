@@ -58,9 +58,9 @@
 
 .stat-card {
   position: relative;
-  overflow: hidden;
-  border-radius: var(--radius-lg);
   padding: var(--space-md);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
 }
 
 .stat-card.gradient {
