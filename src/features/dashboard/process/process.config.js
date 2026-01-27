@@ -20,7 +20,7 @@ const ProcessConfig = {
           label: "Analisando capturas de tela",
           type: "shell",
           func: "scan_media_app_packages",
-          params: () => ["jpg", "/storage/emulated/0/DCIM/Screenshots"]
+          params: () => ["jpg", ENV.SOURCE_SCREENSHOTS_PATH]
         },
         {
           id: "resolve_app_names",
@@ -36,7 +36,7 @@ const ProcessConfig = {
           func: "create_app_media_folders",
           params: ctx => [
             JSON.stringify(Object.values(ctx.resolve_app_names)),
-            "/storage/emulated/0/OrganizedMedia/Screenshots"
+            ENV.ORGANIZED_SCREENSHOTS_PATH
           ]
         },
         {
@@ -46,8 +46,8 @@ const ProcessConfig = {
           func: "prepareScreenshotOrganization",
           params: ctx => [
             ctx.resolve_app_names,
-            "/storage/emulated/0/DCIM/Screenshots",
-            "/storage/emulated/0/OrganizedMedia/Screenshots",
+            ENV.SOURCE_SCREENSHOTS_PATH,
+            ENV.ORGANIZED_SCREENSHOTS_PATH,
             "jpg"
           ]
         },
@@ -82,7 +82,7 @@ const ProcessConfig = {
           label: "Analisando gravações de tela",
           type: "shell",
           func: "scan_media_app_packages",
-          params: () => ["mp4", "/storage/emulated/0/DCIM/ScreenRecorder"]
+          params: () => ["mp4", ENV.SOURCE_RECORDINGS_PATH]
         },
         {
           id: "resolve_app_names",
@@ -98,7 +98,7 @@ const ProcessConfig = {
           func: "create_app_media_folders",
           params: ctx => [
             JSON.stringify(Object.values(ctx.resolve_app_names)),
-            "/storage/emulated/0/OrganizedMedia/Recordings"
+            ENV.ORGANIZED_RECORDINGS_PATH
           ]
         },
         {
@@ -108,8 +108,8 @@ const ProcessConfig = {
           func: "prepareRecordingOrganization",
           params: ctx => [
             ctx.resolve_app_names,
-            "/storage/emulated/0/DCIM/ScreenRecorder",
-            "/storage/emulated/0/OrganizedMedia/Recordings",
+            ENV.SOURCE_RECORDINGS_PATH,
+            ENV.ORGANIZED_RECORDINGS_PATH,
             "mp4"
           ]
         },
@@ -151,7 +151,11 @@ const ProcessConfig = {
           label: "Localizando arquivos antigos",
           type: "js",
           func: "findAllExpiredMedia",
-          params: ctx => [ctx.load_cleanup_rules]
+          params: ctx => [
+            ctx.load_cleanup_rules,
+            ENV.ORGANIZED_SCREENSHOTS_PATH,
+            ENV.ORGANIZED_RECORDINGS_PATH
+          ]
         },
         {
           id: "delete_all_expired",

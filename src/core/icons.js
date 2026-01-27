@@ -105,10 +105,10 @@ const Icons = (function () {
 
   function getFolderIcon(item, attrs = {}) {
     const className = attrs.class ? ` ${attrs.class}` : "";
-    const workDir = ENV.workDir;
+    const WORK_DIR = ENV.WORK_DIR;
     const iconPath = ENV.resolveIconPath(item.pkg);
 
-    return `<img src="${iconPath}" alt="${item.name}" class="folder-icon${className}" onerror="this.onerror=null; this.src='${workDir}src/assets/icons/default.png';"
+    return `<img src="${iconPath}" alt="${item.name}" class="folder-icon${className}" onerror="this.onerror=null; this.src='${WORK_DIR}src/assets/icons/default.png';"
     />`;
   }
 

@@ -82,7 +82,7 @@ const DEFAULT_FOLDERS = [
     },
     cleaner: {
       ss: { on: false, days: 30 },
-      sr: { on: true, days: 30 }
+      sr: { on: false, days: 30 }
     }
   },
   {
@@ -123,7 +123,7 @@ const DEFAULT_FOLDERS = [
       lu: Date.now() - 2 * 60 * 60 * 1000
     },
     cleaner: {
-      ss: { on: true, days: 7 },
+      ss: { on: false, days: 7 },
       sr: { on: false, days: 7 }
     }
   },
@@ -137,7 +137,7 @@ const DEFAULT_FOLDERS = [
       lu: Date.now()
     },
     cleaner: {
-      ss: { on: true, days: 30 },
+      ss: { on: false, days: 30 },
       sr: { on: false, days: 30 }
     }
   },
@@ -152,7 +152,7 @@ const DEFAULT_FOLDERS = [
     },
     cleaner: {
       ss: { on: false, days: 14 },
-      sr: { on: true, days: 14 }
+      sr: { on: false, days: 14 }
     }
   },
   {
@@ -165,8 +165,8 @@ const DEFAULT_FOLDERS = [
       lu: Date.now() - 4 * 24 * 60 * 60 * 1000
     },
     cleaner: {
-      ss: { on: true, days: 14 },
-      sr: { on: true, days: 14 }
+      ss: { on: false, days: 14 },
+      sr: { on: false, days: 14 }
     }
   },
   {
@@ -179,7 +179,7 @@ const DEFAULT_FOLDERS = [
       lu: Date.now() - 24 * 60 * 60 * 1000
     },
     cleaner: {
-      ss: { on: true, days: 14 },
+      ss: { on: false, days: 14 },
       sr: { on: false, days: 14 }
     }
   },
@@ -207,8 +207,8 @@ const DEFAULT_FOLDERS = [
       lu: Date.now() - 2 * 24 * 60 * 60 * 1000
     },
     cleaner: {
-      ss: { on: true, days: 7 },
-      sr: { on: true, days: 7 }
+      ss: { on: false, days: 7 },
+      sr: { on: false, days: 7 }
     }
   },
   {
@@ -221,7 +221,7 @@ const DEFAULT_FOLDERS = [
       lu: Date.now() - 6 * 24 * 60 * 60 * 1000
     },
     cleaner: {
-      ss: { on: true, days: 14 },
+      ss: { on: false, days: 14 },
       sr: { on: false, days: 14 }
     }
   },
@@ -235,7 +235,21 @@ const DEFAULT_FOLDERS = [
       lu: Date.now() - 7 * 24 * 60 * 60 * 1000
     },
     cleaner: {
-      ss: { on: true, days: 7 },
+      ss: { on: false, days: 7 },
+      sr: { on: false, days: 7 }
+    }
+  },
+  {
+    id: "13",
+    name: "Tasker",
+    pkg: "net.dinglisch.android.taskerm",
+    stats: {
+      ss: 31,
+      sr: 3,
+      lu: Date.now() - 7 * 24 * 60 * 60 * 1000
+    },
+    cleaner: {
+      ss: { on: false, days: 7 },
       sr: { on: false, days: 7 }
     }
   }

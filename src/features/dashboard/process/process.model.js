@@ -62,13 +62,13 @@ const ProcessModel = (function () {
     folders.forEach(folder => {
       if (folder.cleaner.ss.on) {
         rules.screenshots.push({
-          folder: folder.path,
+          folder: folder.name,
           days: folder.cleaner.ss.days
         });
       }
       if (folder.cleaner.sr.on) {
         rules.recordings.push({
-          folder: folder.path,
+          folder: folder.name,
           days: folder.cleaner.sr.days
         });
       }
@@ -76,9 +76,9 @@ const ProcessModel = (function () {
     return rules;
   }
 
-  async function findAllExpiredMedia(rules) {
-    const expiredScreenshots = await findExpired(rules.screenshots, "jpg");
-    const expiredRecordings = await findExpired(rules.recordings, "mp4");
+  async function findAllExpiredMedia(rules, screenshotsPath, recordingsPath) {
+    const expiredScreenshots = await findExpired(rules.screenshots, screenshotsPath, "jpg");
+    const expiredRecordings = await findExpired(rules.recordings, recordingsPath, "mp4");
 
     return {
       screenshots: expiredScreenshots,
@@ -87,14 +87,15 @@ const ProcessModel = (function () {
     };
   }
   
-  async function findExpired(configs, extension) {
+  async function findExpired(configs, rootDir, extension) {
     let allExpired = [];
     for (const config of configs) {
       try {
         // Re-utiliza a lógica de busca do script, mas poderia ser uma função JS pura se o ambiente permitir
+        const folderPath = `${rootDir}/${config.folder}`
         const expiredInFolder = await ENV.runProcess(
           "find_expired_files",
-          config.folder,
+          folderPath,
           config.days,
           extension
         );

@@ -40,12 +40,18 @@ const ProcessController = (function() {
           result = await ProcessModel[step.func](...params);
         }
         
-        console.log("Step result", step.id, result);
+        // console.log("Step result", step.id, result);
         state.context[step.id] = result;
         ProcessView.updateStepStatus(i, 'completed');
 
         if ((step.id === 'scan_screenshots' || step.id === 'scan_recordings') && result.length === 0) {
           Toast.info("Nenhum arquivo encontrado para organizar.");
+          stop();
+          return;
+        }
+
+        if (step.id === 'find_all_expired' && result.all.length === 0) {
+          Toast.info("Nenhum arquivo antigo encontrado para limpar.");
           stop();
           return;
         }

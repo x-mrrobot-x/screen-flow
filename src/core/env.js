@@ -79,7 +79,13 @@ const ENV = (() => {
   function WebEnvironment() {
     const storagePrefix = "@screenflow:";
     const processState = { id: null };
-    const workDir = "";
+    const SOURCE_SCREENSHOTS_PATH = "/storage/emulated/0/DCIM/Screenshots";
+    const SOURCE_RECORDINGS_PATH = "/storage/emulated/0/DCIM/ScreenRecorder";
+    const ORGANIZED_SCREENSHOTS_PATH =
+      "/storage/emulated/0/OrganizedMedia/Screenshots";
+    const ORGANIZED_RECORDINGS_PATH =
+      "/storage/emulated/0/OrganizedMedia/ScreenRecordings";
+    const WORK_DIR = "";
 
     function resolveIconPath(pkg) {
       return `src/assets/icons/${pkg}.png`;
@@ -137,12 +143,15 @@ const ENV = (() => {
 
     async function runProcess(command, ...args) {
       // Mocked web environment for testing
-      console.log(`[WEB MOCK] ENV.runProcess: ${command}`, args);
+      // console.log(`[WEB MOCK] ENV.runProcess: ${command}`, args);
       await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
 
       const MOCK_FILES = {
-        jpg: ["/storage/emulated/0/DCIM/Screenshots/_com.app1.jpg", "/storage/emulated/0/DCIM/Screenshots/_com.app2.jpg"],
-        mp4: ["/storage/emulated/0/DCIM/ScreenRecorder/_com.app3.mp4"]
+        jpg: [
+          `${SOURCE_SCREENSHOTS_PATH}/_com.app1.jpg`,
+          `${SOURCE_SCREENSHOTS_PATH}/_com.app2.jpg`
+        ],
+        mp4: [`${SOURCE_RECORDINGS_PATH}/_com.app3.mp4`]
       };
 
       switch (command) {
@@ -167,21 +176,31 @@ const ENV = (() => {
     }
 
     return {
-      workDir,
+      WORK_DIR,
       isWeb: true,
       resolveIconPath,
       getData,
       getDataAsync,
       setData,
       runProcess,
-      cancelProcess
+      cancelProcess,
+      SOURCE_SCREENSHOTS_PATH,
+      SOURCE_RECORDINGS_PATH,
+      ORGANIZED_SCREENSHOTS_PATH,
+      ORGANIZED_RECORDINGS_PATH
     };
   }
 
   // ===== TASKER ENVIRONMENT CONFIG =====
   function TaskerEnvironment() {
-    // The 'tk' object is a global provided by the Tasker environment. It offers access to Tasker's functionalities like running shell commands.
-    const workDir = `${tk.local("%work_dir")}/`;
+    const SOURCE_SCREENSHOTS_PATH = "/storage/emulated/0/DCIM/Screenshots";
+    const SOURCE_RECORDINGS_PATH = "/storage/emulated/0/DCIM/ScreenRecorder";
+    const ORGANIZED_SCREENSHOTS_PATH =
+      "/storage/emulated/0/OrganizedMedia/Screenshots";
+    const ORGANIZED_RECORDINGS_PATH =
+      "/storage/emulated/0/OrganizedMedia/ScreenRecordings";
+
+    const WORK_DIR = `${tk.local("%work_dir")}/`;
 
     function resolveIconPath(pkg) {
       return `content://net.dinglisch.android.taskerm.iconprovider//app/${pkg}`;
@@ -192,7 +211,7 @@ const ENV = (() => {
       const relative = cfg.pathTemplate
         ? resolvePath(cfg.pathTemplate, params)
         : cfg.path;
-      return `${workDir}${relative}`;
+      return `${WORK_DIR}${relative}`;
     }
 
     function getData(key, params = {}) {
@@ -224,12 +243,13 @@ const ENV = (() => {
     }
 
     async function runProcess(command, ...args) {
-      const scriptPath = `${workDir}src/features/dashboard/process/script.sh`;
-      const quotedArgs = args.map(arg => `'${arg}'`).join(' ');
+      const scriptPath = `${WORK_DIR}src/features/dashboard/process/script.sh`;
+      const quotedArgs = args.map(arg => `'${arg}'`).join(" ");
       const fullCommand = `sh "${scriptPath}" ${command} ${quotedArgs}`;
 
       try {
-        console.log(`[FULL COMMANDO] ${fullCommand}`)
+        // console.log(`[FULL COMMANDO] ${fullCommand}`);
+
         const result = tk.shell(fullCommand, false, 5000);
         if (!result) {
           throw new Error("Comando shell retornou resultado vazio.");
@@ -254,15 +274,18 @@ const ENV = (() => {
     }
 
     return {
-      workDir,
+      WORK_DIR,
       isWeb: false,
       resolveIconPath,
-      getPath,
       getData,
       getDataAsync,
       setData,
       runProcess,
-      cancelProcess
+      cancelProcess,
+      SOURCE_SCREENSHOTS_PATH,
+      SOURCE_RECORDINGS_PATH,
+      ORGANIZED_SCREENSHOTS_PATH,
+      ORGANIZED_RECORDINGS_PATH
     };
   }
 

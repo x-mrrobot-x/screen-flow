@@ -17,7 +17,6 @@ const Modal = (() => {
   function show(modalElement, onCloseCallback = null) {
     if (!modalStack.includes(modalElement)) {
       modalStack.push(modalElement);
-      console.log("stack", modalStack)
     }
 
     if (onCloseCallback) {

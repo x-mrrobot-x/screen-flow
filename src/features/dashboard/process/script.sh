@@ -126,23 +126,14 @@ EOF
 
 delete_files_batch() {
   file_list_json="$1"
-  removed_count=0
-
-  file_list=$(echo "$file_list_json" | tr -d '[]"' | tr ',' '\n')
-
-  while IFS= read -r file_path; do
-    file_path=$(echo "$file_path" | xargs)
-    if [ -n "$file_path" ] && [ -f "$file_path" ]; then
-      rm "$file_path"
-      if [ $? -eq 0 ]; then
-        removed_count=$((removed_count + 1))
-      fi
-    fi
-  done << EOF
-$file_list
-EOF
-
-  json_response "true" "{\"removed\": $removed_count}" "null"
+  
+  # Remove colchetes, aspas e substitui vírgulas por espaços
+  file_list=$(echo "$file_list_json" | tr -d '[]"' | tr ',' ' ')
+  
+  # Remove os arquivos diretamente (sh expande a lista)
+  rm -f $file_list 2>/dev/null
+  
+  json_response "true" "null" "null"
 }
 
 main() {
