@@ -129,12 +129,25 @@ const ProcessModel = (function () {
     return resolvedMap;
   }
 
+  async function buildMoveCommands(resolvedNames, sourcePath, destPath, extension) {
+    const commands = [`cd "${sourcePath}"`];
+    
+    for (const pkgName in resolvedNames) {
+      const appName = resolvedNames[pkgName];
+      const safeAppName = appName.replace(/[^\w\s.-]/g, "").trim();
+      commands.push(`mv -v *_${pkgName}.${extension} "${destPath}/${safeAppName}"`);
+    }
+    
+    return commands.join(' && ');
+  }
+
   return {
     extractAppNames,
     mapPackageNamesToAppNames,
     loadCleanerConfig,
     listAllExpired,
     updateProcessData,
-    hasCleanerConfigs
+    hasCleanerConfigs,
+    buildMoveCommands
   };
 })();

@@ -99,7 +99,7 @@ const ProcessController = (function() {
     ProcessView.renderInitialSteps(processData.steps);
     ProcessView.show();
 
-    run();
+    setTimeout(run, 1000);
   }
 
   function cancelCurrentProcess() {

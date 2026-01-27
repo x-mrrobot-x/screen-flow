@@ -46,14 +46,24 @@ const ProcessConfig = {
           ]
         },
         {
+          id: "build_move_commands",
+          label: "Construindo comandos para mover",
+          type: "js",
+          func: "buildMoveCommands",
+          params: ctx => [
+            ctx.resolve_names,
+            "/storage/emulated/0/DCIM/Screenshots",
+            "/storage/emulated/0/OrganizedMedia/Screenshots",
+            "jpg"
+          ]
+        },
+        {
           id: "move",
           label: "Movendo capturas de tela",
           type: "shell",
-          func: "move_files",
+          func: "execute_move_commands",
           params: ctx => [
-            JSON.stringify(ctx.list),
-            "/storage/emulated/0/OrganizedMedia/Screenshots",
-            JSON.stringify(ctx.resolve_names)
+            ctx.build_move_commands
           ]
         },
         {
@@ -103,14 +113,24 @@ const ProcessConfig = {
           ]
         },
         {
+          id: "build_move_commands",
+          label: "Construindo comandos para mover",
+          type: "js",
+          func: "buildMoveCommands",
+          params: ctx => [
+            ctx.resolve_names,
+            "/storage/emulated/0/DCIM/ScreenRecorder",
+            "/storage/emulated/0/OrganizedMedia/Recordings",
+            "mp4"
+          ]
+        },
+        {
           id: "move",
           label: "Movendo gravações de tela",
           type: "shell",
-          func: "move_files",
+          func: "execute_move_commands",
           params: ctx => [
-            JSON.stringify(ctx.list),
-            "/storage/emulated/0/OrganizedMedia/Recordings",
-            JSON.stringify(ctx.resolve_names)
+            ctx.build_move_commands
           ]
         },
         {

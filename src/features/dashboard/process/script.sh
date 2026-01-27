@@ -58,34 +58,25 @@ EOF
   json_response "true" "{\"created\": $created_count}" "null"
 }
 
-move_files() {
-    file_list_json="$1"
-    dest_folder="$2"
-    moved_count=0
-    
-    file_list=$(echo "$file_list_json" | tr -d '[]"' | tr ',' '\n')
+execute_move_commands() {
+  local commands_string="$1"
+  local moved_count=0
+  local output
+  local exit_code
 
-    while IFS= read -r file_path; do
-        file_path=$(echo "$file_path" | xargs)
-        if [ -n "$file_path" ] && [ -f "$file_path" ]; then
-            filename=$(basename "$file_path")
-            app_name=$(echo "$filename" | sed -n 's/.*_\([^.]*\)\..*/\1/p')
+  # Conta o número de comandos 'mv ' na string
+  moved_count=$(echo "$commands_string" | grep -o "mv " | wc -l)
 
-            if [ -n "$app_name" ]; then
-                app_folder="$dest_folder/$app_name"
-                if [ -d "$app_folder" ]; then
-                    cp "$file_path" "$app_folder/"
-                    if [ $? -eq 0 ]; then
-                        moved_count=$((moved_count + 1))
-                    fi
-                fi
-            fi
-        fi
-    done << EOF
-$file_list
-EOF
+  # Executa toda a cadeia de comandos de uma vez
+  output=$(eval "$commands_string" 2>&1)
+  exit_code=$?
 
+  if [ $exit_code -eq 0 ]; then
     json_response "true" "{\"moved\": $moved_count}" "null"
+  else
+    # Mesmo em caso de erro, retorna a contagem de movimentos pretendidos
+    json_response "false" "{\"moved\": 0}" "{\"message\": \"Erro ao mover arquivos\", \"details\": \"$output\"}"
+  fi
 }
 
 list_expired_in_folder() {
@@ -151,8 +142,8 @@ main() {
     create_app_folders)
       create_app_folders "$1" "$2"
       ;; 
-    move_files)
-      move_files "$1" "$2"
+    execute_move_commands)
+      execute_move_commands "$1"
       ;; 
     list_expired_in_folder)
       list_expired_in_folder "$1" "$2" "$3"
