@@ -51,12 +51,21 @@ const ProcessConfig = {
           ]
         },
         {
-          id: "move",
+          id: "count_files",
+          label: "Contando arquivos para mover",
+          type: "shell",
+          func: "execute_shell_command",
+          params: ctx => [
+            ctx.build_move_commands.countCommand
+          ]
+        },
+        {
+          id: "move_files",
           label: "Movendo capturas de tela",
           type: "shell",
-          func: "execute_move_commands",
+          func: "execute_shell_command",
           params: ctx => [
-            ctx.build_move_commands
+            ctx.build_move_commands.moveCommand
           ]
         },
         {
@@ -66,7 +75,7 @@ const ProcessConfig = {
           func: "updateProcessData",
           params: ctx => [
             "organizer_screenshots",
-            { moved: ctx.move.moved, created: ctx.create_folders.created }
+            { moved: parseInt(ctx.count_files.stdout, 10) || 0, created: ctx.create_folders.created }
           ]
         }
       ]
@@ -111,12 +120,21 @@ const ProcessConfig = {
           ]
         },
         {
-          id: "move",
+          id: "count_files",
+          label: "Contando arquivos para mover",
+          type: "shell",
+          func: "execute_shell_command",
+          params: ctx => [
+            ctx.build_move_commands.countCommand
+          ]
+        },
+        {
+          id: "move_files",
           label: "Movendo gravações de tela",
           type: "shell",
-          func: "execute_move_commands",
+          func: "execute_shell_command",
           params: ctx => [
-            ctx.build_move_commands
+            ctx.build_move_commands.moveCommand
           ]
         },
         {
@@ -126,7 +144,7 @@ const ProcessConfig = {
           func: "updateProcessData",
           params: ctx => [
             "organizer_recordings",
-            { moved: ctx.move.moved, created: ctx.create_folders.created }
+            { moved: parseInt(ctx.count_files.stdout, 10) || 0, created: ctx.create_folders.created }
           ]
         }
       ]

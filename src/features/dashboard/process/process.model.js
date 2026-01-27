@@ -116,16 +116,34 @@ const ProcessModel = (function () {
   }
 
   async function buildMoveCommands(resolvedNames, sourcePath, destPath, extension) {
-    const commands = [`cd "${sourcePath}"`];
+  const commands = [`cd "${sourcePath}"`];
+  const patterns = [];
+  
+  for (const pkgName in resolvedNames) {
+    const appName = resolvedNames[pkgName];
+    const safeAppName = appName.replace(/[^\w\s.-]/g, "").trim();
     
-    for (const pkgName in resolvedNames) {
-      const appName = resolvedNames[pkgName];
-      const safeAppName = appName.replace(/[^\w\s.-]/g, "").trim();
-      commands.push(`mv -v *_${pkgName}.${extension} "${destPath}/${safeAppName}"`);
-    }
-    
-    return commands.join(' && ');
+    patterns.push(`*_${pkgName}.${extension}`);
+    commands.push(`mv *_${pkgName}.${extension} "${destPath}/${safeAppName}" 2>/dev/null`);
   }
+  
+  if (patterns.length === 0) {
+    return {
+      countCommand: "echo 0",
+      moveCommand: `cd "${sourcePath}"`,
+      expectedCount: 0
+    };
+  }
+  
+  // MAIS RÁPIDO com ls
+  const countCommand = `cd "${sourcePath}" && ls -1 ${patterns.join(' ')} 2>/dev/null | wc -l`;
+  
+  return {
+    countCommand: countCommand,
+    moveCommand: commands.join(' && '),
+    expectedCount: patterns.length
+  };
+}
 
   return {
     mapPackageNamesToAppNames,

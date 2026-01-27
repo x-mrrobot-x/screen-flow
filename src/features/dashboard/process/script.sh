@@ -62,30 +62,26 @@ EOF
   json_response "true" "{\"created\": $created_count}" "null"
 }
 
-execute_move_commands() {
-  local commands_string="$1"
-  local moved_count=0
+execute_shell_command() {
+  command_string="$1"
   local output
   local exit_code
 
-  # Executa toda a cadeia de comandos de uma vez
-  output=$(eval "$commands_string" 2>&1)
+  # Execute the command string
+  # Redirect stderr to stdout to capture everything
+  output=$(eval "$command_string" 2>&1)
   exit_code=$?
 
-  # Método mais robusto: conta linhas que contêm "renamed" ou padrão específico do busybox
-  # Ajuste conforme o formato exato da sua versão do busybox
-  # moved_count=$(echo "$output" | grep -c "renamed '.*' -> '.*'")
-  
-  # Se o padrão acima não funcionar, tente alternativas:
-  moved_count=$(echo "$output" | grep -c "->")
-  # moved_count=$(echo "$output" | wc -l)
+  # Trim leading/trailing whitespace
+  trimmed_output=$(echo "$output" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
 
   if [ $exit_code -eq 0 ]; then
-    json_response "true" "{\"moved\": $moved_count}" "null"
+    # In the JSON data, we only need the stdout part.
+    # The command's output is in trimmed_output
+    json_response "true" "{\"stdout\": \"$trimmed_output\"}" "null"
   else
-    # Escapa adequadamente a saída para JSON
-    escaped_output=$(printf "%s" "$output" | sed 's/\\/\\\\/g; s/"/\\"/g; s/\n/\\n/g' | tr '\n' ' ')
-    json_response "false" "{\"moved\": $moved_count}" "{\"message\": \"Erro ao mover arquivos\", \"details\": \"$escaped_output\"}"
+    escaped_output=$(printf "%s" "$trimmed_output" | sed 's/\\/\\\\/g; s/"/\\"/g; s/\n/\\n/g' | tr '\n' ' ')
+    json_response "false" "{}" "{\"message\": \"Erro ao executar comando\", \"details\": \"$escaped_output\"}"
   fi
 }
 
@@ -152,8 +148,8 @@ main() {
     create_app_folders)
       create_app_folders "$1" "$2"
       ;; 
-    execute_move_commands)
-      execute_move_commands "$1"
+    execute_shell_command)
+      execute_shell_command "$1"
       ;; 
     list_expired_in_folder)
       list_expired_in_folder "$1" "$2" "$3"
