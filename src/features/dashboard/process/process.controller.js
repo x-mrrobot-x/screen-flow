@@ -33,7 +33,6 @@ const ProcessController = (function() {
         const params = step.params(state.context);
         let result;
 
-        if(step.id == "remove__ss" || step.id == "remove_sr") return
         if (step.type === 'shell') {
           result = await ENV.runProcess(step.func, ...params);
         } else if (step.type === 'js') {
@@ -45,7 +44,7 @@ const ProcessController = (function() {
         state.context[step.id] = result;
         ProcessView.updateStepStatus(i, 'completed');
 
-        if (step.id === 'list' && result.length === 0) {
+        if ((step.id === 'scan_screenshots' || step.id === 'scan_recordings') && result.length === 0) {
           Toast.info("Nenhum arquivo encontrado para organizar.");
           stop();
           return;
@@ -71,12 +70,13 @@ const ProcessController = (function() {
     ProcessView.updateProgress(100);
     ProcessView.updateStepLabel("Processo concluído!");
     
-    const stats = state.context.update_data?.savedStats || {};
+    const finalSummary = state.context.save_summary || state.context.save_cleanup_summary || {};
+    const stats = finalSummary.savedStats || {};
     let completionText = "Processo finalizado com sucesso!";
 
-    if (state.processType === 'organizer_screenshots' || state.processType === 'organizer_recordings') {
+    if (state.processType === 'organize_screenshots' || state.processType === 'organize_recordings') {
       completionText = `Organização concluída! ${stats.moved || 0} arquivos movidos.`;
-    } else if (state.processType === 'clean_old_files') {
+    } else if (state.processType === 'cleanup_old_files') {
       completionText = `Limpeza concluída! ${stats.total_removed || 0} arquivos removidos.`;
     }
 

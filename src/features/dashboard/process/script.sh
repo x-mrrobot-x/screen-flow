@@ -7,7 +7,7 @@ json_response() {
   printf '{"success": %s, "data": %s, "error": %s}\n' "$success" "$data" "$error"
 }
 
-list_unique_package_names() {
+scan_media_app_packages() {
   file_type="$1"
   source_folder="$2"
 
@@ -16,10 +16,9 @@ list_unique_package_names() {
     return 1
   fi
 
-  # Extracts package name from filenames like '..._package.name.ext' and gets unique values.
   package_list=$(find "$source_folder" -maxdepth 1 -type f -name "*_*.$file_type" ! -name ".trashed*" 2>/dev/null \
     | grep -vE "_[0-9]+\.${file_type}" \
-    | sed -n "s/.*_\(.*\)\.${file_type}/\1/p" \
+    | sed -n "s/.*_\(.*\).${file_type}/\1/p" \
     | sort -u)
 
   if [ -z "$package_list" ]; then
@@ -27,13 +26,12 @@ list_unique_package_names() {
     return 0
   fi
   
-  # Convert to JSON
   json_array=$(echo "$package_list" | sed 's/\\/\\\\/g; s/"/\\"/g; s/^/"/; s/$/"/; H; $!d; x; s/\n/,/g; s/^,//')
   
   json_response "true" "[$json_array]" "null"
 }
 
-create_app_folders() {
+create_app_media_folders() {
   app_list_json="$1"
   dest_folder="$2"
   created_count=0
@@ -62,30 +60,39 @@ EOF
   json_response "true" "{\"created\": $created_count}" "null"
 }
 
-execute_shell_command() {
-  command_string="$1"
-  local output
-  local exit_code
+run_batch_command() {
+    count_command="$1"
+    move_command="$2"
+    local count
+    local move_output
+    local exit_code
 
-  # Execute the command string
-  # Redirect stderr to stdout to capture everything
-  output=$(eval "$command_string" 2>&1)
-  exit_code=$?
+    # 1. Contar os arquivos
+    count=$(eval "$count_command" 2>/dev/null)
+    # trim whitespace
+    count=$(echo "$count" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+    count=${count:-0} # Default to 0 if empty
 
-  # Trim leading/trailing whitespace
-  trimmed_output=$(echo "$output" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-
-  if [ $exit_code -eq 0 ]; then
-    # In the JSON data, we only need the stdout part.
-    # The command's output is in trimmed_output
-    json_response "true" "{\"stdout\": \"$trimmed_output\"}" "null"
-  else
-    escaped_output=$(printf "%s" "$trimmed_output" | sed 's/\\/\\\\/g; s/"/\\"/g; s/\n/\\n/g' | tr '\n' ' ')
-    json_response "false" "{}" "{\"message\": \"Erro ao executar comando\", \"details\": \"$escaped_output\"}"
-  fi
+    # Se não houver arquivos, não faz nada
+    if [ "$count" -eq 0 ]; then
+        json_response "true" "{\"moved\": 0}" "null"
+        return 0
+    fi
+    
+    # 2. Mover os arquivos
+    move_output=$(eval "$move_command" 2>&1)
+    exit_code=$?
+    
+    if [ $exit_code -eq 0 ]; then
+        # Retorna a contagem obtida anteriormente
+        json_response "true" "{\"moved\": $count}" "null"
+    else
+        escaped_output=$(printf "%s" "$move_output" | sed 's/\\/\\\\/g; s/"/\\"/g' | tr -d '\n')
+        json_response "false" "{}" "{\"message\": \"Erro ao mover arquivos\", \"details\": \"$escaped_output\"}"
+    fi
 }
 
-list_expired_in_folder() {
+find_expired_files() {
     folder_path="$1"
     days="$2"
     extension="$3"
@@ -104,7 +111,7 @@ list_expired_in_folder() {
     
     json_array=""
     while IFS= read -r file; do
-        escaped_file=$(printf "%s" "$file" | sed 's/\\/\\\\/g; s/"/\"/g')
+        escaped_file=$(printf "%s" "$file" | sed 's/\\/\\\\/g; s/"/\\"/g')
         if [ -z "$json_array" ]; then
             json_array="\"$escaped_file\""
         else
@@ -117,7 +124,7 @@ EOF
     json_response "true" "[$json_array]" "null"
 }
 
-remove_files() {
+delete_files_batch() {
   file_list_json="$1"
   removed_count=0
 
@@ -142,20 +149,20 @@ main() {
   command="$1"
   shift
   case "$command" in
-    list_unique_package_names)
-      list_unique_package_names "$1" "$2"
+    scan_media_app_packages)
+      scan_media_app_packages "$1" "$2"
       ;; 
-    create_app_folders)
-      create_app_folders "$1" "$2"
+    create_app_media_folders)
+      create_app_media_folders "$1" "$2"
       ;; 
-    execute_shell_command)
-      execute_shell_command "$1"
+    run_batch_command)
+      run_batch_command "$1" "$2"
       ;; 
-    list_expired_in_folder)
-      list_expired_in_folder "$1" "$2" "$3"
+    find_expired_files)
+      find_expired_files "$1" "$2" "$3"
       ;; 
-    remove_files)
-      remove_files "$1"
+    delete_files_batch)
+      delete_files_batch "$1"
       ;; 
     *)
       json_response "false" "{}" "\"Unknown command: $command\""

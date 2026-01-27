@@ -10,194 +10,167 @@ const ProcessConfig = {
     resultText: "#modal-result-text",
     closeBtn: "#process-modal-close"
   },
+
   PROCESS_TYPES: {
-    organizer_screenshots: {
-      title: "Organizando Capturas de Tela",
+    organize_screenshots: {
+      title: "Organizar Capturas de Tela",
       steps: [
         {
-          id: "list",
-          label: "Identificando apps nas capturas de tela",
+          id: "scan_screenshots",
+          label: "Analisando capturas de tela",
           type: "shell",
-          func: "list_unique_package_names",
+          func: "scan_media_app_packages",
           params: () => ["jpg", "/storage/emulated/0/DCIM/Screenshots"]
         },
         {
-          id: "resolve_names",
-          label: "Resolvendo nomes dos aplicativos",
+          id: "resolve_app_names",
+          label: "Identificando aplicativos",
           type: "js",
-          func: "mapPackageNamesToAppNames",
-          params: ctx => [ctx.list]
+          func: "resolveAppNames",
+          params: ctx => [ctx.scan_screenshots]
         },
         {
-          id: "create_folders",
-          label: "Criando pastas dos apps",
+          id: "create_app_folders",
+          label: "Criando pastas dos aplicativos",
           type: "shell",
-          func: "create_app_folders",
+          func: "create_app_media_folders",
           params: ctx => [
-            JSON.stringify(Object.values(ctx.resolve_names)),
+            JSON.stringify(Object.values(ctx.resolve_app_names)),
             "/storage/emulated/0/OrganizedMedia/Screenshots"
           ]
         },
         {
-          id: "build_move_commands",
-          label: "Construindo comandos para mover",
+          id: "prepare_file_moves",
+          label: "Preparando arquivos para organização",
           type: "js",
-          func: "buildMoveCommands",
+          func: "prepareScreenshotOrganization",
           params: ctx => [
-            ctx.resolve_names,
+            ctx.resolve_app_names,
             "/storage/emulated/0/DCIM/Screenshots",
             "/storage/emulated/0/OrganizedMedia/Screenshots",
             "jpg"
           ]
         },
         {
-          id: "count_files",
-          label: "Contando arquivos para mover",
+          id: "move_and_count",
+          label: "Organizando capturas de tela",
           type: "shell",
-          func: "execute_shell_command",
-          params: ctx => [
-            ctx.build_move_commands.countCommand
-          ]
+          func: "run_batch_command",
+          params: ctx => [ctx.prepare_file_moves.countCommand, ctx.prepare_file_moves.moveCommand]
         },
         {
-          id: "move_files",
-          label: "Movendo capturas de tela",
-          type: "shell",
-          func: "execute_shell_command",
-          params: ctx => [
-            ctx.build_move_commands.moveCommand
-          ]
-        },
-        {
-          id: "update_data",
-          label: "Finalizando organização",
+          id: "save_summary",
+          label: "Salvando resumo da organização",
           type: "js",
-          func: "updateProcessData",
+          func: "saveScreenshotSummary",
           params: ctx => [
-            "organizer_screenshots",
-            { moved: parseInt(ctx.count_files.stdout, 10) || 0, created: ctx.create_folders.created }
+            "organize_screenshots",
+            {
+              moved: ctx.move_and_count.moved || 0,
+              created: ctx.create_app_folders.created
+            }
           ]
         }
       ]
     },
-    organizer_recordings: {
-      title: "Organizando Gravações de Tela",
+
+    organize_recordings: {
+      title: "Organizar Gravações de Tela",
       steps: [
         {
-          id: "list",
-          label: "Identificando apps nas gravações de tela",
+          id: "scan_recordings",
+          label: "Analisando gravações de tela",
           type: "shell",
-          func: "list_unique_package_names",
+          func: "scan_media_app_packages",
           params: () => ["mp4", "/storage/emulated/0/DCIM/ScreenRecorder"]
         },
         {
-          id: "resolve_names",
-          label: "Resolvendo nomes dos aplicativos",
+          id: "resolve_app_names",
+          label: "Identificando aplicativos",
           type: "js",
-          func: "mapPackageNamesToAppNames",
-          params: ctx => [ctx.list]
+          func: "resolveAppNames",
+          params: ctx => [ctx.scan_recordings]
         },
         {
-          id: "create_folders",
-          label: "Criando pastas dos apps",
+          id: "create_app_folders",
+          label: "Criando pastas dos aplicativos",
           type: "shell",
-          func: "create_app_folders",
+          func: "create_app_media_folders",
           params: ctx => [
-            JSON.stringify(Object.values(ctx.resolve_names)),
+            JSON.stringify(Object.values(ctx.resolve_app_names)),
             "/storage/emulated/0/OrganizedMedia/Recordings"
           ]
         },
         {
-          id: "build_move_commands",
-          label: "Construindo comandos para mover",
+          id: "prepare_file_moves",
+          label: "Preparando arquivos para organização",
           type: "js",
-          func: "buildMoveCommands",
+          func: "prepareRecordingOrganization",
           params: ctx => [
-            ctx.resolve_names,
+            ctx.resolve_app_names,
             "/storage/emulated/0/DCIM/ScreenRecorder",
             "/storage/emulated/0/OrganizedMedia/Recordings",
             "mp4"
           ]
         },
         {
-          id: "count_files",
-          label: "Contando arquivos para mover",
+          id: "move_and_count",
+          label: "Organizando gravações de tela",
           type: "shell",
-          func: "execute_shell_command",
-          params: ctx => [
-            ctx.build_move_commands.countCommand
-          ]
+          func: "run_batch_command",
+          params: ctx => [ctx.prepare_file_moves.countCommand, ctx.prepare_file_moves.moveCommand]
         },
         {
-          id: "move_files",
-          label: "Movendo gravações de tela",
-          type: "shell",
-          func: "execute_shell_command",
-          params: ctx => [
-            ctx.build_move_commands.moveCommand
-          ]
-        },
-        {
-          id: "update_data",
-          label: "Finalizando organização",
+          id: "save_summary",
+          label: "Salvando resumo da organização",
           type: "js",
-          func: "updateProcessData",
+          func: "saveRecordingSummary",
           params: ctx => [
-            "organizer_recordings",
-            { moved: parseInt(ctx.count_files.stdout, 10) || 0, created: ctx.create_folders.created }
+            "organize_recordings",
+            {
+              moved: ctx.move_and_count.moved || 0,
+              created: ctx.create_app_folders.created
+            }
           ]
         }
       ]
     },
-    clean_old_files: {
-      title: "Limpando Arquivos Antigos",
+
+    cleanup_old_files: {
+      title: "Limpeza de Arquivos Antigos",
       steps: [
         {
-          id: "load_config",
-          label: "Carregando configurações de limpeza",
+          id: "load_cleanup_rules",
+          label: "Carregando regras de limpeza",
           type: "js",
-          func: "loadCleanerConfig",
+          func: "loadCleanupRules",
           params: () => []
         },
         {
-          id: "list_ss",
-          label: "Listando capturas expiradas",
+          id: "find_all_expired",
+          label: "Localizando arquivos antigos",
           type: "js",
-          func: "listAllExpired",
-          params: ctx => [ctx.load_config.screenshots, "jpg"]
+          func: "findAllExpiredMedia",
+          params: ctx => [ctx.load_cleanup_rules]
         },
         {
-          id: "list_sr",
-          label: "Listando gravações expiradas",
-          type: "js",
-          func: "listAllExpired",
-          params: ctx => [ctx.load_config?.recordings || [], "mp4"]
-        },
-        {
-          id: "remove_ss",
-          label: "Removendo capturas expiradas",
+          id: "delete_all_expired",
+          label: "Removendo arquivos antigos",
           type: "shell",
-          func: "remove_files",
-          params: ctx => [JSON.stringify(ctx.list_ss)]
+          func: "delete_files_batch",
+          params: ctx => [JSON.stringify(ctx.find_all_expired.all)]
         },
         {
-          id: "remove_sr",
-          label: "Removendo gravações expiradas",
-          type: "shell",
-          func: "remove_files",
-          params: ctx => [JSON.stringify(ctx.list_sr)]
-        },
-        {
-          id: "update_data",
-          label: "Finalizando limpeza",
+          id: "save_cleanup_summary",
+          label: "Salvando resumo da limpeza",
           type: "js",
-          func: "updateProcessData",
+          func: "saveCleanupSummary",
           params: ctx => [
-            "clean_old_files",
+            "cleanup_old_files",
             {
-              ss_removed: ctx.remove_ss.removed,
-              sr_removed: ctx.remove_sr.removed,
-              total_removed: ctx.remove_ss.removed + ctx.remove_sr.removed
+              ss_removed: ctx.find_all_expired.screenshots.length,
+              sr_removed: ctx.find_all_expired.recordings.length,
+              total_removed: ctx.find_all_expired.all.length
             }
           ]
         }
