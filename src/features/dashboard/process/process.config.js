@@ -16,24 +16,17 @@ const ProcessConfig = {
       steps: [
         {
           id: "list",
-          label: "Listando capturas de tela",
+          label: "Identificando apps nas capturas de tela",
           type: "shell",
-          func: "list_files",
+          func: "list_unique_package_names",
           params: () => ["jpg", "/storage/emulated/0/DCIM/Screenshots"]
-        },
-        {
-          id: "extract",
-          label: "Extraindo nomes de pacotes",
-          type: "js",
-          func: "extractAppNames",
-          params: ctx => [ctx.list, "jpg"]
         },
         {
           id: "resolve_names",
           label: "Resolvendo nomes dos aplicativos",
           type: "js",
           func: "mapPackageNamesToAppNames",
-          params: ctx => [ctx.extract]
+          params: ctx => [ctx.list]
         },
         {
           id: "create_folders",
@@ -83,24 +76,17 @@ const ProcessConfig = {
       steps: [
         {
           id: "list",
-          label: "Listando gravações de tela",
+          label: "Identificando apps nas gravações de tela",
           type: "shell",
-          func: "list_files",
+          func: "list_unique_package_names",
           params: () => ["mp4", "/storage/emulated/0/DCIM/ScreenRecorder"]
-        },
-        {
-          id: "extract",
-          label: "Extraindo nomes de pacotes",
-          type: "js",
-          func: "extractAppNames",
-          params: ctx => [ctx.list, "mp4"]
         },
         {
           id: "resolve_names",
           label: "Resolvendo nomes dos aplicativos",
           type: "js",
           func: "mapPackageNamesToAppNames",
-          params: ctx => [ctx.extract]
+          params: ctx => [ctx.list]
         },
         {
           id: "create_folders",

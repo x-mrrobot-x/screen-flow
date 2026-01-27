@@ -1,20 +1,6 @@
 const ProcessModel = (function () {
   "use strict";
 
-  async function extractAppNames(fileList, extension) {
-    if (!fileList || fileList.length === 0) return [];
-
-    const pattern = new RegExp(`_([^_]+)\.${extension}$`);
-    const uniqueNames = new Set();
-
-    for (let i = 0; i < fileList.length; i++) {
-      const match = fileList[i].match(pattern);
-      if (match) uniqueNames.add(match[1]);
-    }
-
-    return [...uniqueNames];
-  }
-
   // Carrega a configuração de limpeza automática a partir dos dados das pastas.
   async function loadCleanerConfig() {
     const folders = await ENV.getDataAsync("FOLDERS");
@@ -142,7 +128,6 @@ const ProcessModel = (function () {
   }
 
   return {
-    extractAppNames,
     mapPackageNamesToAppNames,
     loadCleanerConfig,
     listAllExpired,

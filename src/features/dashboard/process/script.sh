@@ -7,7 +7,7 @@ json_response() {
   printf '{"success": %s, "data": %s, "error": %s}\n' "$success" "$data" "$error"
 }
 
-list_files() {
+list_unique_package_names() {
   file_type="$1"
   source_folder="$2"
 
@@ -16,15 +16,19 @@ list_files() {
     return 1
   fi
 
-  file_list=$(find "$source_folder" -maxdepth 1 -type f -name "*_*.$file_type" ! -name ".trashed*" 2>/dev/null | grep -vE "_[0-9]+\\.${file_type}\$")
+  # Extracts package name from filenames like '..._package.name.ext' and gets unique values.
+  package_list=$(find "$source_folder" -maxdepth 1 -type f -name "*_*.$file_type" ! -name ".trashed*" 2>/dev/null \
+    | grep -vE "_[0-9]+\.${file_type}" \
+    | sed -n "s/.*_\(.*\)\.${file_type}/\1/p" \
+    | sort -u)
 
-  if [ -z "$file_list" ]; then
+  if [ -z "$package_list" ]; then
     json_response "true" "[]" "null"
     return 0
   fi
   
-  # Converte para JSON usando sed
-  json_array=$(echo "$file_list" | sed 's/\\/\\\\/g; s/"/\\"/g; s/^/"/; s/$/"/; H; $!d; x; s/\n/,/g; s/^,//')
+  # Convert to JSON
+  json_array=$(echo "$package_list" | sed 's/\\/\\\\/g; s/"/\\"/g; s/^/"/; s/$/"/; H; $!d; x; s/\n/,/g; s/^,//')
   
   json_response "true" "[$json_array]" "null"
 }
@@ -64,18 +68,24 @@ execute_move_commands() {
   local output
   local exit_code
 
-  # Conta o número de comandos 'mv ' na string
-  moved_count=$(echo "$commands_string" | grep -o "mv " | wc -l)
-
   # Executa toda a cadeia de comandos de uma vez
   output=$(eval "$commands_string" 2>&1)
   exit_code=$?
 
+  # Método mais robusto: conta linhas que contêm "renamed" ou padrão específico do busybox
+  # Ajuste conforme o formato exato da sua versão do busybox
+  # moved_count=$(echo "$output" | grep -c "renamed '.*' -> '.*'")
+  
+  # Se o padrão acima não funcionar, tente alternativas:
+  moved_count=$(echo "$output" | grep -c "->")
+  # moved_count=$(echo "$output" | wc -l)
+
   if [ $exit_code -eq 0 ]; then
     json_response "true" "{\"moved\": $moved_count}" "null"
   else
-    # Mesmo em caso de erro, retorna a contagem de movimentos pretendidos
-    json_response "false" "{\"moved\": 0}" "{\"message\": \"Erro ao mover arquivos\", \"details\": \"$output\"}"
+    # Escapa adequadamente a saída para JSON
+    escaped_output=$(printf "%s" "$output" | sed 's/\\/\\\\/g; s/"/\\"/g; s/\n/\\n/g' | tr '\n' ' ')
+    json_response "false" "{\"moved\": $moved_count}" "{\"message\": \"Erro ao mover arquivos\", \"details\": \"$escaped_output\"}"
   fi
 }
 
@@ -98,7 +108,7 @@ list_expired_in_folder() {
     
     json_array=""
     while IFS= read -r file; do
-        escaped_file=$(printf "%s" "$file" | sed 's/\\/\\\\/g; s/"/\\"/g')
+        escaped_file=$(printf "%s" "$file" | sed 's/\\/\\\\/g; s/"/\"/g')
         if [ -z "$json_array" ]; then
             json_array="\"$escaped_file\""
         else
@@ -136,8 +146,8 @@ main() {
   command="$1"
   shift
   case "$command" in
-    list_files)
-      list_files "$1" "$2"
+    list_unique_package_names)
+      list_unique_package_names "$1" "$2"
       ;; 
     create_app_folders)
       create_app_folders "$1" "$2"
