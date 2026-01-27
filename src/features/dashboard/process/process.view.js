@@ -1,5 +1,5 @@
-const ProcessView = (function() {
-  'use strict';
+const ProcessView = (function () {
+  "use strict";
 
   const elements = {};
   let handleCancel = () => {};
@@ -11,9 +11,9 @@ const ProcessView = (function() {
     handleCancel = options.onCancel;
 
     if (elements.closeBtn) {
-      elements.closeBtn.addEventListener('click', handleCancel);
+      elements.closeBtn.addEventListener("click", handleCancel);
     }
-    elements.modal.addEventListener('click', (e) => {
+    elements.modal.addEventListener("click", e => {
       if (e.target === elements.modal) {
         handleCancel();
       }
@@ -42,12 +42,12 @@ const ProcessView = (function() {
   }
 
   function renderInitialSteps(steps) {
-    elements.stepsContainer.innerHTML = '';
-    steps.forEach((step) => {
-      const stepElement = document.createElement('div');
-      stepElement.className = 'step-item incomplete';
+    elements.stepsContainer.innerHTML = "";
+    steps.forEach(step => {
+      const stepElement = document.createElement("div");
+      stepElement.className = "step-item incomplete";
       stepElement.innerHTML = `
-        <div class="step-icon">${Icons.get('loader')}</div>
+        <div class="step-icon">${Icons.get("loader")}</div>
         <span class="step-label">${step.label}</span>
       `;
       elements.stepsContainer.appendChild(stepElement);
@@ -58,13 +58,15 @@ const ProcessView = (function() {
     const stepElements = elements.stepsContainer.children;
     if (!stepElements[index]) return;
 
-    stepElements[index].classList.remove('incomplete', 'running', 'completed');
+    stepElements[index].classList.remove("incomplete", "running", "completed");
     stepElements[index].classList.add(status);
 
-    if (status === 'completed') {
-      stepElements[index].querySelector('.step-icon').innerHTML = Icons.get('check');
+    if (status === "completed") {
+      stepElements[index].querySelector(".step-icon").innerHTML =
+        Icons.get("check");
     } else {
-      stepElements[index].querySelector('.step-icon').innerHTML = Icons.get('loader');
+      stepElements[index].querySelector(".step-icon").innerHTML =
+        Icons.get("loader");
     }
   }
 
@@ -82,6 +84,16 @@ const ProcessView = (function() {
     elements.resultText.textContent = resultText;
   }
 
+  function scrollToStep(index) {
+    const stepElements = elements.stepsContainer.children;
+    if (!stepElements[index + 1]) return;
+
+    stepElements[index + 1].scrollIntoView({
+      behavior: "smooth",
+      block: "nearest"
+    });
+  }
+
   return {
     init,
     show,
@@ -92,6 +104,7 @@ const ProcessView = (function() {
     updateStepStatus,
     updateProgress,
     updateStepLabel,
-    showCompletion
+    showCompletion,
+    scrollToStep
   };
 })();

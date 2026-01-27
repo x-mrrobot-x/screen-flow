@@ -9,6 +9,8 @@ const ProcessController = (function() {
 
   //======= MOTOR DE EXECUÇÃO DE PROCESSOS =======//
 
+  const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
   async function run() {
     const processData = ProcessConfig.PROCESS_TYPES[state.processType];
     const steps = processData.steps;
@@ -23,6 +25,7 @@ const ProcessController = (function() {
       const progress = (i / steps.length) * 100;
 
       ProcessView.updateStepStatus(i, 'running');
+      ProcessView.scrollToStep(i);
       ProcessView.updateStepLabel(step.label);
       ProcessView.updateProgress(progress);
       
@@ -41,6 +44,14 @@ const ProcessController = (function() {
         console.log("Step result", step.id, result);
         state.context[step.id] = result;
         ProcessView.updateStepStatus(i, 'completed');
+
+        if (step.id === 'list' && result.length === 0) {
+          Toast.info("Nenhum arquivo encontrado para organizar.");
+          stop();
+          return;
+        }
+
+        await sleep(500);
 
       } catch (error) {
         console.error(`Erro na etapa ${step.id}:`, error);
@@ -73,6 +84,12 @@ const ProcessController = (function() {
     state.isRunning = false;
   }
 
+  function stop() {
+    state.isRunning = false;
+    ProcessView.hide();
+    ProcessView.reset();
+  }
+
   async function start(processType) {
     if (state.isRunning) return;
 
@@ -103,7 +120,7 @@ const ProcessController = (function() {
   }
 
   function cancelCurrentProcess() {
-    state.isRunning = false; // Garante que o processo em andamento pare
+    state.isRunning = false;
     ProcessView.hide();
     ProcessView.reset();
   }
@@ -120,5 +137,6 @@ const ProcessController = (function() {
   return {
     init,
     start,
+    stop,
   };
 })();
