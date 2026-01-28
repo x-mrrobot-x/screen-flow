@@ -64,31 +64,46 @@ run_batch_command() {
     count_command="$1"
     move_command="$2"
     local count
-    local move_output
-    local exit_code
+    local moved_count=0
+    local errors=""
 
     # 1. Contar os arquivos
     count=$(eval "$count_command" 2>/dev/null)
-    # trim whitespace
     count=$(echo "$count" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-    count=${count:-0} # Default to 0 if empty
+    count=${count:-0}
 
-    # Se não houver arquivos, não faz nada
     if [ "$count" -eq 0 ]; then
         json_response "true" "{\"moved\": 0}" "null"
         return 0
     fi
     
-    # 2. Mover os arquivos
-    move_output=$(eval "$move_command" 2>&1)
-    exit_code=$?
+    # 2. Executar cada comando mv separadamente e capturar erros
+    move_command_safe=$(echo "$move_command" | sed 's/ && / ; /g')
     
-    if [ $exit_code -eq 0 ]; then
-        # Retorna a contagem obtida anteriormente
-        json_response "true" "{\"moved\": $count}" "null"
+    # Criar arquivo temporário para logs
+    error_log=$(mktemp)
+    
+    # 3. Executar e capturar STDERR
+    eval "$move_command_safe" 2>"$error_log"
+    
+    # 4. Contar quantos arquivos realmente foram movidos
+    remaining=$(eval "$count_command" 2>/dev/null)
+    remaining=$(echo "$remaining" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+    remaining=${remaining:-0}
+    
+    moved_count=$((count - remaining))
+    
+    # 5. Ler erros do arquivo temporário
+    if [ -s "$error_log" ]; then
+        errors=$(cat "$error_log" | tr '\n' ' ' | sed 's/\\/\\\\/g; s/"/\\"/g')
+    fi
+    rm -f "$error_log"
+    
+    if [ $moved_count -eq $count ]; then
+        json_response "true" "{\"moved\": $moved_count, \"total\": $count}" "null"
     else
-        escaped_output=$(printf "%s" "$move_output" | sed 's/\\/\\\\/g; s/"/\\"/g' | tr -d '\n')
-        json_response "false" "{}" "{\"message\": \"Erro ao mover arquivos\", \"details\": \"$escaped_output\"}"
+        failed_count=$((count - moved_count))
+        json_response "true" "{\"moved\": $moved_count, \"total\": $count, \"failed\": $failed_count}" "{\"message\": \"Alguns arquivos não foram movidos\", \"details\": \"$errors\"}"
     fi
 }
 

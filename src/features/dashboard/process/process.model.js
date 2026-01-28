@@ -28,7 +28,9 @@ const ProcessModel = (function () {
 
     for (const pkgName in resolvedNames) {
       const appName = resolvedNames[pkgName];
-      const safeAppName = appName.replace(/[^\w\s.-]/g, "").trim();
+      // REMOVIDO: const safeAppName = appName.replace(/[^\w\s.-]/g, "").trim();
+      // Usa o nome original, apenas remove espaços extras
+      const safeAppName = appName.trim();
 
       patterns.push(`*_${pkgName}.${extension}`);
       commands.push(
@@ -43,7 +45,6 @@ const ProcessModel = (function () {
       };
     }
 
-    // Comando único para contar TODOS os arquivos que serão movidos
     const countCommand = `cd "${sourcePath}" && ls -1 ${patterns.join(
       " "
     )} 2>/dev/null | wc -l`;
