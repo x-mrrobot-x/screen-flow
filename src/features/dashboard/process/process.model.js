@@ -2,9 +2,10 @@ const ProcessModel = (function () {
   "use strict";
 
   async function resolveAppNames(packageNames) {
-    const folders = await ENV.getDataAsync("FOLDERS");
-    const packageToAppNameMap = folders.reduce((map, folder) => {
-      map[folder.pkg] = folder.name;
+    const apps = AppState.getApps();
+
+    const packageToAppNameMap = apps.reduce((map, app) => {
+      map[app.pkg] = app.name;
       return map;
     }, {});
 
@@ -12,43 +13,62 @@ const ProcessModel = (function () {
     for (const pkgName of packageNames) {
       resolvedMap[pkgName] = packageToAppNameMap[pkgName] || pkgName;
     }
-    
+
     return resolvedMap;
   }
 
-  async function buildMoveCommands(resolvedNames, sourcePath, destPath, extension) {
+  async function buildMoveCommands(
+    resolvedNames,
+    sourcePath,
+    destPath,
+    extension
+  ) {
     const commands = [`cd "${sourcePath}"`];
     const patterns = [];
-    
+
     for (const pkgName in resolvedNames) {
       const appName = resolvedNames[pkgName];
       const safeAppName = appName.replace(/[^\w\s.-]/g, "").trim();
-      
+
       patterns.push(`*_${pkgName}.${extension}`);
-      commands.push(`mv *_${pkgName}.${extension} "${destPath}/${safeAppName}" 2>/dev/null`);
+      commands.push(
+        `mv *_${pkgName}.${extension} "${destPath}/${safeAppName}" 2>/dev/null`
+      );
     }
-    
+
     if (patterns.length === 0) {
       return {
         countCommand: "echo 0",
         moveCommand: "echo 'Nenhum arquivo para mover'"
       };
     }
-    
+
     // Comando único para contar TODOS os arquivos que serão movidos
-    const countCommand = `cd "${sourcePath}" && ls -1 ${patterns.join(' ')} 2>/dev/null | wc -l`;
-    
+    const countCommand = `cd "${sourcePath}" && ls -1 ${patterns.join(
+      " "
+    )} 2>/dev/null | wc -l`;
+
     return {
       countCommand: countCommand,
-      moveCommand: commands.join(' && ')
+      moveCommand: commands.join(" && ")
     };
   }
 
-  async function prepareScreenshotOrganization(resolvedNames, sourcePath, destPath, extension) {
+  async function prepareScreenshotOrganization(
+    resolvedNames,
+    sourcePath,
+    destPath,
+    extension
+  ) {
     return buildMoveCommands(resolvedNames, sourcePath, destPath, extension);
   }
 
-  async function prepareRecordingOrganization(resolvedNames, sourcePath, destPath, extension) {
+  async function prepareRecordingOrganization(
+    resolvedNames,
+    sourcePath,
+    destPath,
+    extension
+  ) {
     return buildMoveCommands(resolvedNames, sourcePath, destPath, extension);
   }
 
@@ -77,8 +97,16 @@ const ProcessModel = (function () {
   }
 
   async function findAllExpiredMedia(rules, screenshotsPath, recordingsPath) {
-    const expiredScreenshots = await findExpired(rules.screenshots, screenshotsPath, "jpg");
-    const expiredRecordings = await findExpired(rules.recordings, recordingsPath, "mp4");
+    const expiredScreenshots = await findExpired(
+      rules.screenshots,
+      screenshotsPath,
+      "jpg"
+    );
+    const expiredRecordings = await findExpired(
+      rules.recordings,
+      recordingsPath,
+      "mp4"
+    );
 
     return {
       screenshots: expiredScreenshots,
@@ -86,13 +114,13 @@ const ProcessModel = (function () {
       all: [...expiredScreenshots, ...expiredRecordings]
     };
   }
-  
+
   async function findExpired(configs, rootDir, extension) {
     let allExpired = [];
     for (const config of configs) {
       try {
         // Re-utiliza a lógica de busca do script, mas poderia ser uma função JS pura se o ambiente permitir
-        const folderPath = `${rootDir}/${config.folder}`
+        const folderPath = `${rootDir}/${config.folder}`;
         const expiredInFolder = await ENV.runProcess(
           "find_expired_files",
           folderPath,
@@ -103,7 +131,10 @@ const ProcessModel = (function () {
           allExpired = allExpired.concat(expiredInFolder);
         }
       } catch (e) {
-        console.error(`Falha ao listar arquivos expirados em ${config.folder}:`, e);
+        console.error(
+          `Falha ao listar arquivos expirados em ${config.folder}:`,
+          e
+        );
       }
     }
     return allExpired;
@@ -115,17 +146,21 @@ const ProcessModel = (function () {
     const isCleaner = processType.startsWith("cleanup");
 
     const statsPayload = {
-      processType: isOrganizer ? "organizer" : isCleaner ? "cleanup" : "unknown",
+      processType: isOrganizer
+        ? "organizer"
+        : isCleaner
+        ? "cleanup"
+        : "unknown",
       organizerCount: stats.moved || 0,
       cleanedCount: stats.total_removed || 0
     };
     AppState.updateStatsFromProcess(statsPayload);
 
     // 2. Adiciona a atividade correspondente
-    const activityPayload = { 
-        execution: "manual",
-        type: activityType,
-        count: stats.moved || stats.total_removed || 0
+    const activityPayload = {
+      execution: "manual",
+      type: activityType,
+      count: stats.moved || stats.total_removed || 0
     };
 
     if (mediaType) {
@@ -148,7 +183,7 @@ const ProcessModel = (function () {
   async function saveCleanupSummary(processType, stats) {
     return saveSummary(processType, stats, "cleaner");
   }
-  
+
   async function hasCleanerConfigs() {
     const folders = await ENV.getDataAsync("FOLDERS");
     return folders.some(folder => folder.cleaner.ss.on || folder.cleaner.sr.on);

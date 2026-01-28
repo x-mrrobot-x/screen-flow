@@ -1,0 +1,598 @@
+[
+  {
+    "name": "Câmera",
+    "pkg": "com.android.camera"
+  },
+  {
+    "name": "Chrome",
+    "pkg": "com.android.chrome"
+  },
+  {
+    "name": "Relógio",
+    "pkg": "com.android.deskclock"
+  },
+  {
+    "name": "Configurações",
+    "pkg": "com.android.settings"
+  },
+  {
+    "name": "Gravador",
+    "pkg": "com.android.soundrecorder"
+  },
+  {
+    "name": "Temas",
+    "pkg": "com.android.thememanager"
+  },
+  {
+    "name": "Google Play Store",
+    "pkg": "com.android.vending"
+  },
+  {
+    "name": "Maps",
+    "pkg": "com.google.android.apps.maps"
+  },
+  {
+    "name": "Mensagens",
+    "pkg": "com.google.android.apps.messaging"
+  },
+  {
+    "name": "Agenda",
+    "pkg": "com.google.android.calendar"
+  },
+  {
+    "name": "Contatos",
+    "pkg": "com.google.android.contacts"
+  },
+  {
+    "name": "Telefone",
+    "pkg": "com.google.android.dialer"
+  },
+  {
+    "name": "Gmail",
+    "pkg": "com.google.android.gm"
+  },
+  {
+    "name": "Gerenciador de Arquivos",
+    "pkg": "com.mi.android.globalFileexplorer"
+  },
+  {
+    "name": "Calculadora",
+    "pkg": "com.miui.calculator"
+  },
+  {
+    "name": "Galeria",
+    "pkg": "com.miui.gallery"
+  },
+  {
+    "name": "Serviços e Feedback",
+    "pkg": "com.miui.miservice"
+  },
+  {
+    "name": "Anotações",
+    "pkg": "com.miui.notes"
+  },
+  {
+    "name": "Clima",
+    "pkg": "com.miui.weather2"
+  },
+  {
+    "name": "Centro de Jogos",
+    "pkg": "com.xiaomi.glgm"
+  },
+  {
+    "name": "Digitalizador",
+    "pkg": "com.xiaomi.scanner"
+  },
+  {
+    "name": "Retro Music",
+    "pkg": "code.name.monkey.retromusic"
+  },
+  {
+    "name": "App Usage",
+    "pkg": "com.a0soft.gphone.uninstaller"
+  },
+  {
+    "name": "Brave",
+    "pkg": "com.brave.browser"
+  },
+  {
+    "name": "Lera",
+    "pkg": "com.changdu.portugalreader"
+  },
+  {
+    "name": "YouTube Pro",
+    "pkg": "com.gold.android.youtube"
+  },
+  {
+    "name": "Drive",
+    "pkg": "com.google.android.apps.docs"
+  },
+  {
+    "name": "Meet",
+    "pkg": "com.google.android.apps.tachyon"
+  },
+  {
+    "name": "Google Play Games",
+    "pkg": "com.google.android.play.games"
+  },
+  {
+    "name": "Outlook",
+    "pkg": "com.microsoft.office.outlook"
+  },
+  {
+    "name": "MiXplorer",
+    "pkg": "com.mixplorer.silver"
+  },
+  {
+    "name": "PayPal",
+    "pkg": "com.paypal.android.p2pmobile"
+  },
+  {
+    "name": "PicPay",
+    "pkg": "com.picpay"
+  },
+  {
+    "name": "Pinterest",
+    "pkg": "com.pinterest"
+  },
+  {
+    "name": "Shazam",
+    "pkg": "com.shazam.android"
+  },
+  {
+    "name": "Spotify",
+    "pkg": "com.spotify.music"
+  },
+  {
+    "name": "Tasker",
+    "pkg": "net.dinglisch.android.taskerm"
+  },
+  {
+    "name": "Downloads",
+    "pkg": "com.android.providers.downloads.ui"
+  },
+  {
+    "name": "SIM Claro",
+    "pkg": "com.android.stk"
+  },
+  {
+    "name": "Assistente",
+    "pkg": "com.google.android.apps.googleassistant"
+  },
+  {
+    "name": "Emergência pessoal",
+    "pkg": "com.google.android.apps.safetyhub"
+  },
+  {
+    "name": "Google One",
+    "pkg": "com.google.android.apps.subscriptions.red"
+  },
+  {
+    "name": "Google",
+    "pkg": "com.google.android.googlequicksearchbox"
+  },
+  {
+    "name": "App vault",
+    "pkg": "com.mi.globalminusscreen"
+  },
+  {
+    "name": "Bússola",
+    "pkg": "com.miui.compass"
+  },
+  {
+    "name": "Rádio FM",
+    "pkg": "com.miui.fm"
+  },
+  {
+    "name": "Música",
+    "pkg": "com.miui.player"
+  },
+  {
+    "name": "Gravador de Tela",
+    "pkg": "com.miui.screenrecorder"
+  },
+  {
+    "name": "Segurança",
+    "pkg": "com.miui.securitycenter"
+  },
+  {
+    "name": "Mi Vídeo",
+    "pkg": "com.miui.videoplayer"
+  },
+  {
+    "name": "ShareMe",
+    "pkg": "com.xiaomi.midrop"
+  },
+  {
+    "name": "GetApps",
+    "pkg": "com.xiaomi.mipicks"
+  },
+  {
+    "name": "Perplexity",
+    "pkg": "ai.perplexity.app.android"
+  },
+  {
+    "name": "Grok",
+    "pkg": "ai.x.grok"
+  },
+  {
+    "name": "ChatLLM",
+    "pkg": "com.abacusai.chatllm"
+  },
+  {
+    "name": "Galeria",
+    "pkg": "com.alensw.PicFolder"
+  },
+  {
+    "name": "Claude",
+    "pkg": "com.anthropic.claude"
+  },
+  {
+    "name": "Color Picker AR",
+    "pkg": "com.appsvek.color_picker.rgb_color_detector.eyedropper"
+  },
+  {
+    "name": "Zangi",
+    "pkg": "com.beint.zangi"
+  },
+  {
+    "name": "Cópia Universal",
+    "pkg": "com.camel.corp.universalcopy"
+  },
+  {
+    "name": "Xadrez",
+    "pkg": "com.chess"
+  },
+  {
+    "name": "Speechify",
+    "pkg": "com.cliffweitzman.speechify2"
+  },
+  {
+    "name": "IP Tools",
+    "pkg": "com.ddm.iptools"
+  },
+  {
+    "name": "DeepL",
+    "pkg": "com.deepl.mobiletranslator"
+  },
+  {
+    "name": "DeepSeek",
+    "pkg": "com.deepseek.chat"
+  },
+  {
+    "name": "Flud",
+    "pkg": "com.delphicoder.flud"
+  },
+  {
+    "name": "Discord",
+    "pkg": "com.discord"
+  },
+  {
+    "name": "Dolby On",
+    "pkg": "com.dolby.dolby234"
+  },
+  {
+    "name": "Figurinhas Personalizadas para WhatsApp",
+    "pkg": "com.dstukalov.walocalstoragestickers"
+  },
+  {
+    "name": "Duolingo",
+    "pkg": "com.duolingo"
+  },
+  {
+    "name": "Facebook",
+    "pkg": "com.facebook.katana"
+  },
+  {
+    "name": "Fonts",
+    "pkg": "com.fontskeyboard.fonts"
+  },
+  {
+    "name": "fooView",
+    "pkg": "com.fooview.android.fooview"
+  },
+  {
+    "name": "Acode",
+    "pkg": "com.foxdebug.acode"
+  },
+  {
+    "name": "Serviços MicroG",
+    "pkg": "com.gold.android.gms"
+  },
+  {
+    "name": "Ampere",
+    "pkg": "com.gombosdev.ampere"
+  },
+  {
+    "name": "Gemini",
+    "pkg": "com.google.android.apps.bard"
+  },
+  {
+    "name": "NotebookLM",
+    "pkg": "com.google.android.apps.labs.language.tailwind"
+  },
+  {
+    "name": "Tradutor",
+    "pkg": "com.google.android.apps.translate"
+  },
+  {
+    "name": "Rock Hero 2",
+    "pkg": "com.grillgames.guitarrockhero2"
+  },
+  {
+    "name": "Background Eraser",
+    "pkg": "com.handycloset.android.eraser"
+  },
+  {
+    "name": "AnkiDroid",
+    "pkg": "com.ichi2.anki"
+  },
+  {
+    "name": "Imgur",
+    "pkg": "com.imgur.mobile"
+  },
+  {
+    "name": "Instagram",
+    "pkg": "com.instagram.android"
+  },
+  {
+    "name": "Database Designer",
+    "pkg": "com.klim.dbdesigner"
+  },
+  {
+    "name": "Clicker automático",
+    "pkg": "com.ksxkq.autoclick"
+  },
+  {
+    "name": "Kwai",
+    "pkg": "com.kwai.video"
+  },
+  {
+    "name": "LinkedIn",
+    "pkg": "com.linkedin.android"
+  },
+  {
+    "name": "Ola Party",
+    "pkg": "com.live.party"
+  },
+  {
+    "name": "X-plore",
+    "pkg": "com.lonelycatgames.Xplore"
+  },
+  {
+    "name": "Memento",
+    "pkg": "com.luckydroid.droidbase"
+  },
+  {
+    "name": "Lumosity",
+    "pkg": "com.lumoslabs.lumosity"
+  },
+  {
+    "name": "Jogos de Memória",
+    "pkg": "com.memory.brain.training.games"
+  },
+  {
+    "name": "Mercado Livre",
+    "pkg": "com.mercadolibre"
+  },
+  {
+    "name": "Mercado Pago",
+    "pkg": "com.mercadopago.wallet"
+  },
+  {
+    "name": "Copilot",
+    "pkg": "com.microsoft.copilot"
+  },
+  {
+    "name": "RecordPlus",
+    "pkg": "com.mobilus.recordplay"
+  },
+  {
+    "name": "Cute CUT",
+    "pkg": "com.mobivio.android.cutecut"
+  },
+  {
+    "name": "Netflix",
+    "pkg": "com.netflix.mediaclient"
+  },
+  {
+    "name": "ASR",
+    "pkg": "com.nll.asr"
+  },
+  {
+    "name": "Minha Claro",
+    "pkg": "com.nvt.cs"
+  },
+  {
+    "name": "ChatGPT",
+    "pkg": "com.openai.chatgpt"
+  },
+  {
+    "name": "Opera GX",
+    "pkg": "com.opera.gx"
+  },
+  {
+    "name": "TNotes",
+    "pkg": "com.quyetsama.tnotes"
+  },
+  {
+    "name": "Reddit",
+    "pkg": "com.reddit.frontpage"
+  },
+  {
+    "name": "Reqable",
+    "pkg": "com.reqable.android"
+  },
+  {
+    "name": "Shopee",
+    "pkg": "com.shopee.br"
+  },
+  {
+    "name": "Sticker.ly",
+    "pkg": "com.snowcorp.stickerly.android"
+  },
+  {
+    "name": "ColorNote",
+    "pkg": "com.socialnmobile.dictapps.notepad.color.note"
+  },
+  {
+    "name": "Clash Royale",
+    "pkg": "com.supercell.clashroyale"
+  },
+  {
+    "name": "Temp Mail",
+    "pkg": "com.tempmail"
+  },
+  {
+    "name": "Termux",
+    "pkg": "com.termux"
+  },
+  {
+    "name": "Termux:Tasker",
+    "pkg": "com.termux.tasker"
+  },
+  {
+    "name": "TickTick",
+    "pkg": "com.ticktick.task"
+  },
+  {
+    "name": "SQLite Editor",
+    "pkg": "com.tomminosoftware.sqliteeditor"
+  },
+  {
+    "name": "Trello",
+    "pkg": "com.trello"
+  },
+  {
+    "name": "X",
+    "pkg": "com.twitter.android"
+  },
+  {
+    "name": "Udemy",
+    "pkg": "com.udemy.android"
+  },
+  {
+    "name": "Rave",
+    "pkg": "com.wemesh.android"
+  },
+  {
+    "name": "WhatsApp",
+    "pkg": "com.whatsapp"
+  },
+  {
+    "name": "XML Viewer",
+    "pkg": "com.xmlviewer.json.html.java.kotlin.fileviewer"
+  },
+  {
+    "name": "Hago",
+    "pkg": "com.yy.hiyo"
+  },
+  {
+    "name": "TikTok",
+    "pkg": "com.zhiliaoapp.musically"
+  },
+  {
+    "name": "Quick Brain",
+    "pkg": "de.softan.brainstorm"
+  },
+  {
+    "name": "Timelog",
+    "pkg": "dev.giall.timelog"
+  },
+  {
+    "name": "Turbo VPN",
+    "pkg": "free.vpn.unblock.proxy.turbovpn"
+  },
+  {
+    "name": "Treino em Casa",
+    "pkg": "homeworkout.homeworkouts.noequipment"
+  },
+  {
+    "name": "App Manager",
+    "pkg": "it.sourcenetitalia.appmanager"
+  },
+  {
+    "name": "Shizuku",
+    "pkg": "moe.shizuku.privileged.api"
+  },
+  {
+    "name": "Xmind",
+    "pkg": "net.xmind.doughnut"
+  },
+  {
+    "name": "Notion",
+    "pkg": "notion.id"
+  },
+  {
+    "name": "Readdy: Build websites that stand out | AI Website Builder",
+    "pkg": "org.chromium.webapk.a09a553ca303efd03_v2"
+  },
+  {
+    "name": "Base44",
+    "pkg": "org.chromium.webapk.a156046ce7d635068_v2"
+  },
+  {
+    "name": "regex101",
+    "pkg": "org.chromium.webapk.a38c91abe3bbd812f_v2"
+  },
+  {
+    "name": "UX Pilot",
+    "pkg": "org.chromium.webapk.a472d2ed2aacaaedf_v2"
+  },
+  {
+    "name": "Lovable",
+    "pkg": "org.chromium.webapk.a4cceaa02db571d93_v2"
+  },
+  {
+    "name": "Tasker Share",
+    "pkg": "org.chromium.webapk.a5a2c1d79c78d4baf_v2"
+  },
+  {
+    "name": "AI Studio",
+    "pkg": "org.chromium.webapk.a6aab478f37ca7758_v2"
+  },
+  {
+    "name": "Stitch - Design with AI",
+    "pkg": "org.chromium.webapk.ac8f23cc1de513752_v2"
+  },
+  {
+    "name": "Keyboard Hacker LLC",
+    "pkg": "org.khr.llc"
+  },
+  {
+    "name": "Telegram",
+    "pkg": "org.telegram.messenger"
+  },
+  {
+    "name": "VLC",
+    "pkg": "org.videolan.vlc"
+  },
+  {
+    "name": "Colagem de Fotos - GridArt",
+    "pkg": "photoeditor.layout.collagemaker"
+  },
+  {
+    "name": "Solid Explorer",
+    "pkg": "pl.solidexplorer2"
+  },
+  {
+    "name": "Pydroid 3",
+    "pkg": "ru.iiec.pydroid3"
+  },
+  {
+    "name": "Manus",
+    "pkg": "tech.butterfly.app"
+  },
+  {
+    "name": "Type Sprint",
+    "pkg": "typing.fast.texting.practice.keybord.type.games"
+  },
+  {
+    "name": "PingTools",
+    "pkg": "ua.com.streamsoft.pingtools"
+  },
+  {
+    "name": "Vidma",
+    "pkg": "vidma.video.editor.videomaker"
+  }
+]

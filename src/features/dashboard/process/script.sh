@@ -136,6 +136,38 @@ delete_files_batch() {
   json_response "true" "null" "null"
 }
 
+get_folder_stats() {
+  base_path="$1"
+
+  if [ ! -d "$base_path" ]; then
+    json_response "false" "[]" "\"Base path does not exist: $base_path\""
+    return 1
+  fi
+
+  json_array=""
+  first=true
+  
+  cd "$base_path"
+  for d in */; do
+    if [ -d "$d" ]; then
+      count=$(ls -1 "$d" | wc -l)
+      count=$(echo "$count" | tr -d ' ')
+      folder_name="${d%/}"
+      escaped=$(printf "%s,%s" "$folder_name" "$count" | sed 's/\\/\\\\/g; s/"/\\"/g')
+      
+      if [ "$first" = true ]; then
+        first=false
+      else
+        json_array="$json_array,"
+      fi
+      
+      json_array="$json_array\"$escaped\""
+    fi
+  done
+  
+  json_response "true" "[$json_array]" "null"
+}
+
 main() {
   command="$1"
   shift
@@ -154,7 +186,10 @@ main() {
       ;; 
     delete_files_batch)
       delete_files_batch "$1"
-      ;; 
+      ;;
+    get_folder_stats)
+      get_folder_stats "$1"
+      ;;
     *)
       json_response "false" "{}" "\"Unknown command: $command\""
       exit 1

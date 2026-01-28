@@ -59,6 +59,18 @@ const ENV = (() => {
         pathTemplate: "i18n/{lang}.json",
         default: {}
       }
+    },
+    APPS: {
+      web: {
+        type: "localStorage",
+        key: "apps",
+        default: DEFAULT_APPS
+      },
+      tasker: {
+        type: "file",
+        path: "src/data/apps.json",
+        default: []
+      }
     }
   };
 
@@ -142,33 +154,10 @@ const ENV = (() => {
     }
 
     async function runProcess(command, ...args) {
-      // Mocked web environment for testing
-      // console.log(`[WEB MOCK] ENV.runProcess: ${command}`, args);
-      await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
+      console.log(`[WEB MOCK] ENV.runProcess: ${command}`, args);
+      await new Promise(resolve => setTimeout(resolve, 500));
 
-      const MOCK_FILES = {
-        jpg: [
-          `${SOURCE_SCREENSHOTS_PATH}/_com.app1.jpg`,
-          `${SOURCE_SCREENSHOTS_PATH}/_com.app2.jpg`
-        ],
-        mp4: [`${SOURCE_RECORDINGS_PATH}/_com.app3.mp4`]
-      };
-
-      switch (command) {
-        case "list_files":
-          return MOCK_FILES[args[0]] || [];
-        case "create_app_folders":
-          return { created: JSON.parse(args[0]).length };
-        case "move_files":
-          return { moved: JSON.parse(args[0]).length };
-        case "list_expired_in_folder":
-          return []; // Assume no expired files in web mock
-        case "remove_files":
-          const numFiles = JSON.parse(args[0]).length;
-          return { removed: numFiles };
-        default:
-          throw new Error(`Unknown mock command: ${command}`);
-      }
+      return WEB_MOCK_DATA[command](args);
     }
 
     function cancelProcess() {
@@ -248,9 +237,12 @@ const ENV = (() => {
       const fullCommand = `sh "${scriptPath}" ${command} ${quotedArgs}`;
 
       try {
-        // console.log(`[FULL COMMANDO] ${fullCommand}`);
+        console.log(`[FULL COMMANDO] ${fullCommand}`);
 
         const result = tk.shell(fullCommand, false, 5000);
+        
+        console.log(`[RESULT] ${result}`);
+        
         if (!result) {
           throw new Error("Comando shell retornou resultado vazio.");
         }

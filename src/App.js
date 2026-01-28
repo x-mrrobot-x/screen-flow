@@ -8,6 +8,7 @@ const App = (function() {
       // 1. Initialize Core Services
       EventBus.init();
       AppState.init();
+      Analyzer.init();
       Icons.init();
       Navigation.init();
       

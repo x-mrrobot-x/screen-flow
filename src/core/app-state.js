@@ -5,12 +5,14 @@ const AppState = (() => {
   let settings = {};
   let activities = [];
   let folders = [];
+  let apps = [];
 
   function init() {
     settings = ENV.getData("SETTINGS");
     stats = ENV.getData("STATS");
     folders = ENV.getData("FOLDERS");
     activities = ENV.getData("ACTIVITIES");
+    apps = ENV.getData("APPS");
   }
 
   // Auto-save com debounce
@@ -30,7 +32,9 @@ const AppState = (() => {
       statsTimer = setTimeout(() => ENV.setData("STATS", stats), 500);
     },
 
-    activities: () => ENV.setData("ACTIVITIES", activities)
+    activities: () => ENV.setData("ACTIVITIES", activities),
+
+    apps: () => ENV.setData("APPS", apps)
   };
 
   const EVENTS = {
@@ -65,6 +69,14 @@ const AppState = (() => {
       ];
       persist.activities();
       emitChange("activities");
+    },
+
+    // Apps
+    getApps: () => [...apps],
+    setApps(newApps) {
+      apps = [...newApps];
+      persist.apps();
+      emitChange("apps");
     },
 
     // Settings (configurações do usuário)
@@ -150,16 +162,19 @@ const AppState = (() => {
       stats = JSON.parse(JSON.stringify(DEFAULT_STATS));
       folders = JSON.parse(JSON.stringify(DEFAULT_FOLDERS));
       activities = JSON.parse(JSON.stringify(DEFAULT_ACTIVITIES));
+      apps = ENV.getData("APPS"); // Load default apps from data source
 
       persist.settings();
       persist.stats();
       persist.folders();
       persist.activities();
+      persist.apps();
 
       emitChange("settings");
       emitChange("stats");
       emitChange("folders");
       emitChange("activities");
+      emitChange("apps");
     },
 
     deleteAll() {
@@ -168,16 +183,19 @@ const AppState = (() => {
         stats = JSON.parse(JSON.stringify(DEFAULT_STATS));
         folders = JSON.parse(JSON.stringify(DEFAULT_FOLDERS));
         activities = JSON.parse(JSON.stringify(DEFAULT_ACTIVITIES));
+        apps = ENV.getData("APPS"); // Load default apps from data source
 
         persist.settings();
         persist.stats();
         persist.folders();
         persist.activities();
+        persist.apps();
 
         emitChange("settings");
         emitChange("stats");
         emitChange("folders");
         emitChange("activities");
+        emitChange("apps");
 
         return true;
       } catch (error) {
