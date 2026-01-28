@@ -4,17 +4,32 @@ const ProcessModel = (function () {
   async function resolveAppNames(packageNames) {
     const apps = AppState.getApps();
 
-    const packageToAppNameMap = apps.reduce((map, app) => {
-      map[app.pkg] = app.name;
-      return map;
-    }, {});
+    const identifierToAppNameMap = {};
+
+    apps.forEach(app => {
+      identifierToAppNameMap[app.pkg] = app.name;
+      identifierToAppNameMap[app.name] = app.name;
+    });
 
     const resolvedMap = {};
-    for (const pkgName of packageNames) {
-      resolvedMap[pkgName] = packageToAppNameMap[pkgName] || pkgName;
+
+    for (const identifier of packageNames) {
+      const appName = identifierToAppNameMap[identifier] || identifier;
+      const sanitizedName = sanitizeFolderName(appName);
+      resolvedMap[identifier] = sanitizedName;
     }
 
     return resolvedMap;
+  }
+
+  function sanitizeFolderName(name) {
+    return name
+      .trim()
+      .replace(/:/g, "-")
+      .replace(/"/g, "")
+      .replace(/\$/g, "")
+      .replace(/`/g, "")
+      .replace(/\\/g, "-");
   }
 
   async function buildMoveCommands(
@@ -27,15 +42,10 @@ const ProcessModel = (function () {
     const patterns = [];
 
     for (const pkgName in resolvedNames) {
-      const appName = resolvedNames[pkgName];
-      // REMOVIDO: const safeAppName = appName.replace(/[^\w\s.-]/g, "").trim();
-      // Usa o nome original, apenas remove espaços extras
-      const safeAppName = appName.trim();
+      const appName = resolvedNames[pkgName].trim();
 
-      patterns.push(`*_${pkgName}.${extension}`);
-      commands.push(
-        `mv *_${pkgName}.${extension} "${destPath}/${safeAppName}" 2>/dev/null`
-      );
+      patterns.push(`*"_${pkgName}.${extension}"`);
+      commands.push(`mv *"_${pkgName}.${extension}" "${destPath}/${appName}/"`);
     }
 
     if (patterns.length === 0) {
@@ -51,7 +61,7 @@ const ProcessModel = (function () {
 
     return {
       countCommand: countCommand,
-      moveCommand: commands.join(" && ")
+      moveCommand: commands.join(" ; ")
     };
   }
 

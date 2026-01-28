@@ -71,52 +71,52 @@ const Analyzer = (function () {
   }
 
   async function init() {
-    try {
-      const apps = AppState.getApps();
-      let folders = AppState.getFolders();
+      
+        const apps = AppState.getApps();
+        let folders = AppState.getFolders();
 
-      try {
-        const screenshotsOutput = await ENV.runProcess(
-          "get_folder_stats",
-          ENV.ORGANIZED_SCREENSHOTS_PATH
-        );
-        if (screenshotsOutput) {
-          folders = updateFoldersFromScan(
-            screenshotsOutput,
-            "screenshots",
-            apps,
-            folders
+        try {
+          const screenshotsOutput = await ENV.runProcess(
+            "get_folder_stats",
+            ENV.ORGANIZED_SCREENSHOTS_PATH
+          );
+          if (screenshotsOutput) {
+            folders = updateFoldersFromScan(
+              screenshotsOutput,
+              "screenshots",
+              apps,
+              folders
+            );
+          }
+        } catch (error) {
+          console.error(
+            "Erro ao processar estatísticas de screenshots:",
+            error
           );
         }
-      } catch (error) {
-        console.error("Erro ao processar estatísticas de screenshots:", error);
-      }
 
-      try {
-        const screenrecordingsOutput = await ENV.runProcess(
-          "get_folder_stats",
-          ENV.ORGANIZED_RECORDINGS_PATH
-        );
-        if (screenrecordingsOutput) {
-          folders = updateFoldersFromScan(
-            screenrecordingsOutput,
-            "screenrecordings",
-            apps,
-            folders
+        try {
+          const screenrecordingsOutput = await ENV.runProcess(
+            "get_folder_stats",
+            ENV.ORGANIZED_RECORDINGS_PATH
+          );
+          if (screenrecordingsOutput) {
+            folders = updateFoldersFromScan(
+              screenrecordingsOutput,
+              "screenrecordings",
+              apps,
+              folders
+            );
+          }
+        } catch (error) {
+          console.error(
+            "Erro ao processar estatísticas de screenrecordings:",
+            error
           );
         }
-      } catch (error) {
-        console.error(
-          "Erro ao processar estatísticas de screenrecordings:",
-          error
-        );
-      }
 
-      console.log("fim");
-      AppState.setFolders(folders);
-    } catch (error) {
-      console.error("Erro ao inicializar o analisador de pastas:", error);
-    }
+        console.log("fim");
+        AppState.setFolders(folders);
   }
 
   return {

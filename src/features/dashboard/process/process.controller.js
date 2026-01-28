@@ -40,7 +40,7 @@ const ProcessController = (function() {
           result = await ProcessModel[step.func](...params);
         }
         
-        // console.log("Step result", step.id, result);
+        // console.log("[STEP RESULT]", step.id, result);
         state.context[step.id] = result;
         ProcessView.updateStepStatus(i, 'completed');
 

@@ -9,8 +9,8 @@ const App = (function() {
       EventBus.init();
       AppState.init();
       Analyzer.init();
-      Icons.init();
       Navigation.init();
+      Icons.init();
       
       // 2. Initialize Features
       DashboardController.init();

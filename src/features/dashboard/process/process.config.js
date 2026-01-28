@@ -35,7 +35,7 @@ const ProcessConfig = {
           type: "shell",
           func: "create_app_media_folders",
           params: ctx => [
-            JSON.stringify(Object.values(ctx.resolve_app_names)),
+            JSON.stringify([...new Set(Object.values(ctx.resolve_app_names))]),
             ENV.ORGANIZED_SCREENSHOTS_PATH
           ]
         },
@@ -56,7 +56,10 @@ const ProcessConfig = {
           label: "Organizando capturas de tela",
           type: "shell",
           func: "run_batch_command",
-          params: ctx => [ctx.prepare_file_moves.countCommand, ctx.prepare_file_moves.moveCommand]
+          params: ctx => [
+            ctx.prepare_file_moves.countCommand,
+            ctx.prepare_file_moves.moveCommand
+          ]
         },
         {
           id: "save_summary",
@@ -118,7 +121,10 @@ const ProcessConfig = {
           label: "Organizando gravações de tela",
           type: "shell",
           func: "run_batch_command",
-          params: ctx => [ctx.prepare_file_moves.countCommand, ctx.prepare_file_moves.moveCommand]
+          params: ctx => [
+            ctx.prepare_file_moves.countCommand,
+            ctx.prepare_file_moves.moveCommand
+          ]
         },
         {
           id: "save_summary",

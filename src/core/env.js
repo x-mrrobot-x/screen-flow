@@ -232,31 +232,35 @@ const ENV = (() => {
     }
 
     async function runProcess(command, ...args) {
-      const scriptPath = `${WORK_DIR}src/features/dashboard/process/script.sh`;
-      const quotedArgs = args.map(arg => `'${arg}'`).join(" ");
-      const fullCommand = `sh "${scriptPath}" ${command} ${quotedArgs}`;
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          const scriptPath = `${WORK_DIR}src/features/dashboard/process/script.sh`;
+          const quotedArgs = args.map(arg => `'${arg}'`).join(" ");
+          const fullCommand = `sh "${scriptPath}" ${command} ${quotedArgs}`;
 
-      try {
-        console.log(`[FULL COMMANDO] ${fullCommand}`);
+          try {
+            console.log(`[FULL COMMANDO] ${fullCommand}`);
+            const result = tk.shell(fullCommand, false, 5000);
+            console.log(`[RESULT] ${result}`);
 
-        const result = tk.shell(fullCommand, false, 5000);
-        
-        console.log(`[RESULT] ${result}`);
-        
-        if (!result) {
-          throw new Error("Comando shell retornou resultado vazio.");
-        }
+            if (!result) {
+              throw new Error("Comando shell retornou resultado vazio.");
+            }
 
-        const parsed = JSON.parse(result);
-        if (parsed.success) {
-          return parsed.data;
-        } else {
-          throw new Error(parsed.error || "Erro desconhecido no script shell.");
-        }
-      } catch (e) {
-        console.error(`Erro ao executar comando de processo: ${command}`, e);
-        throw new Error(`Falha ao executar '${command}': ${e.message}`);
-      }
+            const parsed = JSON.parse(result);
+            if (parsed.success) {
+              resolve(parsed.data);
+            } else {
+              throw new Error(
+                parsed.error || "Erro desconhecido no script shell."
+              );
+            }
+          } catch (e) {
+            console.error(`Erro ao executar comando de processo: ${command}`, e);
+            reject(new Error(`Falha ao executar '${command}': ${e.message}`));
+          }
+        }, 0);
+      });
     }
 
     function cancelProcess() {

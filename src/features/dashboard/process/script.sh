@@ -43,7 +43,6 @@ create_app_media_folders() {
   app_list=$(echo "$app_list_json" | tr -d '[]"' | tr ',' '\n')
 
   while IFS= read -r app_name; do
-    app_name=$(echo "$app_name" | xargs)
     if [ -n "$app_name" ]; then
       folder_path="$dest_folder/$app_name"
       if [ ! -d "$folder_path" ]; then
@@ -64,46 +63,37 @@ run_batch_command() {
     count_command="$1"
     move_command="$2"
     local count
-    local moved_count=0
-    local errors=""
+    local remaining
+    local moved_count
 
-    # 1. Contar os arquivos
+    # 1. Contar os arquivos antes de mover
     count=$(eval "$count_command" 2>/dev/null)
     count=$(echo "$count" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
     count=${count:-0}
 
+    # Se não houver arquivos, retorna sucesso
     if [ "$count" -eq 0 ]; then
-        json_response "true" "{\"moved\": 0}" "null"
+        json_response "true" "{\"moved\": 0, \"total\": 0}" "null"
         return 0
     fi
     
-    # 2. Executar cada comando mv separadamente e capturar erros
-    move_command_safe=$(echo "$move_command" | sed 's/ && / ; /g')
+    # 2. Executar comandos de movimentação (todos serão executados com ;)
+    eval "$move_command" 2>/dev/null
     
-    # Criar arquivo temporário para logs
-    error_log=$(mktemp)
-    
-    # 3. Executar e capturar STDERR
-    eval "$move_command_safe" 2>"$error_log"
-    
-    # 4. Contar quantos arquivos realmente foram movidos
+    # 3. Recontar arquivos restantes para saber quantos foram movidos
     remaining=$(eval "$count_command" 2>/dev/null)
     remaining=$(echo "$remaining" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
     remaining=${remaining:-0}
     
+    # 4. Calcular quantos foram movidos com sucesso
     moved_count=$((count - remaining))
     
-    # 5. Ler erros do arquivo temporário
-    if [ -s "$error_log" ]; then
-        errors=$(cat "$error_log" | tr '\n' ' ' | sed 's/\\/\\\\/g; s/"/\\"/g')
-    fi
-    rm -f "$error_log"
-    
+    # 5. Retornar resultado
     if [ $moved_count -eq $count ]; then
         json_response "true" "{\"moved\": $moved_count, \"total\": $count}" "null"
     else
         failed_count=$((count - moved_count))
-        json_response "true" "{\"moved\": $moved_count, \"total\": $count, \"failed\": $failed_count}" "{\"message\": \"Alguns arquivos não foram movidos\", \"details\": \"$errors\"}"
+        json_response "true" "{\"moved\": $moved_count, \"total\": $count, \"failed\": $failed_count}" "{\"message\": \"$failed_count arquivos não foram movidos\"}"
     fi
 }
 
