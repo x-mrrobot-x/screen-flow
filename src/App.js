@@ -19,9 +19,10 @@ const App = (function() {
       StatsController.init();
       SettingsController.init();
       CleanerController.init();
+      AppsController.init();
       
       console.log('✓ Application initialized successfully');
-      
+
     } catch (error) {
       console.error('❌ Failed to initialize application:', error);
     }
@@ -29,6 +30,8 @@ const App = (function() {
   
   return {
     init,
+    updateAppsData: AppsModel.updateAppsData,
+    updateFoldersData: Analyzer.updateFoldersData,
     goBack: Modal.goBack
   };
 })();

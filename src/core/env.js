@@ -164,6 +164,19 @@ const ENV = (() => {
       // No process to cancel in web mock, but keep the function for API consistency
     }
 
+    async function runTask(taskName, priority, ...params) {
+      console.log(`[WEB MOCK] ENV.runTask: ${taskName}`, { priority, params });
+
+      if (taskName === "SO - HANDLE ACTIONS" && params[0] === "load_apps") {
+        setTimeout(() => {
+          console.log(
+            "[WEB MOCK][LOAD APPS] Simulating app data callback with default apps."
+          );
+          App.updateAppsData(JSON.stringify(DEFAULT_APPS));
+        }, 500);
+      }
+    }
+
     return {
       WORK_DIR,
       isWeb: true,
@@ -172,6 +185,7 @@ const ENV = (() => {
       getDataAsync,
       setData,
       runProcess,
+      runTask,
       cancelProcess,
       SOURCE_SCREENSHOTS_PATH,
       SOURCE_RECORDINGS_PATH,
@@ -256,10 +270,38 @@ const ENV = (() => {
               );
             }
           } catch (e) {
-            console.error(`Erro ao executar comando de processo: ${command}`, e);
+            console.error(
+              `Erro ao executar comando de processo: ${command}`,
+              e
+            );
             reject(new Error(`Falha ao executar '${command}': ${e.message}`));
           }
         }, 0);
+      });
+    }
+
+    async function runTask(taskName, priority, ...params) {
+      return new Promise((resolve, reject) => {
+        try {
+          tk.performTask(
+            taskName,
+            priority,
+            params[0] || "",
+            params[1] || "",
+            "",
+            true,
+            true,
+            "",
+            true
+          );
+
+          resolve();
+        } catch (e) {
+          console.error(`Erro ao executar a tarefa '${taskName}':`, e);
+          reject(
+            new Error(`Falha ao executar a tarefa '${taskName}': ${e.message}`)
+          );
+        }
       });
     }
 
@@ -277,6 +319,7 @@ const ENV = (() => {
       getDataAsync,
       setData,
       runProcess,
+      runTask,
       cancelProcess,
       SOURCE_SCREENSHOTS_PATH,
       SOURCE_RECORDINGS_PATH,

@@ -195,11 +195,38 @@ main() {
     get_folder_stats)
       get_folder_stats "$1"
       ;;
+    get_installed_apps)
+      get_installed_apps
+      ;;
     *)
       json_response "false" "{}" "\"Unknown command: $command\""
       exit 1
       ;; 
   esac
+}
+
+get_installed_apps() {
+    packages_output=$(pm list packages -f)
+    
+    json_array=""
+    first=true
+
+    echo "$packages_output" | while IFS= read -r line; do
+        pkg_name=$(echo "$line" | sed 's/.*=//')
+        
+        escaped_pkg_name=$(printf "%s" "$pkg_name" | sed 's/\\/\\\\/g; s/"/\\"/g')
+
+        json_obj="{\"pkg\":\"$escaped_pkg_name\",\"name\":\"$escaped_pkg_name\"}"
+
+        if [ "$first" = true ]; then
+            first=false
+            json_array="$json_obj"
+        else
+            json_array="$json_array,$json_obj"
+        fi
+    done
+
+    json_response "true" "[$json_array]" "null"
 }
 
 main "$@"

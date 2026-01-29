@@ -1,6 +1,11 @@
 const Analyzer = (function () {
   "use strict";
 
+  const TASK_NAME = "SO - HANDLE ACTIONS";
+  const TASK_PRIORITY = 10;
+  const ACTION_LOAD_SS = "load_ss_folder";
+  const ACTION_LOAD_SR = "load_sr_folder";
+
   // A nova função baseada na lógica do usuário
   function updateFoldersFromScan(
     scriptOutput,
@@ -9,8 +14,8 @@ const Analyzer = (function () {
     existingFolders
   ) {
     const statsKey = type === "screenshots" ? "ss" : "sr";
-    const lines = scriptOutput.map(line => line.trim());
 
+    const lines = scriptOutput.map(line => line.trim());
     if (lines.length === 0) {
       return existingFolders;
     }
@@ -70,56 +75,63 @@ const Analyzer = (function () {
     return currentData;
   }
 
-  async function init() {
-      
-        const apps = AppState.getApps();
-        let folders = AppState.getFolders();
+  function updateFoldersData(scriptOutput, type) {
+    console.log(`Received folders data from Tasker for type: ${type}.`);
+    try {
+      const apps = AppState.getApps();
+      const existingFolders = AppState.getFolders();
+      const updatedFolders = updateFoldersFromScan(
+        scriptOutput,
+        type,
+        apps,
+        existingFolders
+      );
+      AppState.setFolders(updatedFolders);
+    } catch (error) {
+      console.error(
+        `Failed to parse or set folders data for type: ${type}`,
+        error
+      );
+    }
+  }
 
-        try {
-          const screenshotsOutput = await ENV.runProcess(
-            "get_folder_stats",
-            ENV.ORGANIZED_SCREENSHOTS_PATH
-          );
-          if (screenshotsOutput) {
-            folders = updateFoldersFromScan(
-              screenshotsOutput,
-              "screenshots",
-              apps,
-              folders
-            );
-          }
-        } catch (error) {
-          console.error(
-            "Erro ao processar estatísticas de screenshots:",
-            error
-          );
-        }
+  function loadFoldersData() {
+    try {
+      const ssConfig = {
+        file_path: ENV.WORK_DIR + "src/data/screenshots_subfolders.json",
+        folder_path: ENV.ORGANIZED_SCREENSHOTS_PATH,
+        type: "screenshots"
+      };
+      ENV.runTask(
+        TASK_NAME,
+        TASK_PRIORITY,
+        ACTION_LOAD_SS,
+        JSON.stringify(ssConfig)
+      );
 
-        try {
-          const screenrecordingsOutput = await ENV.runProcess(
-            "get_folder_stats",
-            ENV.ORGANIZED_RECORDINGS_PATH
-          );
-          if (screenrecordingsOutput) {
-            folders = updateFoldersFromScan(
-              screenrecordingsOutput,
-              "screenrecordings",
-              apps,
-              folders
-            );
-          }
-        } catch (error) {
-          console.error(
-            "Erro ao processar estatísticas de screenrecordings:",
-            error
-          );
-        }
+      const srConfig = {
+        file_path: ENV.WORK_DIR + "src/data/screenrecordings_subfolders.json",
+        folder_path: ENV.ORGANIZED_RECORDINGS_PATH,
+        type: "screenrecordings"
+      };
+      ENV.runTask(
+        TASK_NAME,
+        TASK_PRIORITY,
+        ACTION_LOAD_SR,
+        JSON.stringify(srConfig)
+      );
+    } catch (error) {
+      console.error("Failed to trigger folder data loading:", error);
+    }
+  }
 
-        console.log("fim");
-        AppState.setFolders(folders);
+  function init() {
+    loadFoldersData();
   }
 
   return {
-    init
+    init,
+    loadFoldersData,
+    updateFoldersData
   };
 })();
