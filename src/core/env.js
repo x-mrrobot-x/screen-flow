@@ -89,8 +89,7 @@ const ENV = (() => {
 
   // ===== WEB ENVIRONMENT =====
   function WebEnvironment() {
-    const storagePrefix = "@screenflow:";
-    const processState = { id: null };
+    const STORAGE_PREFIX = "@screenflow:";
     const SOURCE_SCREENSHOTS_PATH = "/storage/emulated/0/DCIM/Screenshots";
     const SOURCE_RECORDINGS_PATH = "/storage/emulated/0/DCIM/ScreenRecorder";
     const ORGANIZED_SCREENSHOTS_PATH =
@@ -109,7 +108,7 @@ const ENV = (() => {
         if (cfg.type === "fetch") {
           throw new Error(`Use getDataAsync para ${key}`);
         }
-        const content = localStorage.getItem(storagePrefix + cfg.key);
+        const content = localStorage.getItem(STORAGE_PREFIX + cfg.key);
         return content ? JSON.parse(content) : getDefault(key);
       } catch (e) {
         console.error(`Erro ao obter ${key}:`, e);
@@ -122,7 +121,7 @@ const ENV = (() => {
         const cfg = STORAGE_CONFIG[key].web;
 
         if (cfg.type === "localStorage") {
-          const content = localStorage.getItem(storagePrefix + cfg.key);
+          const content = localStorage.getItem(STORAGE_PREFIX + cfg.key);
           return content ? JSON.parse(content) : getDefault(key);
         }
 
@@ -145,7 +144,7 @@ const ENV = (() => {
           throw new Error(`Não é possível escrever em ${key} (tipo fetch)`);
         }
 
-        localStorage.setItem(storagePrefix + cfg.key, JSON.stringify(data));
+        localStorage.setItem(STORAGE_PREFIX + cfg.key, JSON.stringify(data));
         return true;
       } catch (e) {
         console.error(`Erro ao salvar ${key}:`, e);

@@ -100,7 +100,8 @@ const Analyzer = (function () {
       const ssConfig = {
         file_path: ENV.WORK_DIR + "src/data/screenshots_subfolders.json",
         folder_path: ENV.ORGANIZED_SCREENSHOTS_PATH,
-        type: "screenshots"
+        type: "screenshots",
+        onload: `App.updateFoldersData(%data, "%config.type")`
       };
       ENV.runTask(
         TASK_NAME,
@@ -112,7 +113,8 @@ const Analyzer = (function () {
       const srConfig = {
         file_path: ENV.WORK_DIR + "src/data/screenrecordings_subfolders.json",
         folder_path: ENV.ORGANIZED_RECORDINGS_PATH,
-        type: "screenrecordings"
+        type: "screenrecordings",
+        onload: `App.updateFoldersData(%data, "%config.type")`
       };
       ENV.runTask(
         TASK_NAME,
