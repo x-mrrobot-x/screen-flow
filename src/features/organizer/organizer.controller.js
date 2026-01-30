@@ -34,7 +34,6 @@ const OrganizerController = (function() {
       if (menuDots) {
         e.stopPropagation();
 
-        // Close any existing popup menu
         if (currentPopupMenu) {
           currentPopupMenu.remove();
           currentPopupMenu = null;
@@ -61,7 +60,6 @@ const OrganizerController = (function() {
         const type = activeFilter === 'all' ? 'both' : (activeFilter === 'screenshots' ? 'ss' : 'sr');
         const removedCount = OrganizerModel.clearFolderStats(folderId, type);
 
-        // Get folder name for the activity
         const folders = OrganizerModel.getFolders();
         const folder = folders.find(f => f.id === folderId);
         const folderName = folder ? folder.name : 'Unknown';
@@ -84,11 +82,16 @@ const OrganizerController = (function() {
       currentPopupMenu = null;
     },
     onDocumentClick: (e) => {
-      // Close popup if clicked outside
       if (currentPopupMenu && !currentPopupMenu.contains(e.target)) {
         currentPopupMenu.remove();
         currentPopupMenu = null;
       }
+    },
+    onStateChange: (data) => {
+        if (data && data.key === 'folders') {
+            console.log("Organizer: Folders updated, re-rendering...");
+            render();
+        }
     }
   };
 
@@ -102,13 +105,13 @@ const OrganizerController = (function() {
     const grid = DOM.qs(OrganizerConfig.SELECTORS.foldersGrid);
     if(grid) grid.addEventListener('click', handlers.onCardClick);
 
-    // Add document click listener to close popup when clicking outside
     document.addEventListener('click', handlers.onDocumentClick);
+    EventBus.on('appstate:changed', handlers.onStateChange);
   }
 
   function cleanupEventListeners() {
-    // Remove document click listener when cleaning up
     document.removeEventListener('click', handlers.onDocumentClick);
+    EventBus.off('appstate:changed', handlers.onStateChange);
   }
 
   function init() {

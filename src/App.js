@@ -1,16 +1,17 @@
 const App = (function() {
   'use strict';
   
-  function init() {
+  async function init() {
     console.log('🚀 Initializing Application...');
     
     try {
       // 1. Initialize Core Services
       EventBus.init();
       AppState.init();
-      Analyzer.init();
+      // Analyzer.init();
       Navigation.init();
       Icons.init();
+      SubfolderMonitor.init();
       
       // 2. Initialize Features
       DashboardController.init();

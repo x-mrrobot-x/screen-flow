@@ -64,6 +64,14 @@ const DashboardView = (function() {
       render[section](data);
     }
   }
+
+  function showScanLoading() {
+    elements.statsGrid.classList.add('loading');
+  }
+
+  function hideScanLoading() {
+    elements.statsGrid.classList.remove('loading');
+  }
   
   function clear() {
     if (container) container.innerHTML = '';
@@ -73,6 +81,8 @@ const DashboardView = (function() {
     init,
     render,
     update,
-    clear
+    clear,
+    showScanLoading,
+    hideScanLoading
   };
 })();

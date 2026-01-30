@@ -1,6 +1,7 @@
 const DashboardConfig = {
   SELECTORS: {
     CONTAINER: "#tab-dashboard",
+    statsGrid: ".stats-grid",
     dashStatOrganizer: "#dash-stat-organizer",
     dashStatRemoved: "#dash-stat-removed",
     dashStatPending: "#dash-stat-pending",

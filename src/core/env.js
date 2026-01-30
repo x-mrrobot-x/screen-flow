@@ -175,6 +175,10 @@ const ENV = (() => {
         }, 500);
       }
     }
+    
+    function execute(){
+      return ""
+    }
 
     return {
       WORK_DIR,
@@ -183,6 +187,7 @@ const ENV = (() => {
       getData,
       getDataAsync,
       setData,
+      execute,
       runProcess,
       runTask,
       cancelProcess,
@@ -303,6 +308,11 @@ const ENV = (() => {
         }
       });
     }
+    
+    function execute(fullCommand){
+     console.log(fullCommand)
+     return tk.shell(fullCommand, false, 5000);
+    }
 
     function cancelProcess() {
       // Tasker process is synchronous per-step, but we can have a global flag
@@ -317,6 +327,7 @@ const ENV = (() => {
       getData,
       getDataAsync,
       setData,
+      execute,
       runProcess,
       runTask,
       cancelProcess,

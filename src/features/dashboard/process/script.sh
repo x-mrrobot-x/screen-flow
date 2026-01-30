@@ -173,6 +173,56 @@ get_folder_stats() {
   json_response "true" "[$json_array]" "null"
 }
 
+get_subfolders() {
+  base_path="$1"
+
+  if [ ! -d "$base_path" ]; then
+    json_response "false" "[]" "\"Base path does not exist: $base_path\""
+    return 1
+  fi
+
+  subfolder_list=$(find "$base_path" -mindepth 1 -maxdepth 1 -type d -printf "%f,%T@\n" 2>/dev/null | sed 's/\([0-9]\{10\}\)\.[0-9]*/\1/')
+
+  if [ -z "$subfolder_list" ]; then
+    json_response "true" "[]" "null"
+    return 0
+  fi
+  
+  json_array=""
+  first=true
+  
+  while IFS= read -r line; do
+    escaped_line=$(printf "%s" "$line" | sed 's/\\/\\\\/g; s/"/\\"/g')
+    
+    if [ "$first" = true ]; then
+      first=false
+    else
+      json_array="$json_array,"
+    fi
+    
+    json_array="$json_array\"$escaped_line\""
+  done << EOF
+$subfolder_list
+EOF
+  
+  json_response "true" "[$json_array]" "null"
+}
+
+get_item_count() {
+  full_subfolder_path="$1"
+
+  if [ ! -d "$full_subfolder_path" ]; then
+    json_response "false" "0" "\"Folder not found: $full_subfolder_path\""
+    return 1
+  fi
+
+  item_count=$(ls -A "$full_subfolder_path" 2>/dev/null | wc -l)
+  item_count=$(echo "$item_count" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+  item_count=${item_count:-0}
+
+  json_response "true" "$item_count" "null"
+}
+
 main() {
   command="$1"
   shift
@@ -195,38 +245,17 @@ main() {
     get_folder_stats)
       get_folder_stats "$1"
       ;;
-    get_installed_apps)
-      get_installed_apps
+    get_subfolders)
+      get_subfolders "$1"
+      ;;
+    get_item_count)
+      get_item_count "$1"
       ;;
     *)
       json_response "false" "{}" "\"Unknown command: $command\""
       exit 1
       ;; 
   esac
-}
-
-get_installed_apps() {
-    packages_output=$(pm list packages -f)
-    
-    json_array=""
-    first=true
-
-    echo "$packages_output" | while IFS= read -r line; do
-        pkg_name=$(echo "$line" | sed 's/.*=//')
-        
-        escaped_pkg_name=$(printf "%s" "$pkg_name" | sed 's/\\/\\\\/g; s/"/\\"/g')
-
-        json_obj="{\"pkg\":\"$escaped_pkg_name\",\"name\":\"$escaped_pkg_name\"}"
-
-        if [ "$first" = true ]; then
-            first=false
-            json_array="$json_obj"
-        else
-            json_array="$json_array,$json_obj"
-        fi
-    done
-
-    json_response "true" "[$json_array]" "null"
 }
 
 main "$@"

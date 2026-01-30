@@ -31,13 +31,26 @@ const DashboardController = (function() {
       loadAndRender();
     }
   }
+
+  function handleScanStart() {
+    DashboardView.showScanLoading();
+  }
+
+  function handleScanComplete() {
+    DashboardView.hideScanLoading();
+    loadAndRender();
+  }
   
   function attachEventListeners() {
     EventBus.on("appstate:changed", refresh);
+    EventBus.on("subfolder-scan:started", handleScanStart);
+    EventBus.on("subfolder-scan:completed", handleScanComplete);
   }
 
   function detachEventListeners() {
     EventBus.off("appstate:changed", refresh);
+    EventBus.off("subfolder-scan:started", handleScanStart);
+    EventBus.off("subfolder-scan:completed", handleScanComplete);
   }
   
   function destroy() {
