@@ -39,6 +39,14 @@ const CleanerController = (function () {
     toggleAutoCleaner: () => {
       CleanerModel.toggleAutoCleaner();
       render();
+    },
+    onStateChange: data => {
+      if (!data || !data.key) return;
+
+      const relevantKeys = ["settings", "folders"];
+      if (relevantKeys.includes(data.key)) {
+        render();
+      }
     }
   };
 
@@ -54,6 +62,8 @@ const CleanerController = (function () {
     if (organizerItemCleanList) {
       organizerItemCleanList.addEventListener("click", handlers.handleEvent);
     }
+
+    EventBus.on("appstate:changed", handlers.onStateChange);
   }
 
   function init() {

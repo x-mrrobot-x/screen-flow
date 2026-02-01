@@ -42,9 +42,18 @@ const StatsController = (function () {
       }
     },
     onStateChange: data => {
-      if (data.key === "activities") {
-        const activities = AppState.getActivities();
-        StatsView.render.activityCard(activities);
+      if (!data || !data.key) return;
+
+      switch (data.key) {
+        case "activities": {
+          const activities = AppState.getActivities();
+          StatsView.render.activityCard(activities);
+          break;
+        }
+        case "stats": {
+          refresh();
+          break;
+        }
       }
     }
   };
@@ -59,26 +68,8 @@ const StatsController = (function () {
     EventBus.on("appstate:changed", handlers.onStateChange);
   }
 
-  function detachEventListeners() {
-    const mediaButtons = document.querySelectorAll(
-      StatsConfig.SELECTORS.mediaTypeButtons
-    );
-    mediaButtons.forEach(btn => {
-      btn.removeEventListener("click", handlers.onMediaTypeChange);
-    });
-    EventBus.off("appstate:changed", handlers.onStateChange);
-  }
-
-  function destroy() {
-    if (!isInitialized) return;
-    detachEventListeners();
-    StatsView.clear();
-    isInitialized = false;
-  }
-
   return {
     init,
-    destroy,
     refresh
   };
 })();

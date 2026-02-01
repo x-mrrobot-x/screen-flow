@@ -21,7 +21,6 @@ const SettingsController = (function () {
     },
     onReset: () => {
       SettingsModel.resetAllSettings();
-      render();
       Toast.success("Configurações restauradas com sucesso!");
     },
     onDelete: () => {
@@ -34,13 +33,17 @@ const SettingsController = (function () {
         () => {
           const success = SettingsModel.deleteAllData();
           if (success) {
-            Toast.success("Todos os dados foram apagados com sucesso!");
-            setTimeout(() => window.location.reload(), 1000);
+            Toast.success("Dados apagados com sucesso!");
           } else {
             Toast.error("Ocorreu um erro ao apagar os dados.");
           }
         }
       );
+    },
+    onStateChange: data => {
+      if (data && data.key === "settings") {
+        render();
+      }
     }
   };
 
@@ -63,6 +66,8 @@ const SettingsController = (function () {
     const deleteAllButton = DOM.qs(SettingsConfig.SELECTORS.deleteAllButton);
     if (deleteAllButton)
       deleteAllButton.addEventListener("click", handlers.onDelete);
+    
+    EventBus.on("appstate:changed", handlers.onStateChange);
   }
 
   function init() {
