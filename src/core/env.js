@@ -128,21 +128,7 @@ const ENV = (() => {
       return `src/assets/icons/${pkg}.png`;
     }
 
-    function getData(key, params = {}) {
-      try {
-        const cfg = STORAGE_CONFIG[key].web;
-        if (cfg.type === "fetch") {
-          throw new Error(`Use getDataAsync for ${key}`);
-        }
-        const content = localStorage.getItem(STORAGE_PREFIX + cfg.key);
-        return content ? JSON.parse(content) : getDefault(key);
-      } catch (e) {
-        console.error(`Error getting ${key}:`, e);
-        return getDefault(key);
-      }
-    }
-
-    async function getDataAsync(key, params = {}) {
+    async function getData(key, params = {}) {
       try {
         const cfg = STORAGE_CONFIG[key].web;
 
@@ -212,7 +198,6 @@ const ENV = (() => {
       isWeb: true,
       resolveIconPath,
       getData,
-      getDataAsync,
       getDefault,
       setData,
       execute,
@@ -248,17 +233,7 @@ const ENV = (() => {
       return `${WORK_DIR}${relative}`;
     }
 
-    function getData(key, params = {}) {
-      try {
-        const content = tk.shell(`cat '${getPath(key, params)}'`, false, 0);
-        return content ? JSON.parse(content) : getDefault(key);
-      } catch (e) {
-        console.error(`Error getting ${key}:`, e);
-        return getDefault(key);
-      }
-    }
-
-    async function getDataAsync(key, params = {}) {
+    async function getData(key, params = {}) {
       try {
         const result = await execute({
           command: 'read_file',
@@ -355,7 +330,6 @@ const ENV = (() => {
       isWeb: false,
       resolveIconPath,
       getData,
-      getDataAsync,
       getDefault,
       setData,
       execute,

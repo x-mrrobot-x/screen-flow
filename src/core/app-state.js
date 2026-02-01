@@ -7,12 +7,29 @@ const AppState = (() => {
   let folders = [];
   let apps = [];
 
-  function init() {
-    settings = ENV.getData("SETTINGS");
-    stats = ENV.getData("STATS");
-    folders = ENV.getData("FOLDERS");
-    activities = ENV.getData("ACTIVITIES");
-    apps = ENV.getData("APPS");
+  async function init() {
+    const [settingsData, statsData, foldersData, activitiesData, appsData] =
+      await Promise.all([
+        ENV.getData("SETTINGS"),
+        ENV.getData("STATS"),
+        ENV.getData("FOLDERS"),
+        ENV.getData("ACTIVITIES"),
+        ENV.getData("APPS")
+      ]);
+
+    console.log({
+      settingsData,
+      statsData,
+      foldersData,
+      activitiesData,
+      appsData
+    });
+
+    settings = settingsData;
+    stats = statsData;
+    folders = foldersData;
+    activities = activitiesData;
+    apps = appsData;
   }
 
   // Auto-save com debounce

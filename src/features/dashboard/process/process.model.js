@@ -84,7 +84,7 @@ const ProcessModel = (function () {
   }
 
   async function loadCleanupRules() {
-    const folders = await ENV.getDataAsync("FOLDERS");
+    const folders = await ENV.getData("FOLDERS");
     const rules = {
       screenshots: [],
       recordings: []
@@ -130,7 +130,6 @@ const ProcessModel = (function () {
     let allExpired = [];
     for (const config of configs) {
       try {
-        // Re-utiliza a lógica de busca do script, mas poderia ser uma função JS pura se o ambiente permitir
         const folderPath = `${rootDir}/${config.folder}`;
 
         const expiredInFolder = await ENV.execute({
@@ -195,7 +194,7 @@ const ProcessModel = (function () {
   }
 
   async function hasCleanerConfigs() {
-    const folders = await ENV.getDataAsync("FOLDERS");
+    const folders = await ENV.getData("FOLDERS");
     return folders.some(folder => folder.cleaner.ss.on || folder.cleaner.sr.on);
   }
 
