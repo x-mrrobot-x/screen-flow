@@ -259,16 +259,24 @@ const ENV = (() => {
     }
 
     async function getDataAsync(key, params = {}) {
-      return getData(key, params);
+      try {
+        const result = await execute({
+          command: 'read_file',
+          args: [getPath(key, params), JSON.stringify(getDefault(key))]
+        });
+        return result;
+      } catch (e) {
+        console.error(`Error getting async ${key}:`, e);
+        return getDefault(key);
+      }
     }
 
-    function setData(key, data, params = {}) {
+    async function setData(key, data, params = {}) {
       try {
-        tk.shell(
-          `echo '${JSON.stringify(data)}' > '${getPath(key, params)}'`,
-          false,
-          0
-        );
+        await execute({
+          command: 'write_file',
+          args: [getPath(key, params), JSON.stringify(data)]
+        });
         return true;
       } catch (e) {
         console.error(`Error saving ${key}:`, e);

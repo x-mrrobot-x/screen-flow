@@ -7,6 +7,28 @@ json_response() {
   printf '{"success": %s, "data": %s, "error": %s}\n' "$success" "$data" "$error"
 }
 
+read_file() {
+    filepath="$1"
+    default_value="$2"
+    if [ -f "$filepath" ] && [ -s "$filepath" ]; then
+        content=$(cat "$filepath")
+        json_response "true" "$content" "null"
+    else
+        json_response "true" "$default_value" "null"
+    fi
+}
+
+write_file() {
+    filepath="$1"
+    content="$2"
+    echo "$content" > "$filepath"
+    if [ $? -eq 0 ]; then
+        json_response "true" "true" "null"
+    else
+        json_response "false" "false" "\"Failed to write to file: $filepath\""
+    fi
+}
+
 scan_media_app_packages() {
   file_type="$1"
   source_folder="$2"
@@ -227,6 +249,12 @@ main() {
   command="$1"
   shift
   case "$command" in
+    read_file)
+      read_file "$1" "$2"
+      ;;
+    write_file)
+      write_file "$1" "$2"
+      ;;
     scan_media_app_packages)
       scan_media_app_packages "$1" "$2"
       ;; 
