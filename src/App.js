@@ -37,4 +37,6 @@ const App = (function() {
   };
 })();
 
+console.time("init")
 App.init();
+console.timeEnd("init")

@@ -98,6 +98,32 @@ const ENV = (() => {
       "/storage/emulated/0/OrganizedMedia/ScreenRecordings";
     const WORK_DIR = "";
 
+    const WEB_MOCK_DATA = {
+      get_subfolders: () => [
+        "Test Folder 1,1675280000",
+        "Test Folder 2,1675281000"
+      ],
+      get_item_count: () => Math.floor(Math.random() * 100),
+      scan_media_app_packages: args => {
+        if (args[0] === "jpg") {
+          return ["com.spotify.music", "com.whatsapp"];
+        } else {
+          return ["com.netflix.mediaclient"];
+        }
+      },
+      create_app_media_folders: args => {
+        try {
+          const apps = JSON.parse(args[0]);
+          return { created: apps.length };
+        } catch (e) {
+          return { created: 0 };
+        }
+      },
+      run_batch_command: () => ({ moved: 5 }),
+      delete_files_batch: () => null,
+      find_expired_files: () => []
+    };
+
     function resolveIconPath(pkg) {
       return `src/assets/icons/${pkg}.png`;
     }
@@ -106,12 +132,12 @@ const ENV = (() => {
       try {
         const cfg = STORAGE_CONFIG[key].web;
         if (cfg.type === "fetch") {
-          throw new Error(`Use getDataAsync para ${key}`);
+          throw new Error(`Use getDataAsync for ${key}`);
         }
         const content = localStorage.getItem(STORAGE_PREFIX + cfg.key);
         return content ? JSON.parse(content) : getDefault(key);
       } catch (e) {
-        console.error(`Erro ao obter ${key}:`, e);
+        console.error(`Error getting ${key}:`, e);
         return getDefault(key);
       }
     }
@@ -132,7 +158,7 @@ const ENV = (() => {
           return await res.json();
         }
       } catch (e) {
-        console.error(`Erro ao obter ${key}:`, e);
+        console.error(`Error getting ${key}:`, e);
         return getDefault(key);
       }
     }
@@ -141,22 +167,27 @@ const ENV = (() => {
       try {
         const cfg = STORAGE_CONFIG[key].web;
         if (cfg.type === "fetch") {
-          throw new Error(`Não é possível escrever em ${key} (tipo fetch)`);
+          throw new Error(`Cannot write to ${key} (fetch type)`);
         }
 
         localStorage.setItem(STORAGE_PREFIX + cfg.key, JSON.stringify(data));
         return true;
       } catch (e) {
-        console.error(`Erro ao salvar ${key}:`, e);
+        console.error(`Error saving ${key}:`, e);
         return false;
       }
     }
 
-    async function runProcess(command, ...args) {
-      console.log(`[WEB MOCK] ENV.runProcess: ${command}`, args);
+    async function execute({ command, args = [] }) {
+      console.log(`[WEB MOCK] ENV.execute: ${command}`, args);
       await new Promise(resolve => setTimeout(resolve, 500));
 
-      return WEB_MOCK_DATA[command](args);
+      if (typeof WEB_MOCK_DATA[command] === "function") {
+        return WEB_MOCK_DATA[command](args);
+      }
+
+      console.warn(`[WEB MOCK] No mock data for command: ${command}`);
+      return null;
     }
 
     function cancelProcess() {
@@ -175,10 +206,6 @@ const ENV = (() => {
         }, 500);
       }
     }
-    
-    function execute(){
-      return ""
-    }
 
     return {
       WORK_DIR,
@@ -188,7 +215,6 @@ const ENV = (() => {
       getDataAsync,
       setData,
       execute,
-      runProcess,
       runTask,
       cancelProcess,
       SOURCE_SCREENSHOTS_PATH,
@@ -226,7 +252,7 @@ const ENV = (() => {
         const content = tk.shell(`cat '${getPath(key, params)}'`, false, 0);
         return content ? JSON.parse(content) : getDefault(key);
       } catch (e) {
-        console.error(`Erro ao obter ${key}:`, e);
+        console.error(`Error getting ${key}:`, e);
         return getDefault(key);
       }
     }
@@ -244,41 +270,46 @@ const ENV = (() => {
         );
         return true;
       } catch (e) {
-        console.error(`Erro ao salvar ${key}:`, e);
+        console.error(`Error saving ${key}:`, e);
         return false;
       }
     }
 
-    async function runProcess(command, ...args) {
+    async function execute({ command, args = [] }) {
       return new Promise((resolve, reject) => {
         setTimeout(() => {
           const scriptPath = `${WORK_DIR}src/features/dashboard/process/script.sh`;
-          const quotedArgs = args.map(arg => `'${arg}'`).join(" ");
+
+          const quotedArgs = args
+            .map(arg => {
+              const argStr =
+                typeof arg === "object" && arg !== null
+                  ? JSON.stringify(arg)
+                  : String(arg);
+              return "'" + argStr.replace(/'/g, "'\\''") + "'";
+            })
+            .join(" ");
+
           const fullCommand = `sh "${scriptPath}" ${command} ${quotedArgs}`;
 
           try {
-            console.log(`[FULL COMMANDO] ${fullCommand}`);
+            console.log(`[FULL COMMAND] ${fullCommand}`);
             const result = tk.shell(fullCommand, false, 5000);
             console.log(`[RESULT] ${result}`);
 
-            if (!result) {
-              throw new Error("Comando shell retornou resultado vazio.");
+            if (!result || result.trim() === "") {
+              throw new Error("Shell command returned empty result.");
             }
 
             const parsed = JSON.parse(result);
             if (parsed.success) {
               resolve(parsed.data);
             } else {
-              throw new Error(
-                parsed.error || "Erro desconhecido no script shell."
-              );
+              throw new Error(parsed.error || "Unknown shell script error.");
             }
           } catch (e) {
-            console.error(
-              `Erro ao executar comando de processo: ${command}`,
-              e
-            );
-            reject(new Error(`Falha ao executar '${command}': ${e.message}`));
+            console.error(`Error executing process command: ${command}`, e);
+            reject(new Error(`Failed to execute '${command}': ${e.message}`));
           }
         }, 0);
       });
@@ -298,27 +329,17 @@ const ENV = (() => {
             "",
             true
           );
-
           resolve();
         } catch (e) {
-          console.error(`Erro ao executar a tarefa '${taskName}':`, e);
+          console.error(`Error executing task '${taskName}':`, e);
           reject(
-            new Error(`Falha ao executar a tarefa '${taskName}': ${e.message}`)
+            new Error(`Failed to execute task '${taskName}': ${e.message}`)
           );
         }
       });
     }
-    
-    function execute(fullCommand){
-     console.log(fullCommand)
-     return tk.shell(fullCommand, false, 5000);
-    }
 
-    function cancelProcess() {
-      // Tasker process is synchronous per-step, but we can have a global flag
-      // For now, cancellation will be handled in the controller between steps
-      // tk.stop(...) could be used if we had a long-running task name
-    }
+    function cancelProcess() {}
 
     return {
       WORK_DIR,
@@ -328,7 +349,6 @@ const ENV = (() => {
       getDataAsync,
       setData,
       execute,
-      runProcess,
       runTask,
       cancelProcess,
       SOURCE_SCREENSHOTS_PATH,

@@ -26,7 +26,10 @@ const SubfolderMonitor = (function () {
 
   async function _scanDirectory(directoryPath) {
     try {
-      const output = await ENV.runProcess("get_subfolders", directoryPath);
+      const output = await ENV.execute({
+        command: "get_subfolders",
+        args: [directoryPath]
+      });
       
       const newSubfolders = new Map();
       if (output && output.length > 0) {

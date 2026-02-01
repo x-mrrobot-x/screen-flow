@@ -57,7 +57,10 @@ const SubfolderCounter = (function () {
   async function _executeCount(directoryPath, subfolder) {
     try {
       const fullPath = `${directoryPath}/${subfolder}`;
-      const count = await ENV.runProcess("get_item_count", fullPath);
+      const count = await ENV.execute({
+        command: "get_item_count",
+        args: [fullPath]
+      });
       const parsedCount = parseInt(count, 10);
 
       if (isNaN(parsedCount)) {

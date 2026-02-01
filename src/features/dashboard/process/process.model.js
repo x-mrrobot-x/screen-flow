@@ -132,12 +132,11 @@ const ProcessModel = (function () {
       try {
         // Re-utiliza a lógica de busca do script, mas poderia ser uma função JS pura se o ambiente permitir
         const folderPath = `${rootDir}/${config.folder}`;
-        const expiredInFolder = await ENV.runProcess(
-          "find_expired_files",
-          folderPath,
-          config.days,
-          extension
-        );
+
+        const expiredInFolder = await ENV.execute({
+          command: "find_expired_files",
+          args: [folderPath, config.days, extension]
+        });
         if (expiredInFolder && expiredInFolder.length > 0) {
           allExpired = allExpired.concat(expiredInFolder);
         }

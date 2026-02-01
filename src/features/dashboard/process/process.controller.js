@@ -34,7 +34,7 @@ const ProcessController = (function () {
         let result;
 
         if (step.type === "shell") {
-          result = await ENV.runProcess(step.func, ...params);
+          result = await ENV.execute({ command: step.func, args: params });
         } else if (step.type === "js") {
           // Chama a função JS diretamente do Model
           result = await ProcessModel[step.func](...params);
