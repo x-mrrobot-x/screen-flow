@@ -21,7 +21,7 @@ const ENV = (() => {
       tasker: {
         type: "file",
         path: "src/data/settings.json",
-        default: {}
+        default: DEFAULT_SETTINGS
       }
     },
     STATS: {
@@ -213,6 +213,7 @@ const ENV = (() => {
       resolveIconPath,
       getData,
       getDataAsync,
+      getDefault,
       setData,
       execute,
       runTask,
@@ -347,6 +348,7 @@ const ENV = (() => {
       resolveIconPath,
       getData,
       getDataAsync,
+      getDefault,
       setData,
       execute,
       runTask,

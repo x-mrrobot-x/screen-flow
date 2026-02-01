@@ -158,43 +158,29 @@ const AppState = (() => {
 
     // Reset & Delete
     resetConfig() {
-      settings = DEFAULT_SETTINGS;
-      stats = JSON.parse(JSON.stringify(DEFAULT_STATS));
-      folders = JSON.parse(JSON.stringify(DEFAULT_FOLDERS));
-      activities = JSON.parse(JSON.stringify(DEFAULT_ACTIVITIES));
-      apps = ENV.getData("APPS"); // Load default apps from data source
-
+      settings = ENV.getDefault("SETTINGS");
       persist.settings();
-      persist.stats();
-      persist.folders();
-      persist.activities();
-      persist.apps();
-
       emitChange("settings");
-      emitChange("stats");
-      emitChange("folders");
-      emitChange("activities");
-      emitChange("apps");
     },
 
     deleteAll() {
       try {
-        settings = DEFAULT_SETTINGS;
-        stats = JSON.parse(JSON.stringify(DEFAULT_STATS));
-        folders = JSON.parse(JSON.stringify(DEFAULT_FOLDERS));
-        activities = JSON.parse(JSON.stringify(DEFAULT_ACTIVITIES));
-        apps = ENV.getData("APPS"); // Load default apps from data source
+        stats = ENV.getDefault("STATS");
+        folders = ENV.getDefault("FOLDERS");
+        activities = ENV.getDefault("ACTIVITIES");
+        settings = ENV.getDefault("SETTINGS");
+        apps = ENV.getDefault("APPS");
 
-        persist.settings();
         persist.stats();
         persist.folders();
         persist.activities();
+        persist.settings();
         persist.apps();
 
-        emitChange("settings");
         emitChange("stats");
         emitChange("folders");
         emitChange("activities");
+        emitChange("settings");
         emitChange("apps");
 
         return true;

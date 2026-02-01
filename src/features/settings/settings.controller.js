@@ -27,17 +27,17 @@ const SettingsController = (function () {
     onDelete: () => {
       ConfirmationModal.open(
         {
-          title: "Excluir Todos os Dados",
+          title: "Apagar Todos os Dados",
           message:
-            "Tem certeza de que deseja excluir todos os dados? Esta ação não pode ser desfeita."
+            "Tem certeza de que deseja apagar todos os dados do aplicativo? Esta ação não pode ser desfeita."
         },
         () => {
           const success = SettingsModel.deleteAllData();
           if (success) {
-            Toast.success("Todos os dados foram excluídos com sucesso!");
+            Toast.success("Todos os dados foram apagados com sucesso!");
             setTimeout(() => window.location.reload(), 1000);
           } else {
-            Toast.error("Ocorreu um erro ao excluir os dados.");
+            Toast.error("Ocorreu um erro ao apagar os dados.");
           }
         }
       );
