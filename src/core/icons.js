@@ -95,7 +95,7 @@ const Icons = (function () {
   function getIcon(name, attrs = {}) {
     const content = DATA[name];
     if (!content) {
-      console.warn(`[Icons]: Icon "${name}" not found`);
+      Logger.warn(`[Icons]: Icon "${name}" not found`);
       return "";
     }
 

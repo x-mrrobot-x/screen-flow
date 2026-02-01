@@ -5,7 +5,7 @@ const DashboardController = (function() {
   
   function init() {
     if (isInitialized) {
-      console.warn('Dashboard already initialized');
+      Logger.warn('Dashboard already initialized');
       return;
     }
     
@@ -16,7 +16,7 @@ const DashboardController = (function() {
       isInitialized = true;
       
     } catch (error) {
-      console.error('Failed to initialize dashboard:', error);
+      Logger.error('Failed to initialize dashboard:', error);
     }
   }
   

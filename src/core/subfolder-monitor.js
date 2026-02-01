@@ -11,7 +11,7 @@ const SubfolderMonitor = (function () {
         lastModifiedCache = JSON.parse(cached);
       }
     } catch (e) {
-      console.error("Failed to load subfolder modification cache.", e);
+      Logger.error("Failed to load subfolder modification cache.", e);
       lastModifiedCache = {};
     }
   }
@@ -20,7 +20,7 @@ const SubfolderMonitor = (function () {
     try {
       localStorage.setItem(CACHE_KEY, JSON.stringify(lastModifiedCache));
     } catch (e) {
-      console.error("Failed to save subfolder modification cache.", e);
+      Logger.error("Failed to save subfolder modification cache.", e);
     }
   }
 
@@ -53,7 +53,7 @@ const SubfolderMonitor = (function () {
       // Check for deleted folders
       for (const cachedSubfolder in directoryCache) {
         if (!newSubfolders.has(cachedSubfolder)) {
-            console.log(`Subfolder ${cachedSubfolder} appears to be deleted. Removing from cache.`);
+            Logger.info(`Subfolder ${cachedSubfolder} appears to be deleted. Removing from cache.`);
             delete directoryCache[cachedSubfolder];
         }
       }
@@ -63,14 +63,14 @@ const SubfolderMonitor = (function () {
         const cachedLastModified = directoryCache[subfolder];
         
         if (cachedLastModified !== lastModified) {
-          console.log(`Subfolder ${subfolder} has been modified or is new. Enqueuing for count.`);
+          Logger.info(`Subfolder ${subfolder} has been modified or is new. Enqueuing for count.`);
           SubfolderCounter.enqueue(directoryPath, subfolder);
           directoryCache[subfolder] = lastModified;
         }
       }
 
     } catch (e) {
-      console.error(`Error scanning directory ${directoryPath}:`, e);
+      Logger.error(`Error scanning directory ${directoryPath}:`, e);
     }
   }
 
@@ -92,7 +92,7 @@ const SubfolderMonitor = (function () {
 
     _saveCache();
     EventBus.emit('subfolder-scan:completed');
-    console.log("Subfolder monitor scan complete.");
+    Logger.user("Análise de pastas concluída.", "success");
   }
 
   function init() {

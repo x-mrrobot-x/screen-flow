@@ -48,7 +48,7 @@ const Analyzer = (function () {
       } else {
         let pkg = appNameToPkgMap[name];
         if (!pkg) {
-          console.warn(
+          Logger.warn(
             `Package não encontrado para a pasta: ${name}, pulando.`
           );
           pkg = name;
@@ -71,12 +71,12 @@ const Analyzer = (function () {
         currentData.push(newEntry);
       }
     });
-    console.log(currentData);
+    Logger.debug('Updated folder data:', currentData);
     return currentData;
   }
 
   function updateFoldersData(scriptOutput, type) {
-    console.log(`Received folders data from Tasker for type: ${type}.`);
+    Logger.info(`Received folders data from Tasker for type: ${type}.`);
     try {
       const apps = AppState.getApps();
       const existingFolders = AppState.getFolders();
@@ -88,7 +88,7 @@ const Analyzer = (function () {
       );
       AppState.setFolders(updatedFolders);
     } catch (error) {
-      console.error(
+      Logger.error(
         `Failed to parse or set folders data for type: ${type}`,
         error
       );
@@ -123,7 +123,7 @@ const Analyzer = (function () {
         JSON.stringify(srConfig)
       );
     } catch (error) {
-      console.error("Failed to trigger folder data loading:", error);
+      Logger.error("Failed to trigger folder data loading:", error);
     }
   }
 

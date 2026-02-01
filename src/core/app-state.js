@@ -17,7 +17,7 @@ const AppState = (() => {
         ENV.getData("APPS")
       ]);
 
-    console.log({
+    Logger.debug("Initial data loaded:", {
       settingsData,
       statsData,
       foldersData,
@@ -202,7 +202,7 @@ const AppState = (() => {
 
         return true;
       } catch (error) {
-        console.error("Error deleting all data:", error);
+        Logger.error("Error deleting all data:", error);
         return false;
       }
     },

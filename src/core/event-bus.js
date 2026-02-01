@@ -24,13 +24,13 @@ const EventBus = (function() {
       try {
         callback(data);
       } catch (error) {
-        console.error(`Error in event listener for "${eventName}":`, error);
+        Logger.error(`Error in event listener for "${eventName}":`, error);
       }
     });
   }
   
   function init() {
-    console.log('✓ EventBus initialized');
+    Logger.info('✓ EventBus initialized');
   }
   
   return {

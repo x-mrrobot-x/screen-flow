@@ -24,7 +24,7 @@ const SubfolderCounter = (function () {
 
       let pkg = appNameToPkgMap[subfolder];
       if (!pkg) {
-        console.warn(
+        Logger.warn(
           `SubfolderCounter: Package not found for folder: ${subfolder}. Using folder name as package.`
         );
         pkg = subfolder;
@@ -64,7 +64,7 @@ const SubfolderCounter = (function () {
       const parsedCount = parseInt(count, 10);
 
       if (isNaN(parsedCount)) {
-        console.warn(
+        Logger.warn(
           `Could not parse item count for ${fullPath}. Received:`,
           count
         );
@@ -73,7 +73,7 @@ const SubfolderCounter = (function () {
 
       _updateFolderData(directoryPath, subfolder, parsedCount);
     } catch (error) {
-      console.error(`Failed to count items for ${subfolder}:`, error);
+      Logger.error(`Failed to count items for ${subfolder}:`, error);
     }
   }
 
@@ -81,7 +81,7 @@ const SubfolderCounter = (function () {
     if (isBatchRunning && queue.length === 0 && activeJobs === 0) {
       AppState.setFolders(internalFolders);
       isBatchRunning = false;
-      console.log(
+      Logger.info(
         "SubfolderCounter: Batch update complete. Folders saved to AppState."
       );
       return;

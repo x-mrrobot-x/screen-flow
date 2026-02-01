@@ -17,7 +17,7 @@ const ProcessController = (function () {
 
     for (let i = 0; i < steps.length; i++) {
       if (!state.isRunning) {
-        console.log("Processo cancelado.");
+        Logger.user("Processo cancelado.", "info");
         return;
       }
 
@@ -40,7 +40,7 @@ const ProcessController = (function () {
           result = await ProcessModel[step.func](...params);
         }
 
-        // console.log("[STEP RESULT]", step.id, result);
+        Logger.debug("[STEP RESULT]", step.id, result);
         state.context[step.id] = result;
         ProcessView.updateStepStatus(i, "completed");
 
@@ -61,7 +61,7 @@ const ProcessController = (function () {
 
         await sleep(500);
       } catch (error) {
-        console.error(`Erro na etapa ${step.id}:`, error);
+        Logger.error(`Erro na etapa ${step.id}:`, error);
         ProcessView.updateStepStatus(i, "failed");
         ProcessView.showCompletion(`Erro em: ${step.label}`);
         state.isRunning = false;
@@ -127,7 +127,7 @@ const ProcessController = (function () {
 
     const processData = ProcessConfig.PROCESS_TYPES[processType];
     if (!processData) {
-      console.error(`Tipo de processo "${processType}" não encontrado.`);
+      Logger.error(`Tipo de processo "${processType}" não encontrado.`);
       return;
     }
 

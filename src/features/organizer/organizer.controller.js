@@ -89,7 +89,7 @@ const OrganizerController = (function() {
     },
     onStateChange: (data) => {
         if (data && data.key === 'folders') {
-            console.log("Organizer: Folders updated, re-rendering...");
+            Logger.info("Organizer: Folders updated, re-rendering...");
             render();
         }
     }

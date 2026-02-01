@@ -18,9 +18,8 @@ const AppsModel = (() => {
   }
 
   function updateAppsData(newApps) {
-    console.log(newApps);
-    return
-    console.log("Received app data from Tasker.");
+    Logger.debug("Received new apps data:", newApps);
+    Logger.info("Received app data from Tasker.");
     try {
       const existingApps = AppState.getApps();
       const existingAppKeys = new Set(
@@ -33,15 +32,15 @@ const AppsModel = (() => {
       });
 
       if (appsToAdd.length === 0) {
-        console.log("No new apps to add.");
+        Logger.user("Nenhum aplicativo novo para adicionar.", "info");
         return;
       }
 
-      console.log(`Adding ${appsToAdd.length} new app(s).`);
+      Logger.user(`Adicionando ${appsToAdd.length} novo(s) aplicativo(s).`, "success");
       const updatedApps = [...existingApps, ...appsToAdd];
       AppState.setApps(updatedApps);
     } catch (error) {
-      console.error("Failed to parse or set app data:", error);
+      Logger.error("Failed to parse or set app data:", error);
     }
   }
 

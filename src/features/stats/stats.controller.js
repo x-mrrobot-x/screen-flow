@@ -5,7 +5,7 @@ const StatsController = (function () {
 
   function init() {
     if (isInitialized) {
-      console.warn("Stats already initialized");
+      Logger.warn("Stats already initialized");
       return;
     }
 
@@ -15,7 +15,7 @@ const StatsController = (function () {
       attachEventListeners();
       isInitialized = true;
     } catch (error) {
-      console.error("Failed to initialize stats:", error);
+      Logger.error("Failed to initialize stats:", error);
     }
   }
 

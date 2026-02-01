@@ -144,7 +144,7 @@ const ENV = (() => {
           return await res.json();
         }
       } catch (e) {
-        console.error(`Error getting ${key}:`, e);
+        Logger.error(`Error getting ${key}:`, e);
         return getDefault(key);
       }
     }
@@ -159,20 +159,20 @@ const ENV = (() => {
         localStorage.setItem(STORAGE_PREFIX + cfg.key, JSON.stringify(data));
         return true;
       } catch (e) {
-        console.error(`Error saving ${key}:`, e);
+        Logger.error(`Error saving ${key}:`, e);
         return false;
       }
     }
 
     async function execute({ command, args = [] }) {
-      console.log(`[WEB MOCK] ENV.execute: ${command}`, args);
+      Logger.debug(`[WEB MOCK] ENV.execute: ${command}`, args);
       await new Promise(resolve => setTimeout(resolve, 500));
 
       if (typeof WEB_MOCK_DATA[command] === "function") {
         return WEB_MOCK_DATA[command](args);
       }
 
-      console.warn(`[WEB MOCK] No mock data for command: ${command}`);
+      Logger.warn(`[WEB MOCK] No mock data for command: ${command}`);
       return null;
     }
 
@@ -181,11 +181,11 @@ const ENV = (() => {
     }
 
     async function runTask(taskName, priority, ...params) {
-      console.log(`[WEB MOCK] ENV.runTask: ${taskName}`, { priority, params });
+      Logger.debug(`[WEB MOCK] ENV.runTask: ${taskName}`, { priority, params });
 
       if (taskName === "SO - HANDLE ACTIONS" && params[0] === "load_apps") {
         setTimeout(() => {
-          console.log(
+          Logger.debug(
             "[WEB MOCK][LOAD APPS] Simulating app data callback with default apps."
           );
           App.updateAppsData(JSON.stringify(DEFAULT_APPS));
@@ -241,7 +241,7 @@ const ENV = (() => {
         });
         return result;
       } catch (e) {
-        console.error(`Error getting async ${key}:`, e);
+        Logger.error(`Error getting async ${key}:`, e);
         return getDefault(key);
       }
     }
@@ -254,7 +254,7 @@ const ENV = (() => {
         });
         return true;
       } catch (e) {
-        console.error(`Error saving ${key}:`, e);
+        Logger.error(`Error saving ${key}:`, e);
         return false;
       }
     }
@@ -277,9 +277,9 @@ const ENV = (() => {
           const fullCommand = `sh "${scriptPath}" ${command} ${quotedArgs}`;
 
           try {
-            console.log(`[FULL COMMAND] ${fullCommand}`);
+            Logger.debug(`[FULL COMMAND] ${fullCommand}`);
             const result = tk.shell(fullCommand, false, 5000);
-            console.log(`[RESULT] ${result}`);
+            Logger.debug(`[RESULT] ${result}`);
 
             if (!result || result.trim() === "") {
               throw new Error("Shell command returned empty result.");
@@ -292,7 +292,7 @@ const ENV = (() => {
               throw new Error(parsed.error || "Unknown shell script error.");
             }
           } catch (e) {
-            console.error(`Error executing process command: ${command}`, e);
+            Logger.error(`Error executing process command: ${command}`, e);
             reject(new Error(`Failed to execute '${command}': ${e.message}`));
           }
         }, 0);
@@ -315,7 +315,7 @@ const ENV = (() => {
           );
           resolve();
         } catch (e) {
-          console.error(`Error executing task '${taskName}':`, e);
+          Logger.error(`Error executing task '${taskName}':`, e);
           reject(
             new Error(`Failed to execute task '${taskName}': ${e.message}`)
           );

@@ -37,7 +37,7 @@ const Modal = (() => {
   }
 
   function goBack() {
-    console.log(modalStack)
+    Logger.debug("Current modal stack:", modalStack)
     if (modalStack.length > 0) {
       const currentModal = modalStack.pop();
       toggleModal(currentModal, false);

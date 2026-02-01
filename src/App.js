@@ -2,10 +2,10 @@ const App = (function() {
   'use strict';
   
   async function init() {
-    console.log('🚀 Initializing Application...');
     
     try {
       // 1. Initialize Core Services
+      Logger.init();
       EventBus.init();
       await AppState.init();
       // Analyzer.init();
@@ -22,10 +22,10 @@ const App = (function() {
       CleanerController.init();
       AppsController.init();
       
-      console.log('✓ Application initialized successfully');
+      Logger.info('✓ Application initialized successfully');
 
     } catch (error) {
-      console.error('❌ Failed to initialize application:', error);
+      Logger.error('❌ Failed to initialize application:', error);
     }
   }
   
@@ -37,6 +37,9 @@ const App = (function() {
   };
 })();
 
-console.time("init")
-App.init();
-console.timeEnd("init")
+(async () => {
+    const startTime = performance.now();
+    await App.init();
+    const endTime = performance.now();
+    Logger.debug(`App initialization took: ${(endTime - startTime).toFixed(2)} ms`);
+})();

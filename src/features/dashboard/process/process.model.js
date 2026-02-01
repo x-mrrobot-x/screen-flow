@@ -140,7 +140,7 @@ const ProcessModel = (function () {
           allExpired = allExpired.concat(expiredInFolder);
         }
       } catch (e) {
-        console.error(
+        Logger.error(
           `Falha ao listar arquivos expirados em ${config.folder}:`,
           e
         );
