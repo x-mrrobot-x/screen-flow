@@ -17,13 +17,13 @@ const AppState = (() => {
         ENV.getData("APPS")
       ]);
 
-    Logger.debug("Initial data loaded:", {
-      settingsData,
-      statsData,
-      foldersData,
-      activitiesData,
-      appsData
-    });
+    // Logger.debug("Initial data loaded:", {
+    //   settingsData,
+    //   statsData,
+    //   foldersData,
+    //   activitiesData,
+    //   appsData
+    // });
 
     settings = settingsData;
     stats = statsData;

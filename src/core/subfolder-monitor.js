@@ -1,106 +1,155 @@
 const SubfolderMonitor = (function () {
-  const SCRIPT_PATH = ENV.WORK_DIR + "src/features/dashboard/process/script.sh";
-  const CACHE_KEY = "subfolder_last_modified_cache";
+  "use strict";
 
-  let lastModifiedCache = {};
+  const STORAGE_KEY_PREFIX = "analyzer:";
 
-  function _loadCache() {
-    try {
-      const cached = localStorage.getItem(CACHE_KEY);
-      if (cached) {
-        lastModifiedCache = JSON.parse(cached);
+  function updateFoldersFromScan(scriptOutput, type, existingFolders) {
+    if (!scriptOutput || scriptOutput.length === 0) {
+      return existingFolders;
+    }
+    
+    const statsKey = type === "screenshots" ? "ss" : "sr";
+    const folderData = scriptOutput.map(line => {
+      const [name, count] = line.split(",");
+      return {
+        name: name.trim(),
+        count: parseInt(count.trim(), 10) || 0
+      };
+    });
+
+    let currentData = [...existingFolders];
+    const apps = AppState.getApps();
+    const appNameToPkgMap = apps.reduce((map, app) => {
+      map[app.name] = app.pkg;
+      return map;
+    }, {});
+
+    folderData.forEach(({ name, count }) => {
+      const existingIndex = currentData.findIndex(f => f.name === name);
+      const timestamp = Date.now();
+
+      if (existingIndex !== -1) {
+        currentData[existingIndex].stats[statsKey] = count;
+        currentData[existingIndex].stats.lu = timestamp;
+      } else {
+        const pkg = appNameToPkgMap[name] || name;
+        if (!appNameToPkgMap[name]) {
+            Logger.warn(`Package não encontrado para a pasta: ${name}, usando o nome da pasta como pkg.`);
+        }
+        // Corrigido: Cria o objeto diretamente
+        const newEntry = {
+            id: String(Date.now()),
+            name: name,
+            pkg: pkg,
+            stats: {
+                ss: type === "screenshots" ? count : 0,
+                sr: type === "screenrecordings" ? count : 0,
+                lu: Date.now()
+            },
+            cleaner: {
+                ss: { on: false, days: 7 },
+                sr: { on: false, days: 7 }
+            }
+        };
+        currentData.push(newEntry);
       }
-    } catch (e) {
-      Logger.error("Failed to load subfolder modification cache.", e);
-      lastModifiedCache = {};
+    });
+
+    Logger.debug(`[SubfolderMonitor] Dados de pastas atualizados para o tipo '${type}'.`);
+    return currentData;
+  }
+
+  function updateFoldersData(scriptOutput, type) {
+    Logger.info(`[SubfolderMonitor] Recebendo dados de contagem para o tipo: ${type}.`);
+    try {
+      const existingFolders = AppState.getFolders();
+      const updatedFolders = updateFoldersFromScan(
+        scriptOutput,
+        type,
+        existingFolders
+      );
+      AppState.setFolders(updatedFolders);
+    } catch (error) {
+      Logger.error(`[SubfolderMonitor] Falha ao processar dados para o tipo: ${type}`, error);
     }
   }
 
-  function _saveCache() {
-    try {
-      localStorage.setItem(CACHE_KEY, JSON.stringify(lastModifiedCache));
-    } catch (e) {
-      Logger.error("Failed to save subfolder modification cache.", e);
-    }
-  }
+  async function processFolderType(type, path) {
+    Logger.debug(`[SubfolderMonitor] Iniciando verificação para o tipo: ${type}`);
+    const FOLDER_MAP_KEY = `${STORAGE_KEY_PREFIX}${type}_map`;
+    const HASH_KEY = `${STORAGE_KEY_PREFIX}${type}_hash`;
 
-  async function _scanDirectory(directoryPath) {
     try {
-      const output = await ENV.execute({
-        command: "get_subfolders",
-        args: [directoryPath]
-      });
+      // Usando 'shell' como tipo, conforme instruído
+      const subfolderList = await TaskQueue.add('get_subfolders', [path], 'shell');
+      if (!subfolderList || subfolderList.length === 0) {
+        Logger.debug(`[SubfolderMonitor] Nenhuma subpasta encontrada para ${type}.`);
+        return;
+      }
       
-      const newSubfolders = new Map();
-      if (output && output.length > 0) {
-        output.forEach(line => {
-          if (!line) return;
-          const parts = line.split(",");
-          if (parts.length < 2) return;
-          const subfolder = parts[0];
-          const lastModified = parseInt(parts[1], 10);
-          if (!isNaN(lastModified)) {
-            newSubfolders.set(subfolder, lastModified);
-          }
-        });
+      const listAsString = subfolderList.join('|');
+      const currentHash = await Utils.generateHash(listAsString);
+      const lastHash = Utils.getStoredData(HASH_KEY);
+
+      if (currentHash === lastHash) {
+        Logger.debug(`[SubfolderMonitor] Sem alterações detectadas para ${type} (hash correspondente).`);
+        return;
+      }
+      Logger.info(`[SubfolderMonitor] Alterações detectadas para ${type}.`);
+      Utils.setStoredData(HASH_KEY, currentHash);
+
+      const oldFolderMap = Utils.getStoredData(FOLDER_MAP_KEY) || {};
+      const newFolderMap = subfolderList.reduce((acc, item) => {
+        const [name, ts] = item.split(',');
+        acc[name] = ts;
+        return acc;
+      }, {});
+      
+      const foldersToUpdate = Object.keys(newFolderMap).filter(name => {
+          return newFolderMap[name] !== oldFolderMap[name];
+      });
+
+      if (foldersToUpdate.length === 0 && Object.keys(newFolderMap).length === Object.keys(oldFolderMap).length) {
+        Logger.debug(`[SubfolderMonitor] Hashes diferentes, mas nenhum timestamp de pasta foi alterado para ${type}.`);
+        Utils.setStoredData(FOLDER_MAP_KEY, newFolderMap);
+        return;
       }
 
-      if (!lastModifiedCache[directoryPath]) {
-        lastModifiedCache[directoryPath] = {};
-      }
-      const directoryCache = lastModifiedCache[directoryPath];
+      Logger.info(`[SubfolderMonitor] As seguintes pastas precisam de atualização para ${type}:`, foldersToUpdate);
+      
+      // Usando 'shell' como tipo, conforme instruído
+      const countsResult = await TaskQueue.add(
+        'get_item_counts_batch',
+        [path, JSON.stringify(foldersToUpdate)],
+        'shell'
+      );
 
-      // Check for deleted folders
-      for (const cachedSubfolder in directoryCache) {
-        if (!newSubfolders.has(cachedSubfolder)) {
-            Logger.info(`Subfolder ${cachedSubfolder} appears to be deleted. Removing from cache.`);
-            delete directoryCache[cachedSubfolder];
-        }
+      if (countsResult && countsResult.length > 0) {
+        updateFoldersData(countsResult, type);
       }
+      
+      Utils.setStoredData(FOLDER_MAP_KEY, newFolderMap);
 
-      // Check for new or modified folders
-      for (const [subfolder, lastModified] of newSubfolders.entries()) {
-        const cachedLastModified = directoryCache[subfolder];
-        
-        if (cachedLastModified !== lastModified) {
-          Logger.info(`Subfolder ${subfolder} has been modified or is new. Enqueuing for count.`);
-          SubfolderCounter.enqueue(directoryPath, subfolder);
-          directoryCache[subfolder] = lastModified;
-        }
-      }
-
-    } catch (e) {
-      Logger.error(`Error scanning directory ${directoryPath}:`, e);
+    } catch (error) {
+      Logger.error(`[SubfolderMonitor] Erro ao processar o tipo de pasta '${type}':`, error);
     }
   }
 
-  async function runScan() {
-    EventBus.emit('subfolder-scan:started');
-    _loadCache();
-
-    const directoriesToScan = [
-      ENV.ORGANIZED_SCREENSHOTS_PATH,
-      ENV.ORGANIZED_RECORDINGS_PATH
-    ];
-
-    // The new implementation uses async/await, making the calls sequential.
-    for (const path of directoriesToScan) {
-      if (path) {
-        await _scanDirectory(path);
-      }
-    }
-
-    _saveCache();
-    EventBus.emit('subfolder-scan:completed');
-    Logger.user("Análise de pastas concluída.", "success");
+  async function loadFoldersData() {
+    await processFolderType("screenshots", ENV.ORGANIZED_SCREENSHOTS_PATH);
+    await processFolderType("screenrecordings", ENV.ORGANIZED_RECORDINGS_PATH);
   }
 
   function init() {
-    runScan();
+    setTimeout(loadFoldersData, 1000);
+  }
+  
+  function runScan(){
+    loadFoldersData()
   }
 
   return {
-    init,
-    runScan
+    runScan,
+    init
   };
 })();

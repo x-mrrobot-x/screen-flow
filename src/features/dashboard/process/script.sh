@@ -245,6 +245,47 @@ get_item_count() {
   json_response "true" "$item_count" "null"
 }
 
+get_item_counts_batch() {
+  base_path="$1"
+  subfolders_json="$2"
+
+  if [ ! -d "$base_path" ]; then
+    json_response "false" "[]" "\"Base path does not exist: $base_path\""
+    return 1
+  fi
+
+  subfolder_list=$(echo "$subfolders_json" | tr -d '[]"' | tr ',' '\n')
+
+  json_array=""
+  first=true
+  
+  # Usa { } em vez de ( ) - NÃO cria subshell
+  {
+    cd "$base_path" || return 1
+    while IFS= read -r folder_name; do
+      # Remove espaços em branco do início/fim
+      folder_name=$(echo "$folder_name" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+      
+      if [ -n "$folder_name" ] && [ -d "$folder_name" ]; then
+          count=$(ls -1 "$folder_name" 2>/dev/null | wc -l)
+          count=$(echo "$count" | tr -d ' ')
+          escaped=$(printf "%s,%s" "$folder_name" "$count" | sed 's/\\/\\\\/g; s/"/\\"/g')
+
+          if [ "$first" = true ]; then
+              first=false
+          else
+              json_array="$json_array,"
+          fi
+          json_array="$json_array\"$escaped\""
+      fi
+    done << EOF
+$subfolder_list
+EOF
+  }
+  
+  json_response "true" "[$json_array]" "null"
+}
+
 main() {
   command="$1"
   shift
@@ -278,6 +319,9 @@ main() {
       ;;
     get_item_count)
       get_item_count "$1"
+      ;;
+    get_item_counts_batch)
+      get_item_counts_batch "$1" "$2"
       ;;
     *)
       json_response "false" "{}" "\"Unknown command: $command\""

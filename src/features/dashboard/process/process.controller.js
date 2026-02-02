@@ -34,7 +34,8 @@ const ProcessController = (function () {
         let result;
 
         if (step.type === "shell") {
-          result = await ENV.execute({ command: step.func, args: params });
+          // Adiciona a tarefa pesada à fila e aguarda a conclusão, especificando o tipo 'shell'
+          result = await TaskQueue.add(step.func, params, 'shell');
         } else if (step.type === "js") {
           // Chama a função JS diretamente do Model
           result = await ProcessModel[step.func](...params);

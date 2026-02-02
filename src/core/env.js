@@ -165,7 +165,7 @@ const ENV = (() => {
     }
 
     async function execute({ command, args = [] }) {
-      Logger.debug(`[WEB MOCK] ENV.execute: ${command}`, args);
+      // Logger.debug(`[WEB MOCK] ENV.execute: ${command}`, args);
       await new Promise(resolve => setTimeout(resolve, 500));
 
       if (typeof WEB_MOCK_DATA[command] === "function") {
@@ -277,9 +277,9 @@ const ENV = (() => {
           const fullCommand = `sh "${scriptPath}" ${command} ${quotedArgs}`;
 
           try {
-            Logger.debug(`[FULL COMMAND] ${fullCommand}`);
+            // Logger.debug(`[FULL COMMAND] ${fullCommand}`);
             const result = tk.shell(fullCommand, false, 5000);
-            Logger.debug(`[RESULT] ${result}`);
+            // Logger.debug(`[RESULT] ${result}`);
 
             if (!result || result.trim() === "") {
               throw new Error("Shell command returned empty result.");

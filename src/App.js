@@ -7,12 +7,13 @@ const App = (function() {
       // 1. Initialize Core Services
       Logger.init();
       EventBus.init();
+      TaskQueue.init();
       await AppState.init();
-      // Analyzer.init();
+      AppMonitor.init();
+      SubfolderMonitor.init();
       Navigation.init();
       Icons.init();
-      SubfolderMonitor.init();
-      
+
       // 2. Initialize Features
       DashboardController.init();
       ProcessController.init();
@@ -20,7 +21,6 @@ const App = (function() {
       StatsController.init();
       SettingsController.init();
       CleanerController.init();
-      AppsController.init();
       
       Logger.info('✓ Application initialized successfully');
 
@@ -31,8 +31,7 @@ const App = (function() {
   
   return {
     init,
-    updateAppsData: AppsModel.updateAppsData,
-    updateFoldersData: Analyzer.updateFoldersData,
+    onTaskerResult: TaskQueue.onResult,
     goBack: Modal.goBack
   };
 })();
