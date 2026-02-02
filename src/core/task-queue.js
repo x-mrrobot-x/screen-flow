@@ -5,96 +5,95 @@ const TaskQueue = (function () {
   const STOPPER_TASK_PRIORITY = 10;
   const TASK_CHECK_INTERVAL = 1000; // 1 segundo
   const MAX_CHECKS = 180; // 3 minutos no total
+  const MAX_CONCURRENT_TASKS = 4; // Limite de tarefas paralelas
 
   const queue = [];
   const pending = {};
-  let isRunning = false;
+  let activeTasks = 0;
   let taskIdCounter = 0;
 
   function _runNext() {
-    if (isRunning || queue.length === 0) {
-      return;
-    }
-    isRunning = true;
+    while (activeTasks < MAX_CONCURRENT_TASKS && queue.length > 0) {
+      activeTasks++;
+      const task = queue.shift();
+      pending[task.id] = task;
 
-    const task = queue.shift();
-    pending[task.id] = task;
+      let checks = 0;
+      const monitorInterval = setInterval(() => {
+        checks++;
+        const runningTasks = ENV.getGlobal("TRUN");
 
-    let checks = 0;
-    const monitorInterval = setInterval(() => {
-      checks++;
-      const runningTasks = ENV.getGlobal("TRUN");
+        if (
+          (!runningTasks || !runningTasks.includes(WORKER_TASK_NAME)) &&
+          pending[task.id]
+        ) {
+          Logger.warn(
+            `[TaskQueue] Worker task not running for task ${task.id}. Cancelling.`
+          );
+          clearInterval(monitorInterval);
+          onResult(
+            JSON.stringify({
+              id: task.id,
+              status: "error",
+              payload: "Worker task disappeared."
+            })
+          );
+        } else if (checks >= MAX_CHECKS) {
+          Logger.error(`[TaskQueue] Task ${task.id} timed out.`);
+          clearInterval(monitorInterval);
+          onResult(
+            JSON.stringify({
+              id: task.id,
+              status: "error",
+              payload: "Task timed out"
+            })
+          );
+        }
+      }, TASK_CHECK_INTERVAL);
 
-      if (
-        (!runningTasks || !runningTasks.includes(WORKER_TASK_NAME)) &&
-        pending[task.id]
-      ) {
-        Logger.warn(
-          `[TaskQueue] Worker task not running. Cancelling task ${task.id}.`
-        );
-        clearInterval(monitorInterval);
-        onResult(
-          JSON.stringify({
-            id: task.id,
-            status: "error",
-            payload: "Worker task disappeared."
+      task.monitorInterval = monitorInterval;
+
+      Logger.debug(
+        `[TaskQueue] Running task ${task.id}: ${task.action}`,
+        task.params
+      );
+
+      const taskerParams = {
+        id: task.id,
+        action: task.action,
+        params: task.params,
+        type: task.type,
+        fullCommand: null
+      };
+
+      if (task.type === "shell") {
+        const scriptPath = `${ENV.WORK_DIR}src/features/dashboard/process/script.sh`;
+        const command = task.action;
+        const args = Array.isArray(task.params) ? task.params : [];
+
+        const quotedArgs = args
+          .map(arg => {
+            const argStr =
+              typeof arg === "object" && arg !== null
+                ? JSON.stringify(arg)
+                : String(arg);
+            return "'" + argStr.replace(/'/g, "'\\''") + "'";
           })
-        );
-      } else if (checks >= MAX_CHECKS) {
-        Logger.error(`[TaskQueue] Task ${task.id} timed out.`);
-        clearInterval(monitorInterval);
-        onResult(
-          JSON.stringify({
-            id: task.id,
-            status: "error",
-            payload: "Task timed out"
-          })
+          .join(" ");
+
+        taskerParams.fullCommand = `sh "${scriptPath}" ${command} ${quotedArgs}`;
+        taskerParams.action = `run_shell`;
+        Logger.debug(
+          `[TaskQueue] Generated full command for shell task: ${taskerParams.fullCommand}`
         );
       }
-    }, TASK_CHECK_INTERVAL);
 
-    task.monitorInterval = monitorInterval;
-
-    Logger.debug(
-      `[TaskQueue] Running task ${task.id}: ${task.action}`,
-      task.params
-    );
-
-    const taskerParams = {
-      id: task.id,
-      action: task.action,
-      params: task.params,
-      type: task.type,
-      fullCommand: null
-    };
-
-    if (task.type === "shell") {
-      const scriptPath = `${ENV.WORK_DIR}src/features/dashboard/process/script.sh`;
-      const command = task.action;
-      const args = Array.isArray(task.params) ? task.params : [];
-
-      const quotedArgs = args
-        .map(arg => {
-          const argStr =
-            typeof arg === "object" && arg !== null
-              ? JSON.stringify(arg)
-              : String(arg);
-          return "'" + argStr.replace(/'/g, "'\\''") + "'";
-        })
-        .join(" ");
-
-      taskerParams.fullCommand = `sh "${scriptPath}" ${command} ${quotedArgs}`;
-      taskerParams.action = `run_shell`;
-      Logger.debug(
-        `[TaskQueue] Generated full command for shell task: ${taskerParams.fullCommand}`
+      ENV.runTask(
+        WORKER_TASK_NAME,
+        WORKER_TASK_PRIORITY,
+        JSON.stringify(taskerParams)
       );
     }
-
-    ENV.runTask(
-      WORKER_TASK_NAME,
-      WORKER_TASK_PRIORITY,
-      JSON.stringify(taskerParams)
-    );
   }
 
   function onResult(resultJson) {
@@ -120,7 +119,7 @@ const TaskQueue = (function () {
       }
 
       delete pending[id];
-      isRunning = false;
+      activeTasks--;
 
       setTimeout(_runNext, 0);
     } catch (error) {
@@ -128,7 +127,11 @@ const TaskQueue = (function () {
         error,
         resultJson
       });
-      isRunning = false;
+      // Por agora, vamos chamar _runNext, mas com cautela.
+      if (pending[error?.id]) {
+        delete pending[error.id];
+        activeTasks--;
+      }
       setTimeout(_runNext, 0);
     }
   }
@@ -157,25 +160,28 @@ const TaskQueue = (function () {
     Logger.info("TaskQueue initialized.");
   }
 
-  function cancelCurrentTask() {
-    Logger.warn(`[TaskQueue] Attempting to cancel current task via ${STOPPER_TASK_NAME}.`);
-    const pendingTaskId = Object.keys(pending)[0];
-    if (!pendingTaskId) {
-      Logger.warn("[TaskQueue] No pending task to cancel.");
+  function cancelAll() {
+    Logger.warn(`[TaskQueue] Cancelling all tasks.`);
+
+    // Cancela tarefas que estão na fila de espera
+    queue.length = 0;
+
+    // Cancela tarefas que estão em execução
+    const runningTaskIds = Object.keys(pending);
+    if (runningTaskIds.length === 0) {
+      Logger.warn("[TaskQueue] No pending tasks to cancel.");
       return;
     }
 
-    const task = pending[pendingTaskId];
+    runningTaskIds.forEach(id => {
+      const task = pending[id];
+      ENV.runTask(STOPPER_TASK_NAME, STOPPER_TASK_PRIORITY, WORKER_TASK_NAME);
+      clearInterval(task.monitorInterval);
+      task.onError("Cancelled");
+      delete pending[id];
+    });
 
-    // Run the dedicated stopper task, passing the worker task's name as a parameter.
-    ENV.runTask(STOPPER_TASK_NAME, STOPPER_TASK_PRIORITY, WORKER_TASK_NAME);
-
-    clearInterval(task.monitorInterval);
-    task.onError("Cancelled");
-
-    delete pending[pendingTaskId];
-    isRunning = false;
-
+    activeTasks = 0;
     setTimeout(_runNext, 0);
   }
 
@@ -183,6 +189,6 @@ const TaskQueue = (function () {
     init,
     add,
     onResult,
-    cancelCurrentTask
+    cancelAll
   };
 })();

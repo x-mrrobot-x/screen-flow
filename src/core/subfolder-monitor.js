@@ -134,8 +134,10 @@ const SubfolderMonitor = (function () {
   }
 
   async function loadFoldersData() {
-    await processFolderType("screenshots", ENV.ORGANIZED_SCREENSHOTS_PATH);
-    await processFolderType("screenrecordings", ENV.ORGANIZED_RECORDINGS_PATH);
+    await Promise.all([
+      processFolderType("screenshots", ENV.ORGANIZED_SCREENSHOTS_PATH),
+      processFolderType("screenrecordings", ENV.ORGANIZED_RECORDINGS_PATH)
+    ]);
   }
 
   function init() {
