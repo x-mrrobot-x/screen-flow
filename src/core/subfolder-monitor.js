@@ -141,7 +141,8 @@ const SubfolderMonitor = (function () {
   }
 
   function init() {
-    setTimeout(loadFoldersData, 1000);
+    EventBus.on('appmonitor:ready', loadFoldersData);
+    Logger.debug("[SubfolderMonitor] Aguardando o evento 'appmonitor:ready'.");
   }
   
   function runScan(){

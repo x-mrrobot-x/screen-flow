@@ -62,10 +62,22 @@ const Utils = (function() {
       localStorage.setItem(STORAGE_PREFIX + key, JSON.stringify(data));
   }
 
+  function sanitizeFolderName(name) {
+    if (typeof name !== 'string') return '';
+    return name
+      .trim()
+      .replace(/:/g, "-")
+      .replace(/"/g, "")
+      .replace(/\$/g, "")
+      .replace(/`/g, "")
+      .replace(/\\/g, "-");
+  }
+
   return {
     formatTimestamp,
     generateHash,
     getStoredData,
-    setStoredData
+    setStoredData,
+    sanitizeFolderName
   };
 })();

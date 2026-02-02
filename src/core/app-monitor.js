@@ -1,6 +1,66 @@
 const AppMonitor = (() => {
   const HASH_KEY = "apps_hash";
 
+  // NOVA FUNÇÃO para renomear pastas
+  async function renameFoldersForNewApps(newApps) {
+    Logger.debug(`[AppMonitor] Verificando se pastas precisam ser renomeadas ou corrigidas para ${newApps.length} novo(s) app(s).`);
+
+    const folders = AppState.getFolders();
+    const pkgToNewAppMap = new Map(newApps.map(app => [app.pkg, app]));
+    const nameToNewAppMap = new Map(newApps.map(app => [app.name, app]));
+    let foldersStateUpdated = false;
+
+    for (const folder of folders) {
+        // Cenário 1: O NOME da pasta é um pacote. Renomear a pasta.
+        if (pkgToNewAppMap.has(folder.name)) {
+            const app = pkgToNewAppMap.get(folder.name);
+            const oldName = folder.name;
+            const newName = Utils.sanitizeFolderName(app.name);
+
+            if (oldName === newName) continue;
+
+            const basePath = folder.type === 'ss' 
+              ? ENV.ORGANIZED_SCREENSHOTS_PATH 
+              : ENV.ORGANIZED_RECORDINGS_PATH;
+            
+            try {
+                Logger.info(`[AppMonitor] Renomeando pasta '${oldName}' para '${newName}'.`);
+                await TaskQueue.add("rename_folder", [basePath, oldName, newName], 'shell');
+                
+                // Atualiza NOME e PKG no estado
+                folder.name = newName;
+                folder.pkg = app.pkg;
+                foldersStateUpdated = true;
+                
+                Toast.success(`Pasta '${oldName}' atualizada para '${newName}'!`);
+
+            } catch (error) {
+                Logger.error(`[AppMonitor] Falha ao renomear a pasta '${oldName}':`, error);
+            }
+            // Pula para a próxima pasta, pois esta já foi tratada
+            continue; 
+        }
+
+        // Cenário 2: O PKG da pasta está incorreto. Corrigir apenas no estado.
+        if (nameToNewAppMap.has(folder.name)) {
+            const app = nameToNewAppMap.get(folder.name);
+            if (folder.pkg !== app.pkg) {
+                Logger.info(`[AppMonitor] Corrigindo PKG para a pasta '${folder.name}'. Antigo: '${folder.pkg}', Novo: '${app.pkg}'.`);
+                
+                // Atualiza apenas o PKG no estado
+                folder.pkg = app.pkg;
+                foldersStateUpdated = true;
+                Toast.info(`Metadados da pasta '${folder.name}' atualizados.`);
+            }
+        }
+    }
+
+    if (foldersStateUpdated) {
+        AppState.setFolders(folders);
+        Logger.info("[AppMonitor] Estado das pastas foi atualizado com novos nomes e/ou pacotes corrigidos.");
+    }
+  }
+
   function updateAppsData(newApps) {
     if (!newApps || newApps.length === 0) {
       Logger.info(
@@ -26,6 +86,11 @@ const AppMonitor = (() => {
         return;
       }
 
+      // >>>>>>>>>> PONTO DE INJEÇÃO DA NOVA LÓGICA <<<<<<<<<<
+      // Antes de atualizar o estado dos apps, verificamos se podemos renomear pastas
+      // Usamos 'setTimeout' para não bloquear o fluxo principal de atualização
+      setTimeout(() => renameFoldersForNewApps(appsToAdd), 500);
+      
       Logger.user("Lista de aplicativos atualizada.", "success");
       const updatedApps = [...existingApps, ...appsToAdd];
       AppState.setApps(updatedApps);
@@ -87,6 +152,9 @@ const AppMonitor = (() => {
         "[AppMonitor] Falha ao sincronizar a lista de aplicativos:",
         error
       );
+    } finally {
+      EventBus.emit('appmonitor:ready');
+      Logger.debug("[AppMonitor] Evento 'appmonitor:ready' emitido.");
     }
   }
 

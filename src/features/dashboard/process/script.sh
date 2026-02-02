@@ -286,6 +286,38 @@ EOF
   json_response "true" "[$json_array]" "null"
 }
 
+rename_folder() {
+  base_path="$1"
+  old_name="$2"
+  new_name="$3"
+
+  # Caminhos completos
+  old_path="$base_path/$old_name"
+  new_path="$base_path/$new_name"
+
+  # Verifica se a pasta antiga existe e o nome é diferente
+  if [ -d "$old_path" ] && [ "$old_name" != "$new_name" ]; then
+    
+    # Se a nova pasta já existe, mescla o conteúdo
+    if [ -d "$new_path" ]; then
+      # Move o conteúdo e depois remove a pasta antiga vazia
+      mv "$old_path"/* "$new_path"/ 2>/dev/null && rmdir "$old_path"
+    else
+      # Senão, apenas renomeia
+      mv "$old_path" "$new_path"
+    fi
+
+    if [ $? -eq 0 ]; then
+      json_response "true" "{\"renamed\": true}" "null"
+    else
+      json_response "false" "null" "\"Falha ao renomear/mesclar $old_name\""
+    fi
+  else
+    # Nada a fazer
+    json_response "true" "{\"renamed\": false}" "null"
+  fi
+}
+
 main() {
   command="$1"
   shift
@@ -322,6 +354,9 @@ main() {
       ;;
     get_item_counts_batch)
       get_item_counts_batch "$1" "$2"
+      ;;
+    rename_folder)
+      rename_folder "$1" "$2" "$3"
       ;;
     *)
       json_response "false" "{}" "\"Unknown command: $command\""
