@@ -149,10 +149,11 @@ const ProcessController = (function () {
   }
 
   function cancelCurrentProcess() {
-    if (!state.isRunning) return;
-    Logger.user("Cancelando processo...", "warn");
-    state.isRunning = false;
-    TaskQueue.cancelAll();
+    if (state.isRunning) {
+      Logger.user("Cancelando processo...", "warn");
+      state.isRunning = false;
+      TaskQueue.cancelAll();
+    }
     ProcessView.hide();
     ProcessView.reset();
   }
