@@ -323,6 +323,16 @@ const ENV = (() => {
       });
     }
 
+    function getGlobal(varName) {
+      try {
+        const value = tk.global(varName);
+        return value !== `%${varName}` ? value : undefined;
+      } catch (e) {
+        Logger.error(`Error getting global variable '${varName}':`, e);
+        return undefined;
+      }
+    }
+
     function cancelProcess() {}
 
     return {
@@ -334,6 +344,7 @@ const ENV = (() => {
       setData,
       execute,
       runTask,
+      getGlobal,
       cancelProcess,
       SOURCE_SCREENSHOTS_PATH,
       SOURCE_RECORDINGS_PATH,

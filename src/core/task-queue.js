@@ -4,9 +4,10 @@ const TaskQueue = (function () {
   let isRunning = false;
   let taskIdCounter = 0;
 
-  // A Task do Tasker que vai executar tudo
   const WORKER_TASK_NAME = "JS_WORKER_TASK";
-  const WORKER_TASK_PRIORITY = 9; // Prioridade um pouco menor que a principal
+  const WORKER_TASK_PRIORITY = 9;
+  const TASK_CHECK_INTERVAL = 1000; // 1 segundo
+  const MAX_CHECKS = 180; // 3 minutos no total
 
   function _runNext() {
     if (isRunning || queue.length === 0) {
@@ -17,24 +18,57 @@ const TaskQueue = (function () {
     const task = queue.shift();
     pending[task.id] = task;
 
+    let checks = 0;
+    const monitorInterval = setInterval(() => {
+      checks++;
+      const runningTasks = ENV.getGlobal("TRUN");
+
+      if (
+        (!runningTasks || !runningTasks.includes(WORKER_TASK_NAME)) &&
+        pending[task.id]
+      ) {
+        Logger.warn(
+          `[TaskQueue] Worker task not running. Cancelling task ${task.id}.`
+        );
+        clearInterval(monitorInterval);
+        onResult(
+          JSON.stringify({
+            id: task.id,
+            status: "error",
+            payload: "Worker task disappeared."
+          })
+        );
+      } else if (checks >= MAX_CHECKS) {
+        Logger.error(`[TaskQueue] Task ${task.id} timed out.`);
+        clearInterval(monitorInterval);
+        onResult(
+          JSON.stringify({
+            id: task.id,
+            status: "error",
+            payload: "Task timed out"
+          })
+        );
+      }
+    }, TASK_CHECK_INTERVAL);
+
+    task.monitorInterval = monitorInterval;
+
     Logger.debug(
       `[TaskQueue] Running task ${task.id}: ${task.action}`,
       task.params
     );
 
-    // Estrutura de dados enviada para a Task Worker
     const taskerParams = {
       id: task.id,
       action: task.action,
       params: task.params,
-      type: task.type, // Envia o tipo da tarefa para o Tasker
-      fullCommand: null // Valor padrão
+      type: task.type,
+      fullCommand: null
     };
 
     if (task.type === "shell") {
       const scriptPath = `${ENV.WORK_DIR}src/features/dashboard/process/script.sh`;
       const command = task.action;
-      // Garante que os argumentos sejam sempre um array para o .map funcionar
       const args = Array.isArray(task.params) ? task.params : [];
 
       const quotedArgs = args
@@ -43,7 +77,6 @@ const TaskQueue = (function () {
             typeof arg === "object" && arg !== null
               ? JSON.stringify(arg)
               : String(arg);
-          // Escapa aspas simples para o shell
           return "'" + argStr.replace(/'/g, "'\\''") + "'";
         })
         .join(" ");
@@ -54,23 +87,18 @@ const TaskQueue = (function () {
       );
     }
 
-    // O ponto central que chama o Tasker
     ENV.runTask(
       WORKER_TASK_NAME,
       WORKER_TASK_PRIORITY,
-      JSON.stringify(taskerParams) // Passamos tudo como um único JSON
+      JSON.stringify(taskerParams)
     );
   }
 
-  /**
-   * Ponto de entrada que o Tasker chamará com o resultado.
-   * Esta função deve ser acessível globalmente.
-   * @param {string} resultJson - Um JSON string contendo { id, status, payload }
-   */
   function onResult(resultJson) {
     Logger.debug("[TaskQueue] Received result from Tasker:", resultJson);
     try {
-      const { id, status, payload } = resultJson;
+      const { id, status, payload } =
+        typeof resultJson === "string" ? JSON.parse(resultJson) : resultJson;
 
       const task = pending[id];
       if (!task) {
@@ -79,6 +107,8 @@ const TaskQueue = (function () {
         );
         return;
       }
+
+      clearInterval(task.monitorInterval);
 
       if (status === "success" && task.onSuccess) {
         task.onSuccess(payload);
@@ -89,7 +119,6 @@ const TaskQueue = (function () {
       delete pending[id];
       isRunning = false;
 
-      // Tenta executar a próxima tarefa da fila
       setTimeout(_runNext, 0);
     } catch (error) {
       Logger.error("[TaskQueue] Failed to parse result from Tasker:", {
@@ -101,13 +130,6 @@ const TaskQueue = (function () {
     }
   }
 
-  /**
-   * Adiciona uma nova tarefa à fila.
-   * @param {string} action - A ação que o worker deve executar (ex: 'load_apps').
-   * @param {object} params - Parâmetros para a ação.
-   * @param {string} type - O tipo de tarefa ('default', 'shell').
-   * @returns {Promise<any>} - Uma promessa que resolve ou rejeita quando a tarefa é concluída.
-   */
   function add(action, params = {}, type = "default") {
     return new Promise((resolve, reject) => {
       const taskId = ++taskIdCounter;
@@ -119,7 +141,7 @@ const TaskQueue = (function () {
         id: taskId,
         action: action,
         params: params,
-        type: type, // Armazena o tipo da tarefa
+        type: type,
         onSuccess: resolve,
         onError: reject
       });
@@ -135,6 +157,6 @@ const TaskQueue = (function () {
   return {
     init,
     add,
-    onResult // Exposto para ser chamado globalmente
+    onResult
   };
 })();
