@@ -62,9 +62,13 @@ const ProcessController = (function () {
 
         await sleep(500);
       } catch (error) {
-        Logger.error(`Erro na etapa ${step.id}:`, error);
-        ProcessView.updateStepStatus(i, "failed");
-        ProcessView.showCompletion(`Erro em: ${step.label}`);
+        if (error === "Cancelled") {
+          Logger.warn(`Processo '${state.processType}' cancelado pelo usuário.`);
+        } else {
+          Logger.error(`Erro na etapa ${step.id}:`, error);
+          ProcessView.updateStepStatus(i, "failed");
+          ProcessView.showCompletion(`Erro em: ${step.label}`);
+        }
         state.isRunning = false;
         return;
       }
@@ -145,7 +149,10 @@ const ProcessController = (function () {
   }
 
   function cancelCurrentProcess() {
+    if (!state.isRunning) return;
+    Logger.user("Cancelando processo...", "warn");
     state.isRunning = false;
+    TaskQueue.cancelCurrentTask();
     ProcessView.hide();
     ProcessView.reset();
   }

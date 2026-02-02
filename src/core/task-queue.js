@@ -1,13 +1,15 @@
 const TaskQueue = (function () {
+  const WORKER_TASK_NAME = "SO - FILE QUEUE WORKER";
+  const WORKER_TASK_PRIORITY = 9;
+  const STOPPER_TASK_NAME = "SO - STOP WORKER TASK";
+  const STOPPER_TASK_PRIORITY = 10;
+  const TASK_CHECK_INTERVAL = 1000; // 1 segundo
+  const MAX_CHECKS = 180; // 3 minutos no total
+
   const queue = [];
   const pending = {};
   let isRunning = false;
   let taskIdCounter = 0;
-
-  const WORKER_TASK_NAME = "JS_WORKER_TASK";
-  const WORKER_TASK_PRIORITY = 9;
-  const TASK_CHECK_INTERVAL = 1000; // 1 segundo
-  const MAX_CHECKS = 180; // 3 minutos no total
 
   function _runNext() {
     if (isRunning || queue.length === 0) {
@@ -82,6 +84,7 @@ const TaskQueue = (function () {
         .join(" ");
 
       taskerParams.fullCommand = `sh "${scriptPath}" ${command} ${quotedArgs}`;
+      taskerParams.action = `run_shell`;
       Logger.debug(
         `[TaskQueue] Generated full command for shell task: ${taskerParams.fullCommand}`
       );
@@ -154,9 +157,32 @@ const TaskQueue = (function () {
     Logger.info("TaskQueue initialized.");
   }
 
+  function cancelCurrentTask() {
+    Logger.warn(`[TaskQueue] Attempting to cancel current task via ${STOPPER_TASK_NAME}.`);
+    const pendingTaskId = Object.keys(pending)[0];
+    if (!pendingTaskId) {
+      Logger.warn("[TaskQueue] No pending task to cancel.");
+      return;
+    }
+
+    const task = pending[pendingTaskId];
+
+    // Run the dedicated stopper task, passing the worker task's name as a parameter.
+    ENV.runTask(STOPPER_TASK_NAME, STOPPER_TASK_PRIORITY, WORKER_TASK_NAME);
+
+    clearInterval(task.monitorInterval);
+    task.onError("Cancelled");
+
+    delete pending[pendingTaskId];
+    isRunning = false;
+
+    setTimeout(_runNext, 0);
+  }
+
   return {
     init,
     add,
-    onResult
+    onResult,
+    cancelCurrentTask
   };
 })();

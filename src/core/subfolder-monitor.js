@@ -80,7 +80,6 @@ const SubfolderMonitor = (function () {
     const HASH_KEY = `${STORAGE_KEY_PREFIX}${type}_hash`;
 
     try {
-      // Usando 'shell' como tipo, conforme instruído
       const subfolderList = await TaskQueue.add('get_subfolders', [path], 'shell');
       if (!subfolderList || subfolderList.length === 0) {
         Logger.debug(`[SubfolderMonitor] Nenhuma subpasta encontrada para ${type}.`);
@@ -117,7 +116,6 @@ const SubfolderMonitor = (function () {
 
       Logger.info(`[SubfolderMonitor] As seguintes pastas precisam de atualização para ${type}:`, foldersToUpdate);
       
-      // Usando 'shell' como tipo, conforme instruído
       const countsResult = await TaskQueue.add(
         'get_item_counts_batch',
         [path, JSON.stringify(foldersToUpdate)],
