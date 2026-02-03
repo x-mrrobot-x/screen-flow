@@ -7,6 +7,7 @@ const AppState = (() => {
   let folders = [];
   let apps = [];
   let monitor = {};
+  let isReady = false;
 
   async function init() {
     const [
@@ -39,6 +40,10 @@ const AppState = (() => {
     activities = activitiesData;
     apps = appsData;
     monitor = monitorData;
+
+    isReady = true;
+    EventBus.emit("appstate:ready");
+    Logger.debug("[AppState] Evento 'appstate:ready' emitido.");
   }
 
   // Auto-save com debounce
@@ -75,6 +80,7 @@ const AppState = (() => {
 
   return {
     init,
+    isReady: () => isReady,
 
     // Folders
     getFolders: () => [...folders],

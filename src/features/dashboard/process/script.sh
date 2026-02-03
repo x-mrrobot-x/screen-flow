@@ -318,6 +318,15 @@ rename_folder() {
   fi
 }
 
+path_exists() {
+  path_to_check="$1"
+  if [ -e "$path_to_check" ]; then
+    json_response "true" "true" "null"
+  else
+    json_response "true" "false" "null"
+  fi
+}
+
 main() {
   command="$1"
   shift
@@ -357,6 +366,9 @@ main() {
       ;;
     rename_folder)
       rename_folder "$1" "$2" "$3"
+      ;;
+    path_exists)
+      path_exists "$1"
       ;;
     *)
       json_response "false" "{}" "\"Unknown command: $command\""

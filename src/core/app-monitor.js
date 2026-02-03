@@ -1,7 +1,6 @@
 const AppMonitor = (() => {
   const HASH_KEY = "apps_hash";
 
-  // NOVA FUNÇÃO para renomear pastas
   async function renameFoldersForNewApps(newApps) {
     Logger.debug(`[AppMonitor] Verificando se pastas precisam ser renomeadas ou corrigidas para ${newApps.length} novo(s) app(s).`);
 
@@ -19,38 +18,37 @@ const AppMonitor = (() => {
 
             if (oldName === newName) continue;
 
+            // Lógica de renomeação desacoplada
             let successfullyRenamed = false;
             let attemptedRename = false;
             
-            const monitorData = AppState.getMonitorData();
-            const ssMap = monitorData['analyzer:screenshots_map'] || {};
-            const srMap = monitorData['analyzer:screenrecordings_map'] || {};
+            const screenshotsPath = `${ENV.ORGANIZED_SCREENSHOTS_PATH}/${oldName}`;
+            const recordingsPath = `${ENV.ORGANIZED_RECORDINGS_PATH}/${oldName}`;
 
-            // Verifica se a pasta existe no mapa de screenshots da última varredura
-            if (Object.keys(ssMap).includes(oldName)) {
+            // Verifica e renomeia a pasta de screenshots
+            if (await TaskQueue.add("path_exists", [screenshotsPath], 'shell')) {
                 attemptedRename = true;
-                const basePath = ENV.ORGANIZED_SCREENSHOTS_PATH;
                 try {
                     Logger.info(`[AppMonitor] Tentando renomear pasta de screenshots: '${oldName}' para '${newName}'.`);
-                    await TaskQueue.add("rename_folder", [basePath, oldName, newName], 'shell');
+                    await TaskQueue.add("rename_folder", [ENV.ORGANIZED_SCREENSHOTS_PATH, oldName, newName], 'shell');
                     successfullyRenamed = true;
                 } catch (error) {
                     Logger.error(`[AppMonitor] Falha ao renomear a pasta de screenshots '${oldName}':`, error);
                 }
             }
 
-            // Verifica se a pasta existe no mapa de screen recordings da última varredura
-            if (Object.keys(srMap).includes(oldName)) {
+            // Verifica e renomeia a pasta de screen recordings
+            if (await TaskQueue.add("path_exists", [recordingsPath], 'shell')) {
                 attemptedRename = true;
-                const basePath = ENV.ORGANIZED_RECORDINGS_PATH;
                 try {
                     Logger.info(`[AppMonitor] Tentando renomear pasta de screen recordings: '${oldName}' para '${newName}'.`);
-                    await TaskQueue.add("rename_folder", [basePath, oldName, newName], 'shell');
+                    await TaskQueue.add("rename_folder", [ENV.ORGANIZED_RECORDINGS_PATH, oldName, newName], 'shell');
                     successfullyRenamed = true;
                 } catch (error) {
                     Logger.error(`[AppMonitor] Falha ao renomear a pasta de screen recordings '${oldName}':`, error);
                 }
             }
+
 
             if (successfullyRenamed) {
                 folder.name = newName;
@@ -180,8 +178,12 @@ const AppMonitor = (() => {
   }
 
   function init() {
-    // Leve atraso para garantir que dependências como o AppState estejam prontas
-    setTimeout(loadInstalledApps, 1500);
+    if (AppState.isReady()) {
+      loadInstalledApps();
+    } else {
+      EventBus.on('appstate:ready', loadInstalledApps);
+    }
+    Logger.debug("[AppMonitor] Initialized.");
   }
 
   return {
