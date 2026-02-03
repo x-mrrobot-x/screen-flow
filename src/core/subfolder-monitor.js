@@ -81,23 +81,34 @@ const SubfolderMonitor = (function () {
 
     try {
       const subfolderList = await TaskQueue.add('get_subfolders', [path], 'shell');
+      const monitorData = AppState.getMonitorData();
+      const oldFolderMap = monitorData[FOLDER_MAP_KEY] || {};
+
       if (!subfolderList || subfolderList.length === 0) {
-        Logger.debug(`[SubfolderMonitor] Nenhuma subpasta encontrada para ${type}.`);
+        if (Object.keys(oldFolderMap).length > 0) {
+            Logger.info(`[SubfolderMonitor] Todas as pastas para ${type} foram removidas. Limpando o mapa de monitoramento.`);
+            const newMonitorData = {
+                ...monitorData,
+                [HASH_KEY]: await Utils.generateHash(""),
+                [FOLDER_MAP_KEY]: {}
+            };
+            AppState.setMonitorData(newMonitorData);
+        } else {
+            Logger.debug(`[SubfolderMonitor] Nenhuma subpasta encontrada para ${type} e nenhuma existia no mapa.`);
+        }
         return;
       }
       
       const listAsString = subfolderList.join('|');
       const currentHash = await Utils.generateHash(listAsString);
-      const lastHash = Utils.getStoredData(HASH_KEY);
+      const lastHash = monitorData[HASH_KEY];
 
       if (currentHash === lastHash) {
         Logger.debug(`[SubfolderMonitor] Sem alterações detectadas para ${type} (hash correspondente).`);
         return;
       }
       Logger.info(`[SubfolderMonitor] Alterações detectadas para ${type}.`);
-      Utils.setStoredData(HASH_KEY, currentHash);
 
-      const oldFolderMap = Utils.getStoredData(FOLDER_MAP_KEY) || {};
       const newFolderMap = subfolderList.reduce((acc, item) => {
         const [name, ts] = item.split(',');
         acc[name] = ts;
@@ -108,9 +119,15 @@ const SubfolderMonitor = (function () {
           return newFolderMap[name] !== oldFolderMap[name];
       });
 
+      const newMonitorData = {
+        ...monitorData,
+        [HASH_KEY]: currentHash,
+        [FOLDER_MAP_KEY]: newFolderMap
+      };
+
       if (foldersToUpdate.length === 0 && Object.keys(newFolderMap).length === Object.keys(oldFolderMap).length) {
         Logger.debug(`[SubfolderMonitor] Hashes diferentes, mas nenhum timestamp de pasta foi alterado para ${type}.`);
-        Utils.setStoredData(FOLDER_MAP_KEY, newFolderMap);
+        AppState.setMonitorData(newMonitorData);
         return;
       }
 
@@ -126,7 +143,7 @@ const SubfolderMonitor = (function () {
         updateFoldersData(countsResult, type);
       }
       
-      Utils.setStoredData(FOLDER_MAP_KEY, newFolderMap);
+      AppState.setMonitorData(newMonitorData);
 
     } catch (error) {
       Logger.error(`[SubfolderMonitor] Erro ao processar o tipo de pasta '${type}':`, error);
@@ -138,6 +155,24 @@ const SubfolderMonitor = (function () {
       processFolderType("screenshots", ENV.ORGANIZED_SCREENSHOTS_PATH),
       processFolderType("screenrecordings", ENV.ORGANIZED_RECORDINGS_PATH)
     ]);
+    
+    Logger.debug("[SubfolderMonitor] Ambas as verificações de tipo de pasta foram concluídas. Executando a limpeza do estado.");
+
+    const monitorData = AppState.getMonitorData();
+    const ssMap = monitorData[`${STORAGE_KEY_PREFIX}screenshots_map`] || {};
+    const srMap = monitorData[`${STORAGE_KEY_PREFIX}screenrecordings_map`] || {};
+    const foldersOnDisk = new Set([...Object.keys(ssMap), ...Object.keys(srMap)]);
+    
+    const foldersInState = AppState.getFolders();
+    const foldersToKeep = foldersInState.filter(f => foldersOnDisk.has(f.name));
+
+    if (foldersToKeep.length < foldersInState.length) {
+        const deletedNames = foldersInState.filter(f => !foldersOnDisk.has(f.name)).map(f => f.name);
+        Logger.info("[SubfolderMonitor] Removendo pastas do estado que não existem mais no disco:", deletedNames);
+        AppState.setFolders(foldersToKeep);
+    } else {
+        Logger.debug("[SubfolderMonitor] Nenhuma pasta obsoleta encontrada no estado.");
+    }
   }
 
   function init() {

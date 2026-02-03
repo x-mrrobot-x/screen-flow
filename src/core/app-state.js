@@ -6,16 +6,24 @@ const AppState = (() => {
   let activities = [];
   let folders = [];
   let apps = [];
+  let monitor = {};
 
   async function init() {
-    const [settingsData, statsData, foldersData, activitiesData, appsData] =
-      await Promise.all([
-        ENV.getData("SETTINGS"),
-        ENV.getData("STATS"),
-        ENV.getData("FOLDERS"),
-        ENV.getData("ACTIVITIES"),
-        ENV.getData("APPS")
-      ]);
+    const [
+      settingsData,
+      statsData,
+      foldersData,
+      activitiesData,
+      appsData,
+      monitorData
+    ] = await Promise.all([
+      ENV.getData("SETTINGS"),
+      ENV.getData("STATS"),
+      ENV.getData("FOLDERS"),
+      ENV.getData("ACTIVITIES"),
+      ENV.getData("APPS"),
+      ENV.getData("MONITOR")
+    ]);
 
     // Logger.debug("Initial data loaded:", {
     //   settingsData,
@@ -30,6 +38,7 @@ const AppState = (() => {
     folders = foldersData;
     activities = activitiesData;
     apps = appsData;
+    monitor = monitorData;
   }
 
   // Auto-save com debounce
@@ -51,7 +60,9 @@ const AppState = (() => {
 
     activities: () => ENV.setData("ACTIVITIES", activities),
 
-    apps: () => ENV.setData("APPS", apps)
+    apps: () => ENV.setData("APPS", apps),
+    
+    monitor: () => ENV.setData("MONITOR", monitor)
   };
 
   const EVENTS = {
@@ -94,6 +105,14 @@ const AppState = (() => {
       apps = [...newApps];
       persist.apps();
       emitChange("apps");
+    },
+    
+    // Monitor
+    getMonitorData: () => ({ ...monitor }),
+    setMonitorData(newData) {
+      monitor = { ...monitor, ...newData };
+      persist.monitor();
+      emitChange("monitor");
     },
 
     // Settings (configurações do usuário)
@@ -187,18 +206,21 @@ const AppState = (() => {
         activities = ENV.getDefault("ACTIVITIES");
         settings = ENV.getDefault("SETTINGS");
         apps = ENV.getDefault("APPS");
+        monitor = ENV.getDefault("MONITOR");
 
         persist.stats();
         persist.folders();
         persist.activities();
         persist.settings();
         persist.apps();
+        persist.monitor();
 
         emitChange("stats");
         emitChange("folders");
         emitChange("activities");
         emitChange("settings");
         emitChange("apps");
+        emitChange("monitor");
 
         return true;
       } catch (error) {

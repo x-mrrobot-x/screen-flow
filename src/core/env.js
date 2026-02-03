@@ -71,6 +71,18 @@ const ENV = (() => {
         path: "src/data/apps.json",
         default: []
       }
+    },
+    MONITOR: {
+      web: {
+        type: "localStorage",
+        key: "monitor",
+        default: {}
+      },
+      tasker: {
+        type: "file",
+        path: "src/data/monitor.json",
+        default: {}
+      }
     }
   };
 

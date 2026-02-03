@@ -3,7 +3,7 @@ const TaskQueue = (function () {
   const WORKER_TASK_PRIORITY = 9;
   const STOPPER_TASK_NAME = "SO - STOP WORKER TASK";
   const STOPPER_TASK_PRIORITY = 10;
-  const TASK_CHECK_INTERVAL = 1000; // 1 segundo
+  const TASK_CHECK_INTERVAL = 2000; // 1 segundo
   const MAX_CHECKS = 180; // 3 minutos no total
   const MAX_CONCURRENT_TASKS = 4; // Limite de tarefas paralelas
 

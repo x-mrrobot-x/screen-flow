@@ -19,26 +19,49 @@ const AppMonitor = (() => {
 
             if (oldName === newName) continue;
 
-            const basePath = folder.type === 'ss' 
-              ? ENV.ORGANIZED_SCREENSHOTS_PATH 
-              : ENV.ORGANIZED_RECORDINGS_PATH;
+            let successfullyRenamed = false;
+            let attemptedRename = false;
             
-            try {
-                Logger.info(`[AppMonitor] Renomeando pasta '${oldName}' para '${newName}'.`);
-                await TaskQueue.add("rename_folder", [basePath, oldName, newName], 'shell');
-                
-                // Atualiza NOME e PKG no estado
+            const monitorData = AppState.getMonitorData();
+            const ssMap = monitorData['analyzer:screenshots_map'] || {};
+            const srMap = monitorData['analyzer:screenrecordings_map'] || {};
+
+            // Verifica se a pasta existe no mapa de screenshots da última varredura
+            if (Object.keys(ssMap).includes(oldName)) {
+                attemptedRename = true;
+                const basePath = ENV.ORGANIZED_SCREENSHOTS_PATH;
+                try {
+                    Logger.info(`[AppMonitor] Tentando renomear pasta de screenshots: '${oldName}' para '${newName}'.`);
+                    await TaskQueue.add("rename_folder", [basePath, oldName, newName], 'shell');
+                    successfullyRenamed = true;
+                } catch (error) {
+                    Logger.error(`[AppMonitor] Falha ao renomear a pasta de screenshots '${oldName}':`, error);
+                }
+            }
+
+            // Verifica se a pasta existe no mapa de screen recordings da última varredura
+            if (Object.keys(srMap).includes(oldName)) {
+                attemptedRename = true;
+                const basePath = ENV.ORGANIZED_RECORDINGS_PATH;
+                try {
+                    Logger.info(`[AppMonitor] Tentando renomear pasta de screen recordings: '${oldName}' para '${newName}'.`);
+                    await TaskQueue.add("rename_folder", [basePath, oldName, newName], 'shell');
+                    successfullyRenamed = true;
+                } catch (error) {
+                    Logger.error(`[AppMonitor] Falha ao renomear a pasta de screen recordings '${oldName}':`, error);
+                }
+            }
+
+            if (successfullyRenamed) {
                 folder.name = newName;
                 folder.pkg = app.pkg;
                 foldersStateUpdated = true;
-                
-                Toast.success(`Pasta '${oldName}' atualizada para '${newName}'!`);
-
-            } catch (error) {
-                Logger.error(`[AppMonitor] Falha ao renomear a pasta '${oldName}':`, error);
+                Toast.success(`Pasta(s) do app '${newName}' foram atualizadas.`);
+            } else if (attemptedRename) {
+                Toast.error(`Falha ao renomear pasta(s) para '${newName}'.`);
             }
-            // Pula para a próxima pasta, pois esta já foi tratada
-            continue; 
+
+            continue;
         }
 
         // Cenário 2: O PKG da pasta está incorreto. Corrigir apenas no estado.
@@ -47,7 +70,6 @@ const AppMonitor = (() => {
             if (folder.pkg !== app.pkg) {
                 Logger.info(`[AppMonitor] Corrigindo PKG para a pasta '${folder.name}'. Antigo: '${folder.pkg}', Novo: '${app.pkg}'.`);
                 
-                // Atualiza apenas o PKG no estado
                 folder.pkg = app.pkg;
                 foldersStateUpdated = true;
                 Toast.info(`Metadados da pasta '${folder.name}' atualizados.`);
@@ -61,7 +83,7 @@ const AppMonitor = (() => {
     }
   }
 
-  function updateAppsData(newApps) {
+  async function updateAppsData(newApps) {
     if (!newApps || newApps.length === 0) {
       Logger.info(
         "[AppMonitor] Nenhum detalhe de novo aplicativo para adicionar."
@@ -85,11 +107,9 @@ const AppMonitor = (() => {
         );
         return;
       }
-
-      // >>>>>>>>>> PONTO DE INJEÇÃO DA NOVA LÓGICA <<<<<<<<<<
-      // Antes de atualizar o estado dos apps, verificamos se podemos renomear pastas
-      // Usamos 'setTimeout' para não bloquear o fluxo principal de atualização
-      setTimeout(() => renameFoldersForNewApps(appsToAdd), 500);
+      
+      // Aguarda a conclusão do processo de renomeação antes de continuar
+      await renameFoldersForNewApps(appsToAdd);
       
       Logger.user("Lista de aplicativos atualizada.", "success");
       const updatedApps = [...existingApps, ...appsToAdd];
@@ -114,7 +134,8 @@ const AppMonitor = (() => {
 
       const listAsString = allPkgs.sort().join(",");
       const currentHash = await Utils.generateHash(listAsString);
-      const lastHash = Utils.getStoredData(HASH_KEY);
+      const monitorData = AppState.getMonitorData();
+      const lastHash = monitorData[HASH_KEY];
 
       if (currentHash === lastHash) {
         Logger.debug(
@@ -139,14 +160,14 @@ const AppMonitor = (() => {
           newPkgs,
           "app"
         );
-        updateAppsData(appDetails);
+        await updateAppsData(appDetails);
       } else {
         Logger.debug(
           "[AppMonitor] Nenhuma aplicativo novo para adicionar, apenas remoções foram detectadas."
         );
       }
 
-      Utils.setStoredData(HASH_KEY, currentHash);
+      AppState.setMonitorData({ [HASH_KEY]: currentHash });
     } catch (error) {
       Logger.error(
         "[AppMonitor] Falha ao sincronizar a lista de aplicativos:",

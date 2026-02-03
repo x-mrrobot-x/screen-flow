@@ -44,22 +44,11 @@ const Utils = (function() {
     }
   }
 
-  const STORAGE_PREFIX = "@screenflow:";
-
   async function generateHash(str) {
       const buffer = new TextEncoder().encode(str);
       const hashBuffer = await crypto.subtle.digest('SHA-1', buffer);
       const hashArray = Array.from(new Uint8Array(hashBuffer));
       return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  }
-
-  function getStoredData(key) {
-      const data = localStorage.getItem(STORAGE_PREFIX + key);
-      return data ? JSON.parse(data) : null;
-  }
-
-  function setStoredData(key, data) {
-      localStorage.setItem(STORAGE_PREFIX + key, JSON.stringify(data));
   }
 
   function sanitizeFolderName(name) {
@@ -76,8 +65,6 @@ const Utils = (function() {
   return {
     formatTimestamp,
     generateHash,
-    getStoredData,
-    setStoredData,
     sanitizeFolderName
   };
 })();
