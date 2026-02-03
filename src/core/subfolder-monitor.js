@@ -151,27 +151,29 @@ const SubfolderMonitor = (function () {
   }
 
   async function loadFoldersData() {
-    await Promise.all([
-      processFolderType("screenshots", ENV.ORGANIZED_SCREENSHOTS_PATH),
-      processFolderType("screenrecordings", ENV.ORGANIZED_RECORDINGS_PATH)
-    ]);
-    
-    Logger.debug("[SubfolderMonitor] Ambas as verificações de tipo de pasta foram concluídas. Executando a limpeza do estado.");
+    try {
+      await Promise.all([
+        processFolderType("screenshots", ENV.ORGANIZED_SCREENSHOTS_PATH),
+        processFolderType("screenrecordings", ENV.ORGANIZED_RECORDINGS_PATH)
+      ]);
+    } finally {
+      Logger.debug("[SubfolderMonitor] Verificações concluídas. Executando a limpeza do estado, independentemente de erros.");
 
-    const monitorData = AppState.getMonitorData();
-    const ssMap = monitorData[`${STORAGE_KEY_PREFIX}screenshots_map`] || {};
-    const srMap = monitorData[`${STORAGE_KEY_PREFIX}screenrecordings_map`] || {};
-    const foldersOnDisk = new Set([...Object.keys(ssMap), ...Object.keys(srMap)]);
-    
-    const foldersInState = AppState.getFolders();
-    const foldersToKeep = foldersInState.filter(f => foldersOnDisk.has(f.name));
+      const monitorData = AppState.getMonitorData();
+      const ssMap = monitorData[`${STORAGE_KEY_PREFIX}screenshots_map`] || {};
+      const srMap = monitorData[`${STORAGE_KEY_PREFIX}screenrecordings_map`] || {};
+      const foldersOnDisk = new Set([...Object.keys(ssMap), ...Object.keys(srMap)]);
+      
+      const foldersInState = AppState.getFolders();
+      const foldersToKeep = foldersInState.filter(f => foldersOnDisk.has(f.name));
 
-    if (foldersToKeep.length < foldersInState.length) {
-        const deletedNames = foldersInState.filter(f => !foldersOnDisk.has(f.name)).map(f => f.name);
-        Logger.info("[SubfolderMonitor] Removendo pastas do estado que não existem mais no disco:", deletedNames);
-        AppState.setFolders(foldersToKeep);
-    } else {
-        Logger.debug("[SubfolderMonitor] Nenhuma pasta obsoleta encontrada no estado.");
+      if (foldersToKeep.length < foldersInState.length) {
+          const deletedNames = foldersInState.filter(f => !foldersOnDisk.has(f.name)).map(f => f.name);
+          Logger.info("[SubfolderMonitor] Removendo pastas do estado que não existem mais no disco:", deletedNames);
+          AppState.setFolders(foldersToKeep);
+      } else {
+          Logger.debug("[SubfolderMonitor] Nenhuma pasta obsoleta encontrada no estado.");
+      }
     }
   }
 
