@@ -1,14 +1,18 @@
 const SubfolderMonitor = (function () {
   "use strict";
 
-  const STORAGE_KEY_PREFIX = "analyzer:";
-
-  function updateFoldersFromScan(scriptOutput, type, existingFolders) {
+  function updateFoldersFromScan(
+    scriptOutput,
+    type,
+    existingFolders,
+    folderTimestamps
+  ) {
     if (!scriptOutput || scriptOutput.length === 0) {
       return existingFolders;
     }
-    
+
     const statsKey = type === "screenshots" ? "ss" : "sr";
+    const timestampKey = `disk_ts_${statsKey}`;
     const folderData = scriptOutput.map(line => {
       const [name, count] = line.split(",");
       return {
@@ -26,154 +30,166 @@ const SubfolderMonitor = (function () {
 
     folderData.forEach(({ name, count }) => {
       const existingIndex = currentData.findIndex(f => f.name === name);
-      const timestamp = Date.now();
+      const diskTimestamp = folderTimestamps[name];
 
       if (existingIndex !== -1) {
-        currentData[existingIndex].stats[statsKey] = count;
-        currentData[existingIndex].stats.lu = timestamp;
+        const folder = currentData[existingIndex];
+        folder.stats[statsKey] = count;
+        folder[timestampKey] = diskTimestamp;
+        if (folder.disk_ts) {
+          delete folder.disk_ts;
+        }
       } else {
         const pkg = appNameToPkgMap[name] || name;
         if (!appNameToPkgMap[name]) {
             Logger.warn(`Package não encontrado para a pasta: ${name}, usando o nome da pasta como pkg.`);
         }
-        // Corrigido: Cria o objeto diretamente
         const newEntry = {
-            id: String(Date.now()),
-            name: name,
-            pkg: pkg,
-            stats: {
-                ss: type === "screenshots" ? count : 0,
-                sr: type === "screenrecordings" ? count : 0,
-                lu: Date.now()
-            },
-            cleaner: {
-                ss: { on: false, days: 7 },
-                sr: { on: false, days: 7 }
-            }
+          id: String(Date.now()),
+          name: name,
+          pkg: pkg,
+          stats: {
+            ss: 0,
+            sr: 0
+          },
+          cleaner: {
+            ss: { on: false, days: 7 },
+            sr: { on: false, days: 7 }
+          }
         };
+        newEntry.stats[statsKey] = count;
+        newEntry[timestampKey] = diskTimestamp;
         currentData.push(newEntry);
       }
     });
 
-    Logger.debug(`[SubfolderMonitor] Dados de pastas atualizados para o tipo '${type}'.`);
+    Logger.debug(
+      `[SubfolderMonitor] Dados de pastas atualizados para o tipo '${type}'.`
+    );
     return currentData;
   }
 
-  function updateFoldersData(scriptOutput, type) {
-    Logger.info(`[SubfolderMonitor] Recebendo dados de contagem para o tipo: ${type}.`);
+  function updateFoldersData(scriptOutput, type, folderTimestamps) {
+    Logger.info(
+      `[SubfolderMonitor] Recebendo dados de contagem para o tipo: ${type}.`
+    );
     try {
       const existingFolders = AppState.getFolders();
       const updatedFolders = updateFoldersFromScan(
         scriptOutput,
         type,
-        existingFolders
+        existingFolders,
+        folderTimestamps
       );
       AppState.setFolders(updatedFolders);
     } catch (error) {
-      Logger.error(`[SubfolderMonitor] Falha ao processar dados para o tipo: ${type}`, error);
+      Logger.error(
+        `[SubfolderMonitor] Falha ao processar dados para o tipo: ${type}`,
+        error
+      );
     }
   }
 
   async function processFolderType(type, path) {
     Logger.debug(`[SubfolderMonitor] Iniciando verificação para o tipo: ${type}`);
-    const FOLDER_MAP_KEY = `${STORAGE_KEY_PREFIX}${type}_map`;
-    const HASH_KEY = `${STORAGE_KEY_PREFIX}${type}_hash`;
-
     try {
-      const subfolderList = await TaskQueue.add('get_subfolders', [path], 'shell');
-      const monitorData = AppState.getMonitorData();
-      const oldFolderMap = monitorData[FOLDER_MAP_KEY] || {};
+      const subfolderList = await TaskQueue.add("get_subfolders", [path], "shell");
 
       if (!subfolderList || subfolderList.length === 0) {
-        if (Object.keys(oldFolderMap).length > 0) {
-            Logger.info(`[SubfolderMonitor] Todas as pastas para ${type} foram removidas. Limpando o mapa de monitoramento.`);
-            const newMonitorData = {
-                ...monitorData,
-                [HASH_KEY]: await Utils.generateHash(""),
-                [FOLDER_MAP_KEY]: {}
-            };
-            AppState.setMonitorData(newMonitorData);
-        } else {
-            Logger.debug(`[SubfolderMonitor] Nenhuma subpasta encontrada para ${type} e nenhuma existia no mapa.`);
-        }
-        return;
+        Logger.debug(`[SubfolderMonitor] Nenhuma subpasta encontrada para ${type}.`);
+        return {};
       }
-      
-      const listAsString = subfolderList.join('|');
-      const currentHash = await Utils.generateHash(listAsString);
-      const lastHash = monitorData[HASH_KEY];
 
-      if (currentHash === lastHash) {
-        Logger.debug(`[SubfolderMonitor] Sem alterações detectadas para ${type} (hash correspondente).`);
-        return;
-      }
-      Logger.info(`[SubfolderMonitor] Alterações detectadas para ${type}.`);
-
-      const newFolderMap = subfolderList.reduce((acc, item) => {
-        const [name, ts] = item.split(',');
+      const currentDiskFolders = subfolderList.reduce((acc, item) => {
+        const [name, ts] = item.split(",");
         acc[name] = ts;
         return acc;
       }, {});
-      
-      const foldersToUpdate = Object.keys(newFolderMap).filter(name => {
-          return newFolderMap[name] !== oldFolderMap[name];
+
+      const existingFolders = AppState.getFolders();
+      const stateFolderMap = existingFolders.reduce((map, folder) => {
+        map[folder.name] = folder;
+        return map;
+      }, {});
+
+      const timestampKey = `disk_ts_${type === "screenshots" ? "ss" : "sr"}`;
+
+      const foldersToUpdate = Object.keys(currentDiskFolders).filter(name => {
+        const folderInState = stateFolderMap[name];
+        return (
+          !folderInState ||
+          folderInState[timestampKey] !== currentDiskFolders[name]
+        );
       });
 
-      const newMonitorData = {
-        ...monitorData,
-        [HASH_KEY]: currentHash,
-        [FOLDER_MAP_KEY]: newFolderMap
-      };
+      if (foldersToUpdate.length > 0) {
+        Logger.info(
+          `[SubfolderMonitor] As seguintes pastas precisam de atualização para ${type}:`,
+          foldersToUpdate
+        );
+        const countsResult = await TaskQueue.add(
+          "get_item_counts_batch",
+          [path, JSON.stringify(foldersToUpdate)],
+          "shell"
+        );
 
-      if (foldersToUpdate.length === 0 && Object.keys(newFolderMap).length === Object.keys(oldFolderMap).length) {
-        Logger.debug(`[SubfolderMonitor] Hashes diferentes, mas nenhum timestamp de pasta foi alterado para ${type}.`);
-        AppState.setMonitorData(newMonitorData);
-        return;
+        if (countsResult && countsResult.length > 0) {
+          updateFoldersData(countsResult, type, currentDiskFolders);
+        }
+      } else {
+        Logger.debug(
+          `[SubfolderMonitor] Sem alterações de timestamp detectadas para ${type}.`
+        );
       }
 
-      Logger.info(`[SubfolderMonitor] As seguintes pastas precisam de atualização para ${type}:`, foldersToUpdate);
-      
-      const countsResult = await TaskQueue.add(
-        'get_item_counts_batch',
-        [path, JSON.stringify(foldersToUpdate)],
-        'shell'
-      );
-
-      if (countsResult && countsResult.length > 0) {
-        updateFoldersData(countsResult, type);
-      }
-      
-      AppState.setMonitorData(newMonitorData);
-
+      return currentDiskFolders;
     } catch (error) {
-      Logger.error(`[SubfolderMonitor] Erro ao processar o tipo de pasta '${type}':`, error);
+      Logger.error(
+        `[SubfolderMonitor] Erro ao processar o tipo de pasta '${type}':`,
+        error
+      );
+      return {};
     }
   }
 
   async function loadFoldersData() {
     try {
-      await Promise.all([
+      const [screenshotFolders, screenrecordingFolders] = await Promise.all([
         processFolderType("screenshots", ENV.ORGANIZED_SCREENSHOTS_PATH),
         processFolderType("screenrecordings", ENV.ORGANIZED_RECORDINGS_PATH)
       ]);
-    } finally {
-      Logger.debug("[SubfolderMonitor] Verificações concluídas. Executando a limpeza do estado, independentemente de erros.");
 
-      const monitorData = AppState.getMonitorData();
-      const ssMap = monitorData[`${STORAGE_KEY_PREFIX}screenshots_map`] || {};
-      const srMap = monitorData[`${STORAGE_KEY_PREFIX}screenrecordings_map`] || {};
-      const foldersOnDisk = new Set([...Object.keys(ssMap), ...Object.keys(srMap)]);
-      
+      Logger.debug(
+        "[SubfolderMonitor] Verificações concluídas. Executando a limpeza do estado."
+      );
+
+      const foldersOnDisk = new Set([
+        ...Object.keys(screenshotFolders || {}),
+        ...Object.keys(screenrecordingFolders || {})
+      ]);
+
       const foldersInState = AppState.getFolders();
-      const foldersToKeep = foldersInState.filter(f => foldersOnDisk.has(f.name));
+      const foldersToKeep = foldersInState.filter(f =>
+        foldersOnDisk.has(f.name)
+      );
 
       if (foldersToKeep.length < foldersInState.length) {
-          const deletedNames = foldersInState.filter(f => !foldersOnDisk.has(f.name)).map(f => f.name);
-          Logger.info("[SubfolderMonitor] Removendo pastas do estado que não existem mais no disco:", deletedNames);
-          AppState.setFolders(foldersToKeep);
+        const deletedNames = foldersInState
+          .filter(f => !foldersOnDisk.has(f.name))
+          .map(f => f.name);
+        Logger.info(
+          "[SubfolderMonitor] Removendo pastas do estado que não existem mais no disco:",
+          deletedNames
+        );
+        AppState.setFolders(foldersToKeep);
       } else {
-          Logger.debug("[SubfolderMonitor] Nenhuma pasta obsoleta encontrada no estado.");
+        Logger.debug("[SubfolderMonitor] Nenhuma pasta obsoleta encontrada no estado.");
       }
+    } catch (error) {
+      Logger.error(
+        "[SubfolderMonitor] Erro durante o ciclo de verificação e limpeza:",
+        error
+      );
     }
   }
 

@@ -2,7 +2,9 @@ const AppMonitor = (() => {
   const HASH_KEY = "apps_hash";
 
   async function renameFoldersForNewApps(newApps) {
-    Logger.debug(`[AppMonitor] Verificando se pastas precisam ser renomeadas ou corrigidas para ${newApps.length} novo(s) app(s).`);
+    Logger.debug(
+      `[AppMonitor] Verificando se pastas precisam ser renomeadas ou corrigidas para ${newApps.length} novo(s) app(s).`
+    );
 
     const folders = AppState.getFolders();
     const pkgToNewAppMap = new Map(newApps.map(app => [app.pkg, app]));
@@ -10,88 +12,113 @@ const AppMonitor = (() => {
     let foldersStateUpdated = false;
 
     for (const folder of folders) {
-        // Cenário 1: O NOME da pasta é um pacote. Renomear a pasta.
-        if (pkgToNewAppMap.has(folder.name)) {
-            const app = pkgToNewAppMap.get(folder.name);
-            const oldName = folder.name;
-            const newName = Utils.sanitizeFolderName(app.name);
+      // Cenário 1: O NOME da pasta é um pacote. Renomear a pasta.
+      if (pkgToNewAppMap.has(folder.name)) {
+        const app = pkgToNewAppMap.get(folder.name);
+        const oldName = folder.name;
+        const newName = Utils.sanitizeFolderName(app.name);
 
-            if (oldName === newName) continue;
+        if (oldName === newName) continue;
 
-            // Lógica de renomeação desacoplada
-            let successfullyRenamed = false;
-            let attemptedRename = false;
-            
-            const screenshotsPath = `${ENV.ORGANIZED_SCREENSHOTS_PATH}/${oldName}`;
-            const recordingsPath = `${ENV.ORGANIZED_RECORDINGS_PATH}/${oldName}`;
+        // Lógica de renomeação desacoplada
+        let successfullyRenamed = false;
+        let attemptedRename = false;
 
-            // Verifica e renomeia a pasta de screenshots
-            if (await TaskQueue.add("path_exists", [screenshotsPath], 'shell')) {
-                attemptedRename = true;
-                try {
-                    Logger.info(`[AppMonitor] Tentando renomear pasta de screenshots: '${oldName}' para '${newName}'.`);
-                    const renameResult = await TaskQueue.add("rename_folder", [ENV.ORGANIZED_SCREENSHOTS_PATH, oldName, newName], 'shell');
-                    
-                    if (renameResult && renameResult.renamed) {
-                        successfullyRenamed = true;
-                        if (renameResult.timestamp) {
-                            folder.stats.disk_ts = renameResult.timestamp;
-                            Logger.debug(`[AppMonitor] Timestamp da pasta '${newName}' atualizado para ${renameResult.timestamp} após renomear.`);
-                        }
-                    }
-                } catch (error) {
-                    Logger.error(`[AppMonitor] Falha ao renomear a pasta de screenshots '${oldName}':`, error);
-                }
+        const screenshotsPath = `${ENV.ORGANIZED_SCREENSHOTS_PATH}/${oldName}`;
+        const recordingsPath = `${ENV.ORGANIZED_RECORDINGS_PATH}/${oldName}`;
+
+        // Verifica e renomeia a pasta de screenshots
+        if (await TaskQueue.add("path_exists", [screenshotsPath], "shell")) {
+          attemptedRename = true;
+          try {
+            Logger.info(
+              `[AppMonitor] Tentando renomear pasta de screenshots: '${oldName}' para '${newName}'.`
+            );
+            const renameResult = await TaskQueue.add(
+              "rename_folder",
+              [ENV.ORGANIZED_SCREENSHOTS_PATH, oldName, newName],
+              "shell"
+            );
+
+            if (renameResult && renameResult.renamed) {
+              successfullyRenamed = true;
+              if (renameResult.timestamp) {
+                folder.disk_ts = renameResult.timestamp;
+                Logger.debug(
+                  `[AppMonitor] Timestamp da pasta '${newName}' atualizado para ${renameResult.timestamp} após renomear.`
+                );
+              }
             }
-
-            // Verifica e renomeia a pasta de screen recordings
-            if (await TaskQueue.add("path_exists", [recordingsPath], 'shell')) {
-                attemptedRename = true;
-                try {
-                    Logger.info(`[AppMonitor] Tentando renomear pasta de screen recordings: '${oldName}' para '${newName}'.`);
-                    const renameResult = await TaskQueue.add("rename_folder", [ENV.ORGANIZED_RECORDINGS_PATH, oldName, newName], 'shell');
-
-                    if (renameResult && renameResult.renamed) {
-                        successfullyRenamed = true;
-                        if (renameResult.timestamp) {
-                            folder.stats.disk_ts = renameResult.timestamp;
-                            Logger.debug(`[AppMonitor] Timestamp da pasta '${newName}' atualizado para ${renameResult.timestamp} após renomear.`);
-                        }
-                    }
-                } catch (error) {
-                    Logger.error(`[AppMonitor] Falha ao renomear a pasta de screen recordings '${oldName}':`, error);
-                }
-            }
-
-
-            if (successfullyRenamed) {
-                folder.name = newName;
-                folder.pkg = app.pkg;
-                foldersStateUpdated = true;
-                Toast.success(`Pasta(s) do app '${newName}' foram atualizadas.`);
-            } else if (attemptedRename) {
-                Toast.error(`Falha ao renomear pasta(s) para '${newName}'.`);
-            }
-
-            continue;
+          } catch (error) {
+            Logger.error(
+              `[AppMonitor] Falha ao renomear a pasta de screenshots '${oldName}':`,
+              error
+            );
+          }
         }
 
-        // Cenário 2: O PKG da pasta está incorreto. Corrigir apenas no estado.
-        if (nameToNewAppMap.has(folder.name)) {
-            const app = nameToNewAppMap.get(folder.name);
-            if (folder.pkg !== app.pkg) {
-                Logger.info(`[AppMonitor] Corrigindo PKG para a pasta '${folder.name}'. Antigo: '${folder.pkg}', Novo: '${app.pkg}'.`);
-                
-                folder.pkg = app.pkg;
-                foldersStateUpdated = true;
-                Toast.info(`Metadados da pasta '${folder.name}' atualizados.`);
+        // Verifica e renomeia a pasta de screen recordings
+        if (await TaskQueue.add("path_exists", [recordingsPath], "shell")) {
+          attemptedRename = true;
+          try {
+            Logger.info(
+              `[AppMonitor] Tentando renomear pasta de screen recordings: '${oldName}' para '${newName}'.`
+            );
+            const renameResult = await TaskQueue.add(
+              "rename_folder",
+              [ENV.ORGANIZED_RECORDINGS_PATH, oldName, newName],
+              "shell"
+            );
+
+            if (renameResult && renameResult.renamed) {
+              successfullyRenamed = true;
+              if (renameResult.timestamp) {
+                folder.disk_ts = renameResult.timestamp;
+                Logger.debug(
+                  `[AppMonitor] Timestamp da pasta '${newName}' atualizado para ${renameResult.timestamp} após renomear.`
+                );
+              }
             }
+          } catch (error) {
+            Logger.error(
+              `[AppMonitor] Falha ao renomear a pasta de screen recordings '${oldName}':`,
+              error
+            );
+          }
         }
+
+        if (successfullyRenamed) {
+          folder.name = newName;
+          folder.pkg = app.pkg;
+          foldersStateUpdated = true;
+          Toast.success(`Pasta(s) do app '${newName}' foram atualizadas.`);
+        } else if (attemptedRename) {
+          Toast.error(`Falha ao renomear pasta(s) para '${newName}'.`);
+        }
+
+        continue;
+      }
+
+      // Cenário 2: O PKG da pasta está incorreto. Corrigir apenas no estado.
+      if (nameToNewAppMap.has(folder.name)) {
+        const app = nameToNewAppMap.get(folder.name);
+        if (folder.pkg !== app.pkg) {
+          Logger.info(
+            `[AppMonitor] Corrigindo PKG para a pasta '${folder.name}'. Antigo: '${folder.pkg}', Novo: '${app.pkg}'.`
+          );
+
+          folder.pkg = app.pkg;
+          foldersStateUpdated = true;
+          Toast.info(`Metadados da pasta '${folder.name}' atualizados.`);
+        }
+      }
     }
 
     if (foldersStateUpdated) {
-        AppState.setFolders(folders);
-        Logger.info("[AppMonitor] Estado das pastas foi atualizado com novos nomes e/ou pacotes corrigidos.");
+      AppState.setFolders(folders);
+      Logger.info(
+        "[AppMonitor] Estado das pastas foi atualizado com novos nomes e/ou pacotes corrigidos."
+      );
     }
   }
 
@@ -119,9 +146,9 @@ const AppMonitor = (() => {
         );
         return;
       }
-      
+
       await renameFoldersForNewApps(appsToAdd);
-      
+
       Logger.user("Lista de aplicativos atualizada.", "success");
       const updatedApps = [...existingApps, ...appsToAdd];
       AppState.setApps(updatedApps);
@@ -185,7 +212,7 @@ const AppMonitor = (() => {
         error
       );
     } finally {
-      EventBus.emit('appmonitor:ready');
+      EventBus.emit("appmonitor:ready");
       Logger.debug("[AppMonitor] Evento 'appmonitor:ready' emitido.");
     }
   }
@@ -194,7 +221,7 @@ const AppMonitor = (() => {
     if (AppState.isReady()) {
       loadInstalledApps();
     } else {
-      EventBus.on('appstate:ready', loadInstalledApps);
+      EventBus.on("appstate:ready", loadInstalledApps);
     }
     Logger.debug("[AppMonitor] Initialized.");
   }
