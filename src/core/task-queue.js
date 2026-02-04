@@ -83,9 +83,9 @@ const TaskQueue = (function () {
 
         taskerParams.fullCommand = `sh "${scriptPath}" ${command} ${quotedArgs}`;
         taskerParams.action = `run_shell`;
-        Logger.debug(
-          `[TaskQueue] Generated full command for shell task: ${taskerParams.fullCommand}`
-        );
+        // Logger.debug(
+        //   `[TaskQueue] Generated full command for shell task: ${taskerParams.fullCommand}`
+        // );
       }
 
       ENV.runTask(
@@ -97,7 +97,10 @@ const TaskQueue = (function () {
   }
 
   function onResult(resultJson) {
-    Logger.debug("[TaskQueue] Received result from Tasker:", resultJson);
+    Logger.debug(
+      `[TaskQueue] Received result from ${resultJson?.id} from Tasker:`,
+      resultJson
+    );
     try {
       const { id, status, payload } =
         typeof resultJson === "string" ? JSON.parse(resultJson) : resultJson;
@@ -127,7 +130,6 @@ const TaskQueue = (function () {
         error,
         resultJson
       });
-      // Por agora, vamos chamar _runNext, mas com cautela.
       if (pending[error?.id]) {
         delete pending[error.id];
         activeTasks--;

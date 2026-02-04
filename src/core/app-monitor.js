@@ -30,8 +30,15 @@ const AppMonitor = (() => {
                 attemptedRename = true;
                 try {
                     Logger.info(`[AppMonitor] Tentando renomear pasta de screenshots: '${oldName}' para '${newName}'.`);
-                    await TaskQueue.add("rename_folder", [ENV.ORGANIZED_SCREENSHOTS_PATH, oldName, newName], 'shell');
-                    successfullyRenamed = true;
+                    const renameResult = await TaskQueue.add("rename_folder", [ENV.ORGANIZED_SCREENSHOTS_PATH, oldName, newName], 'shell');
+                    
+                    if (renameResult && renameResult.renamed) {
+                        successfullyRenamed = true;
+                        if (renameResult.timestamp) {
+                            folder.stats.disk_ts = renameResult.timestamp;
+                            Logger.debug(`[AppMonitor] Timestamp da pasta '${newName}' atualizado para ${renameResult.timestamp} após renomear.`);
+                        }
+                    }
                 } catch (error) {
                     Logger.error(`[AppMonitor] Falha ao renomear a pasta de screenshots '${oldName}':`, error);
                 }
@@ -42,8 +49,15 @@ const AppMonitor = (() => {
                 attemptedRename = true;
                 try {
                     Logger.info(`[AppMonitor] Tentando renomear pasta de screen recordings: '${oldName}' para '${newName}'.`);
-                    await TaskQueue.add("rename_folder", [ENV.ORGANIZED_RECORDINGS_PATH, oldName, newName], 'shell');
-                    successfullyRenamed = true;
+                    const renameResult = await TaskQueue.add("rename_folder", [ENV.ORGANIZED_RECORDINGS_PATH, oldName, newName], 'shell');
+
+                    if (renameResult && renameResult.renamed) {
+                        successfullyRenamed = true;
+                        if (renameResult.timestamp) {
+                            folder.stats.disk_ts = renameResult.timestamp;
+                            Logger.debug(`[AppMonitor] Timestamp da pasta '${newName}' atualizado para ${renameResult.timestamp} após renomear.`);
+                        }
+                    }
                 } catch (error) {
                     Logger.error(`[AppMonitor] Falha ao renomear a pasta de screen recordings '${oldName}':`, error);
                 }
@@ -106,7 +120,6 @@ const AppMonitor = (() => {
         return;
       }
       
-      // Aguarda a conclusão do processo de renomeação antes de continuar
       await renameFoldersForNewApps(appsToAdd);
       
       Logger.user("Lista de aplicativos atualizada.", "success");

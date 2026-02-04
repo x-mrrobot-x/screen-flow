@@ -308,13 +308,14 @@ rename_folder() {
     fi
 
     if [ $? -eq 0 ]; then
-      json_response "true" "{\"renamed\": true}" "null"
+      new_ts=$(stat -c %Y "$new_path")
+      json_response "true" "{\"renamed\": true, \"timestamp\": $new_ts}" "null"
     else
       json_response "false" "null" "\"Falha ao renomear/mesclar $old_name\""
     fi
   else
     # Nada a fazer
-    json_response "true" "{\"renamed\": false}" "null"
+    json_response "true" "{\"renamed\": false, \"timestamp\": null}" "null"
   fi
 }
 

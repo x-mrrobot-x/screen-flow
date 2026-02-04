@@ -9,8 +9,8 @@ const App = (function() {
       EventBus.init();
       TaskQueue.init();
       await AppState.init();
-      AppMonitor.init();
       SubfolderMonitor.init();
+      AppMonitor.init();
       Navigation.init();
       Icons.init();
 
