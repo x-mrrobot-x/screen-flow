@@ -205,6 +205,11 @@ const ENV = (() => {
       }
     }
 
+    function isTaskRunning(taskName) {
+      Logger.debug(`[WEB MOCK] ENV.isTaskRunning check for: ${taskName}`);
+      return true;
+    }
+
     return {
       WORK_DIR,
       isWeb: true,
@@ -215,6 +220,7 @@ const ENV = (() => {
       execute,
       runTask,
       cancelProcess,
+      isTaskRunning,
       SOURCE_SCREENSHOTS_PATH,
       SOURCE_RECORDINGS_PATH,
       ORGANIZED_SCREENSHOTS_PATH,
@@ -248,7 +254,7 @@ const ENV = (() => {
     async function getData(key, params = {}) {
       try {
         const result = await execute({
-          command: 'read_file',
+          command: "read_file",
           args: [getPath(key, params), JSON.stringify(getDefault(key))]
         });
         return result;
@@ -261,7 +267,7 @@ const ENV = (() => {
     async function setData(key, data, params = {}) {
       try {
         await execute({
-          command: 'write_file',
+          command: "write_file",
           args: [getPath(key, params), JSON.stringify(data)]
         });
         return true;
@@ -335,14 +341,8 @@ const ENV = (() => {
       });
     }
 
-    function getGlobal(varName) {
-      try {
-        const value = tk.global(varName);
-        return value !== `%${varName}` ? value : undefined;
-      } catch (e) {
-        Logger.error(`Error getting global variable '${varName}':`, e);
-        return undefined;
-      }
+    function isTaskRunning(taskName) {
+      return tk.taskRunning(taskName);
     }
 
     function cancelProcess() {}
@@ -356,7 +356,7 @@ const ENV = (() => {
       setData,
       execute,
       runTask,
-      getGlobal,
+      isTaskRunning,
       cancelProcess,
       SOURCE_SCREENSHOTS_PATH,
       SOURCE_RECORDINGS_PATH,

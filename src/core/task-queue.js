@@ -21,12 +21,8 @@ const TaskQueue = (function () {
       let checks = 0;
       const monitorInterval = setInterval(() => {
         checks++;
-        const runningTasks = ENV.getGlobal("TRUN");
-
-        if (
-          (!runningTasks || !runningTasks.includes(WORKER_TASK_NAME)) &&
-          pending[task.id]
-        ) {
+        const isWorkerRunning = ENV.isTaskRunning(WORKER_TASK_NAME);
+        if (!isWorkerRunning && pending[task.id]) {
           Logger.warn(
             `[TaskQueue] Worker task not running for task ${task.id}. Cancelling.`
           );

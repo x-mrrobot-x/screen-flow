@@ -53,7 +53,6 @@ const OrganizerModel = (function() {
         folder.stats.ss = 0;
         folder.stats.sr = 0;
       }
-      folder.stats.lu = Date.now();
       AppState.setFolders(folders);
       return removedCount;
     }
