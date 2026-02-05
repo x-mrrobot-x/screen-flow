@@ -45,7 +45,7 @@ const SubfolderMonitor = (function () {
             Logger.warn(`Package não encontrado para a pasta: ${name}, usando o nome da pasta como pkg.`);
         }
         const newEntry = {
-          id: String(Date.now()),
+          id: `${Math.random().toString(36).substring(2)}`,
           name: name,
           pkg: pkg,
           stats: {
