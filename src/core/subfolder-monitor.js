@@ -36,9 +36,6 @@ const SubfolderMonitor = (function () {
         const folder = currentData[existingIndex];
         folder.stats[statsKey] = count;
         folder[timestampKey] = diskTimestamp;
-        if (folder.disk_ts) {
-          delete folder.disk_ts;
-        }
       } else {
         const pkg = appNameToPkgMap[name] || name;
         if (!appNameToPkgMap[name]) {

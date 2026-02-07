@@ -40,5 +40,5 @@ const App = (function() {
     const startTime = performance.now();
     await App.init();
     const endTime = performance.now();
-    Logger.debug(`App initialization took: ${(endTime - startTime).toFixed(2)} ms`);
+    Logger.warn(`App initialization took: ${(endTime - startTime).toFixed(2)} ms`);
 })();
