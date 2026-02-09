@@ -43,15 +43,15 @@ const OrganizerModel = (function() {
       const folder = folders[folderIndex];
       let removedCount = 0;
       if (type === 'ss') {
-        removedCount = folder.stats.ss;
-        folder.stats.ss = 0;
+        removedCount = folder.ss.count;
+        folder.ss.count = 0;
       } else if (type === 'sr') {
-        removedCount = folder.stats.sr;
-        folder.stats.sr = 0;
+        removedCount = folder.sr.count;
+        folder.sr.count = 0;
       } else if (type === 'both') {
-        removedCount = folder.stats.ss + folder.stats.sr;
-        folder.stats.ss = 0;
-        folder.stats.sr = 0;
+        removedCount = folder.ss.count + folder.sr.count;
+        folder.ss.count = 0;
+        folder.sr.count = 0;
       }
       AppState.setFolders(folders);
       return removedCount;

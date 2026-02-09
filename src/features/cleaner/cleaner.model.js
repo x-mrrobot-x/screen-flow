@@ -17,17 +17,15 @@ const CleanerModel = (function() {
 
   function toggleFolderClean(folderId, mediaType) {
     const updatedFolders = updateFolderState(folderId, mediaType, folder => {
-      if (mediaType === "screenshots") {
-        folder.cleaner.ss.on = !folder.cleaner.ss.on;
-      } else if (mediaType === "recordings") {
-        folder.cleaner.sr.on = !folder.cleaner.sr.on;
-      }
+      const key = mediaType === "screenshots" ? "ss" : "sr";
+      folder[key].cleaner.on = !folder[key].cleaner.on;
     });
 
     const folder = updatedFolders.find(f => f.id === folderId);
     if (folder) {
       const actionType = mediaType === "screenshots" ? "screenshots" : "recordings";
-      const isEnabled = mediaType === "screenshots" ? folder.cleaner.ss.on : folder.cleaner.sr.on;
+      const key = mediaType === "screenshots" ? "ss" : "sr";
+      const isEnabled = folder[key].cleaner.on;
 
       AppState.addActivity({
         type: "auto-cleaner-folder-toggle",
@@ -40,11 +38,8 @@ const CleanerModel = (function() {
 
   function setFolderDays(folderId, mediaType, days) {
     updateFolderState(folderId, mediaType, folder => {
-      if (mediaType === "screenshots") {
-        folder.cleaner.ss.days = days;
-      } else if (mediaType === "recordings") {
-        folder.cleaner.sr.days = days;
-      }
+      const key = mediaType === "screenshots" ? "ss" : "sr";
+      folder[key].cleaner.days = days;
     });
   }
 

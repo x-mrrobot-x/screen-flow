@@ -91,16 +91,16 @@ const ProcessModel = (function () {
     };
 
     folders.forEach(folder => {
-      if (folder.cleaner.ss.on) {
+      if (folder.ss.cleaner.on) {
         rules.screenshots.push({
           folder: folder.name,
-          days: folder.cleaner.ss.days
+          days: folder.ss.cleaner.days
         });
       }
-      if (folder.cleaner.sr.on) {
+      if (folder.sr.cleaner.on) {
         rules.recordings.push({
           folder: folder.name,
-          days: folder.cleaner.sr.days
+          days: folder.sr.cleaner.days
         });
       }
     });
@@ -195,7 +195,7 @@ const ProcessModel = (function () {
 
   async function hasCleanerConfigs() {
     const folders = await ENV.getData("FOLDERS");
-    return folders.some(folder => folder.cleaner.ss.on || folder.cleaner.sr.on);
+    return folders.some(folder => folder.ss.cleaner.on || folder.sr.cleaner.on);
   }
 
   return {

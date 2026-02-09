@@ -9,15 +9,15 @@ const OrganizerView = (function () {
       if (activeFilter === "all") {
         return `
           <div class="folder-badge">
-            ${Icons.get("image")} ${item.stats.ss}
+            ${Icons.get("image")} ${item.ss.count}
           </div>
           <div class="folder-badge">
-            ${Icons.get("video")} ${item.stats.sr}
+            ${Icons.get("video")} ${item.sr.count}
           </div>
         `;
       }
       const mediaCount =
-        activeFilter === "recordings" ? item.stats.sr : item.stats.ss;
+        activeFilter === "recordings" ? item.sr.count : item.ss.count;
       const mediaIcon = Icons.get(
         activeFilter === "recordings" ? "video" : "image"
       );
@@ -88,10 +88,10 @@ const OrganizerView = (function () {
       let mediaIcon = "";
       if (activeFilter === "all") {
         const totalScreenshots = folders.reduce(
-          (sum, f) => sum + f.stats.ss,
+          (sum, f) => sum + f.ss.count,
           0
         );
-        const totalRecordings = folders.reduce((sum, f) => sum + f.stats.sr, 0);
+        const totalRecordings = folders.reduce((sum, f) => sum + f.sr.count, 0);
         elements.mediaCounter.innerHTML = `
           <span style="display: flex; align-items: center; gap: 0.25rem;">${Icons.get(
             "folder"
@@ -102,10 +102,10 @@ const OrganizerView = (function () {
         `;
       } else {
         if (activeFilter === "recordings") {
-          totalMedia = folders.reduce((sum, f) => sum + f.stats.sr, 0);
+          totalMedia = folders.reduce((sum, f) => sum + f.sr.count, 0);
           mediaIcon = Icons.get("video");
         } else {
-          totalMedia = folders.reduce((sum, f) => sum + f.stats.ss, 0);
+          totalMedia = folders.reduce((sum, f) => sum + f.ss.count, 0);
           mediaIcon = Icons.get("image");
         }
         elements.mediaCounter.innerHTML = `

@@ -239,9 +239,9 @@ const AppState = (() => {
     getTopFoldersByType(type) {
       const key = type === "screenshots" ? "ss" : "sr";
       return [...folders]
-        .sort((a, b) => b.stats[key] - a.stats[key])
+        .sort((a, b) => b[key].count - a[key].count)
         .slice(0, 5)
-        .map(f => ({ name: f.name, count: f.stats[key] }));
+        .map(f => ({ name: f.name, count: f[key].count }));
     }
   };
 })();

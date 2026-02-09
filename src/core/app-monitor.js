@@ -5,12 +5,12 @@ const AppMonitor = (() => {
       SCREENSHOTS: {
         name: "screenshots",
         path: ENV.ORGANIZED_SCREENSHOTS_PATH,
-        timestampKey: "disk_ts_ss"
+        timestampKey: "mtime"
       },
       RECORDINGS: {
         name: "screen recordings",
         path: ENV.ORGANIZED_RECORDINGS_PATH,
-        timestampKey: "disk_ts_sr"
+        timestampKey: "mtime"
       }
     }
   };
@@ -192,11 +192,11 @@ const AppMonitor = (() => {
         const updatedFolder = { ...folder, name: newName };
 
         if (screenshotResult.timestamp) {
-          updatedFolder.disk_ts_ss = screenshotResult.timestamp;
+          updatedFolder.ss.mtime = screenshotResult.timestamp;
         }
 
         if (recordingResult.timestamp) {
-          updatedFolder.disk_ts_sr = recordingResult.timestamp;
+          updatedFolder.sr.mtime = recordingResult.timestamp;
         }
 
         return updatedFolder;

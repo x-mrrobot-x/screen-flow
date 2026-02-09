@@ -674,182 +674,195 @@ const DEFAULT_FOLDERS = [
     id: "1",
     name: "YouTube",
     pkg: "com.gold.android.youtube",
-    stats: {
-      ss: 45,
-      sr: 32,
-      lu: Date.now()
+    ss: {
+      count: 45,
+      cleaner: { on: false, days: 30 },
+      mtime: Date.now()
     },
-    cleaner: {
-      ss: { on: false, days: 30 },
-      sr: { on: false, days: 30 }
+    sr: {
+      count: 32,
+      cleaner: { on: false, days: 30 },
+      mtime: Date.now()
     }
   },
   {
     id: "2",
     name: "Spotify",
     pkg: "com.spotify.music",
-    stats: {
-      ss: 12,
-      sr: 0,
-      lu: Date.now() - 3 * 24 * 60 * 60 * 1000
+    ss: {
+      count: 12,
+      cleaner: { on: false, days: 30 },
+      mtime: Date.now() - 3 * 24 * 60 * 60 * 1000
     },
-    cleaner: {
-      ss: { on: false, days: 30 },
-      sr: { on: false, days: 30 }
+    sr: {
+      count: 0,
+      cleaner: { on: false, days: 30 },
+      mtime: Date.now() - 3 * 24 * 60 * 60 * 1000
     }
   },
   {
     id: "3",
     name: "Google",
     pkg: "com.google.android.googlequicksearchbox",
-    stats: {
-      ss: 8,
-      sr: 2,
-      lu: Date.now() - 1 * 24 * 60 * 60 * 1000
+    ss: {
+      count: 8,
+      cleaner: { on: false, days: 14 },
+      mtime: Date.now() - 1 * 24 * 60 * 60 * 1000
     },
-    cleaner: {
-      ss: { on: false, days: 14 },
-      sr: { on: false, days: 14 }
+    sr: {
+      count: 2,
+      cleaner: { on: false, days: 14 },
+      mtime: Date.now() - 1 * 24 * 60 * 60 * 1000
     }
   },
   {
     id: "4",
     name: "Claude",
     pkg: "com.anthropic.claude",
-    stats: {
-      ss: 67,
-      sr: 5,
-      lu: Date.now() - 2 * 60 * 60 * 1000
+    ss: {
+      count: 67,
+      cleaner: { on: false, days: 7 },
+      mtime: Date.now() - 2 * 60 * 60 * 1000
     },
-    cleaner: {
-      ss: { on: false, days: 7 },
-      sr: { on: false, days: 7 }
+    sr: {
+      count: 5,
+      cleaner: { on: false, days: 7 },
+      mtime: Date.now() - 2 * 60 * 60 * 1000
     }
   },
   {
     id: "5",
     name: "Instagram",
     pkg: "com.instagram.android",
-    stats: {
-      ss: 124,
-      sr: 15,
-      lu: Date.now()
+    ss: {
+      count: 124,
+      cleaner: { on: false, days: 30 },
+      mtime: Date.now()
     },
-    cleaner: {
-      ss: { on: false, days: 30 },
-      sr: { on: false, days: 30 }
+    sr: {
+      count: 15,
+      cleaner: { on: false, days: 30 },
+      mtime: Date.now()
     }
   },
   {
     id: "6",
     name: "Netflix",
     pkg: "com.netflix.mediaclient",
-    stats: {
-      ss: 7,
-      sr: 15,
-      lu: Date.now() - 5 * 24 * 60 * 60 * 1000
+    ss: {
+      count: 7,
+      cleaner: { on: false, days: 14 },
+      mtime: Date.now() - 5 * 24 * 60 * 60 * 1000
     },
-    cleaner: {
-      ss: { on: false, days: 14 },
-      sr: { on: false, days: 14 }
+    sr: {
+      count: 15,
+      cleaner: { on: false, days: 14 },
+      mtime: Date.now() - 5 * 24 * 60 * 60 * 1000
     }
   },
   {
     id: "7",
     name: "Clash Royale",
     pkg: "com.supercell.clashroyale",
-    stats: {
-      ss: 234,
-      sr: 89,
-      lu: Date.now() - 4 * 24 * 60 * 60 * 1000
+    ss: {
+      count: 234,
+      cleaner: { on: false, days: 14 },
+      mtime: Date.now() - 4 * 24 * 60 * 60 * 1000
     },
-    cleaner: {
-      ss: { on: false, days: 14 },
-      sr: { on: false, days: 14 }
+    sr: {
+      count: 89,
+      cleaner: { on: false, days: 14 },
+      mtime: Date.now() - 4 * 24 * 60 * 60 * 1000
     }
   },
   {
     id: "8",
     name: "X",
     pkg: "com.twitter.android",
-    stats: {
-      ss: 43,
-      sr: 0,
-      lu: Date.now() - 24 * 60 * 60 * 1000
+    ss: {
+      count: 43,
+      cleaner: { on: false, days: 14 },
+      mtime: Date.now() - 24 * 60 * 60 * 1000
     },
-    cleaner: {
-      ss: { on: false, days: 14 },
-      sr: { on: false, days: 14 }
+    sr: {
+      count: 0,
+      cleaner: { on: false, days: 14 },
+      mtime: Date.now() - 24 * 60 * 60 * 1000
     }
   },
   {
     id: "9",
     name: "WhatsApp",
     pkg: "com.whatsapp",
-    stats: {
-      ss: 156,
-      sr: 12,
-      lu: Date.now() - 2 * 60 * 60 * 1000
+    ss: {
+      count: 156,
+      cleaner: { on: false, days: 7 },
+      mtime: Date.now() - 2 * 60 * 60 * 1000
     },
-    cleaner: {
-      ss: { on: false, days: 7 },
-      sr: { on: false, days: 7 }
+    sr: {
+      count: 12,
+      cleaner: { on: false, days: 7 },
+      mtime: Date.now() - 2 * 60 * 60 * 1000
     }
   },
   {
     id: "10",
     name: "TikTok",
     pkg: "com.zhiliaoapp.musically",
-    stats: {
-      ss: 89,
-      sr: 45,
-      lu: Date.now() - 2 * 24 * 60 * 60 * 1000
+    ss: {
+      count: 89,
+      cleaner: { on: false, days: 7 },
+      mtime: Date.now() - 2 * 24 * 60 * 60 * 1000
     },
-    cleaner: {
-      ss: { on: false, days: 7 },
-      sr: { on: false, days: 7 }
+    sr: {
+      count: 45,
+      cleaner: { on: false, days: 7 },
+      mtime: Date.now() - 2 * 24 * 60 * 60 * 1000
     }
   },
   {
     id: "11",
     name: "AI Studio",
     pkg: "org.chromium.webapk.a6aab478f37ca7758_v2",
-    stats: {
-      ss: 54,
-      sr: 8,
-      lu: Date.now() - 6 * 24 * 60 * 60 * 1000
+    ss: {
+      count: 54,
+      cleaner: { on: false, days: 14 },
+      mtime: Date.now() - 6 * 24 * 60 * 60 * 1000
     },
-    cleaner: {
-      ss: { on: false, days: 14 },
-      sr: { on: false, days: 14 }
+    sr: {
+      count: 8,
+      cleaner: { on: false, days: 14 },
+      mtime: Date.now() - 6 * 24 * 60 * 60 * 1000
     }
   },
   {
     id: "12",
     name: "Telegram",
     pkg: "org.telegram.messenger",
-    stats: {
-      ss: 31,
-      sr: 3,
-      lu: Date.now() - 7 * 24 * 60 * 60 * 1000
+    ss: {
+      count: 31,
+      cleaner: { on: false, days: 7 },
+      mtime: Date.now() - 7 * 24 * 60 * 60 * 1000
     },
-    cleaner: {
-      ss: { on: false, days: 7 },
-      sr: { on: false, days: 7 }
+    sr: {
+      count: 3,
+      cleaner: { on: false, days: 7 },
+      mtime: Date.now() - 7 * 24 * 60 * 60 * 1000
     }
   },
   {
     id: "13",
     name: "Tasker",
     pkg: "net.dinglisch.android.taskerm",
-    stats: {
-      ss: 31,
-      sr: 3,
-      lu: Date.now() - 7 * 24 * 60 * 60 * 1000
+    ss: {
+      count: 31,
+      cleaner: { on: false, days: 7 },
+      mtime: Date.now() - 7 * 24 * 60 * 60 * 1000
     },
-    cleaner: {
-      ss: { on: false, days: 7 },
-      sr: { on: false, days: 7 }
+    sr: {
+      count: 3,
+      cleaner: { on: false, days: 7 },
+      mtime: Date.now() - 7 * 24 * 60 * 60 * 1000
     }
   }
 ];

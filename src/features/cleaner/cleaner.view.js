@@ -7,12 +7,13 @@ const CleanerView = (function() {
   const templates = {
     folderOptions: (folder, mediaType) => {
       const config = CleanerConfig;
-      const isActive = mediaType === "screenshots" ? folder.cleaner.ss.on : folder.cleaner.sr.on;
+      const key = mediaType === "screenshots" ? "ss" : "sr";
+      const isActive = folder[key].cleaner.on;
       if (!isActive) return "";
 
       const optionId = `option-group-${folder.id}-${mediaType}`;
       const label = mediaType === "screenshots" ? "Capturas" : "Gravações";
-      const currentDays = mediaType === "screenshots" ? folder.cleaner.ss.days : folder.cleaner.sr.days;
+      const currentDays = folder[key].cleaner.days;
 
       let optionsHtml = config.DAY_OPTIONS.map(days => {
         const activeClass = currentDays === days ? "active" : "";
@@ -27,7 +28,7 @@ const CleanerView = (function() {
       `;
     },
     folderCard: (folder, index) => {
-      const isEnabled = folder.cleaner.ss.on || folder.cleaner.sr.on;
+      const isEnabled = folder.ss.cleaner.on || folder.sr.cleaner.on;
       const enabledClass = isEnabled ? "enabled" : "";
 
       return `
@@ -40,17 +41,17 @@ const CleanerView = (function() {
             <div class="folder-clean-switches">
               <div class="clean-switch-container" data-action="toggleDayConfigVisibility" data-media-type="screenshots">
                 <span class="switch-label">Capturas</span>
-                <button class="switch ${folder.cleaner.ss.on ? "active" : ""}" data-action="toggleFolderClean" data-media-type="screenshots"></button>
+                <button class="switch ${folder.ss.cleaner.on ? "active" : ""}" data-action="toggleFolderClean" data-media-type="screenshots"></button>
               </div>
-              <div class="clean-switch-container" data-action="toggleDayConfigVisibility" data-media-type="recordings">
+              <div class="clean-switch-container" data-action="toggleDayConfigVisibility" data-media-type="screenrecordings">
                 <span class="switch-label">Gravações</span>
-                <button class="switch ${folder.cleaner.sr.on ? "active" : ""}" data-action="toggleFolderClean" data-media-type="recordings"></button>
+                <button class="switch ${folder.sr.cleaner.on ? "active" : ""}" data-action="toggleFolderClean" data-media-type="screenrecordings"></button>
               </div>
             </div>
           </div>
           ${isEnabled ? `<div class="folder-clean-options">
             ${templates.folderOptions(folder, "screenshots")}
-            ${templates.folderOptions(folder, "recordings")}
+            ${templates.folderOptions(folder, "screenrecordings")}
           </div>` : ""}
         </div>
       `;
@@ -59,8 +60,8 @@ const CleanerView = (function() {
 
   const render = {
     counts: (folders, autoCleaner) => {
-      const screenshotsCount = folders.filter(f => f.cleaner.ss.on).length;
-      const recordingsCount = folders.filter(f => f.cleaner.sr.on).length;
+      const screenshotsCount = folders.filter(f => f.ss && f.ss.cleaner.on).length;
+      const recordingsCount = folders.filter(f => f.sr && f.sr.cleaner.on).length;
 
       if (autoCleaner) {
         elements.cleanerCountText.innerHTML = `<span class="subtitle-item"><span class="dot dot-screenshot"></span>${screenshotsCount} pastas com limpeza de capturas</span>, <span class="subtitle-item"><span class="dot dot-recording"></span>${recordingsCount} com limpeza de gravações</span>`;

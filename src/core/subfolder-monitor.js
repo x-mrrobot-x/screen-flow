@@ -12,7 +12,6 @@ const SubfolderMonitor = (function () {
     }
 
     const statsKey = type === "screenshots" ? "ss" : "sr";
-    const timestampKey = `disk_ts_${statsKey}`;
     const folderData = scriptOutput.map(line => {
       const [name, count] = line.split(",");
       return {
@@ -34,8 +33,8 @@ const SubfolderMonitor = (function () {
 
       if (existingIndex !== -1) {
         const folder = currentData[existingIndex];
-        folder.stats[statsKey] = count;
-        folder[timestampKey] = diskTimestamp;
+        folder[statsKey].count = count;
+        folder[statsKey].mtime = diskTimestamp;
       } else {
         const pkg = appNameToPkgMap[name] || name;
         if (!appNameToPkgMap[name]) {
@@ -45,17 +44,19 @@ const SubfolderMonitor = (function () {
           id: `${Math.random().toString(36).substring(2)}`,
           name: name,
           pkg: pkg,
-          stats: {
-            ss: 0,
-            sr: 0
+          ss: {
+            count: 0,
+            cleaner: { on: false, days: 7 },
+            mtime: ""
           },
-          cleaner: {
-            ss: { on: false, days: 7 },
-            sr: { on: false, days: 7 }
+          sr: {
+            count: 0,
+            cleaner: { on: false, days: 7 },
+            mtime: ""
           }
         };
-        newEntry.stats[statsKey] = count;
-        newEntry[timestampKey] = diskTimestamp;
+        newEntry[statsKey].count = count;
+        newEntry[statsKey].mtime = diskTimestamp;
         currentData.push(newEntry);
       }
     });
@@ -109,13 +110,13 @@ const SubfolderMonitor = (function () {
         return map;
       }, {});
 
-      const timestampKey = `disk_ts_${type === "screenshots" ? "ss" : "sr"}`;
+      const statsKey = type === "screenshots" ? "ss" : "sr";
 
       const foldersToUpdate = Object.keys(currentDiskFolders).filter(name => {
         const folderInState = stateFolderMap[name];
         return (
           !folderInState ||
-          folderInState[timestampKey] !== currentDiskFolders[name]
+          folderInState[statsKey].mtime !== currentDiskFolders[name]
         );
       });
 

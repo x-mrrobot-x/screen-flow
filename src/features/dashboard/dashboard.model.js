@@ -9,7 +9,7 @@ const DashboardModel = (function() {
 
     const foldersWithTotals = folders.map(folder => ({
       ...folder,
-      totalFiles: folder.stats.ss + folder.stats.sr
+      totalFiles: folder.ss.count + folder.sr.count
     }));
 
     return foldersWithTotals.reduce((top, current) =>
