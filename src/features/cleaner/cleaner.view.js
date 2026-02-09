@@ -1,6 +1,6 @@
-const CleanerView = (function() {
-  'use strict';
-  
+const CleanerView = (function () {
+  "use strict";
+
   let container = null;
   const elements = {};
 
@@ -18,7 +18,7 @@ const CleanerView = (function() {
       let optionsHtml = config.DAY_OPTIONS.map(days => {
         const activeClass = currentDays === days ? "active" : "";
         return `<button class="clean-day-button tap-scale ${activeClass}" data-action="setFolderDays" data-media-type="${mediaType}" data-days="${days}">${days} dias</button>`;
-      }).join('');
+      }).join("");
 
       return `
         <div class="folder-clean-group" id="${optionId}">
@@ -32,27 +32,37 @@ const CleanerView = (function() {
       const enabledClass = isEnabled ? "enabled" : "";
 
       return `
-        <div class="folder-clean-card ${enabledClass} animate-fade-in-left delay-${index % 10}" data-folder-id="${folder.id}">
+        <div class="folder-clean-card ${enabledClass} animate-fade-in-left delay-${
+          index % 10
+        }" data-folder-id="${folder.id}">
           <div class="folder-clean-header">
-            <div class="folder-clean-info">
-              ${Icons.getFolderIcon(folder)}
-              <span>${folder.name}</span>
-            </div>
+            ${Icons.getFolderIcon(folder)}
+            <span class="folder-clean-name truncate-text">${
+              folder.name
+            }</span>
             <div class="folder-clean-switches">
               <div class="clean-switch-container" data-action="toggleDayConfigVisibility" data-media-type="screenshots">
                 <span class="switch-label">Capturas</span>
-                <button class="switch ${folder.ss.cleaner.on ? "active" : ""}" data-action="toggleFolderClean" data-media-type="screenshots"></button>
+                <button class="switch ${
+                  folder.ss.cleaner.on ? "active" : ""
+                }" data-action="toggleFolderClean" data-media-type="screenshots"></button>
               </div>
               <div class="clean-switch-container" data-action="toggleDayConfigVisibility" data-media-type="screenrecordings">
                 <span class="switch-label">Gravações</span>
-                <button class="switch ${folder.sr.cleaner.on ? "active" : ""}" data-action="toggleFolderClean" data-media-type="screenrecordings"></button>
+                <button class="switch ${
+                  folder.sr.cleaner.on ? "active" : ""
+                }" data-action="toggleFolderClean" data-media-type="screenrecordings"></button>
               </div>
             </div>
           </div>
-          ${isEnabled ? `<div class="folder-clean-options">
+          ${
+            isEnabled
+              ? `<div class="folder-clean-options">
             ${templates.folderOptions(folder, "screenshots")}
             ${templates.folderOptions(folder, "screenrecordings")}
-          </div>` : ""}
+          </div>`
+              : ""
+          }
         </div>
       `;
     }
@@ -60,8 +70,12 @@ const CleanerView = (function() {
 
   const render = {
     counts: (folders, autoCleaner) => {
-      const screenshotsCount = folders.filter(f => f.ss && f.ss.cleaner.on).length;
-      const recordingsCount = folders.filter(f => f.sr && f.sr.cleaner.on).length;
+      const screenshotsCount = folders.filter(
+        f => f.ss && f.ss.cleaner.on
+      ).length;
+      const recordingsCount = folders.filter(
+        f => f.sr && f.sr.cleaner.on
+      ).length;
 
       if (autoCleaner) {
         elements.cleanerCountText.innerHTML = `<span class="subtitle-item"><span class="dot dot-screenshot"></span>${screenshotsCount} pastas com limpeza de capturas</span>, <span class="subtitle-item"><span class="dot dot-recording"></span>${recordingsCount} com limpeza de gravações</span>`;
@@ -69,8 +83,10 @@ const CleanerView = (function() {
         elements.cleanerCountText.textContent = "Limpe pastas automaticamente";
       }
     },
-    folderList: (folders) => {
-      elements.folderCleanList.innerHTML = folders.map((folder, index) => templates.folderCard(folder, index)).join("");
+    folderList: folders => {
+      elements.folderCleanList.innerHTML = folders
+        .map((folder, index) => templates.folderCard(folder, index))
+        .join("");
     },
     cleaner: (folders, autoCleaner) => {
       render.counts(folders, autoCleaner);

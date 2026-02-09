@@ -229,9 +229,6 @@
   font-size: 15px;
   font-weight: 600;
   color: hsl(var(--foreground));
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 /* Menu de Ações (3 pontinhos) */

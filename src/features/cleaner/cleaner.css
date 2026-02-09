@@ -19,12 +19,13 @@
 }
 
 .folder-clean-card {
-  background: hsl(var(--card));
   border: 1px solid hsl(var(--border));
   border-radius: var(--radius-lg);
   padding: var(--space-md);
-  transition: all 0.2s ease;
   margin-top: var(--space-md);
+  background: hsl(var(--card));
+  transition: all 0.2s ease;
+  overflow: hidden;
 }
 
 .folder-clean-card.enabled {
@@ -34,21 +35,16 @@
 .folder-clean-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: var(--space-md);
 }
 
-.folder-clean-info {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-}
-
-.folder-clean-info .folder-icon {
+.folder-clean-header .folder-icon {
   width: 5rem;
   height: 5rem;
 }
 
-.folder-clean-info span {
+.folder-clean-name {
+  flex: 1;
   font-weight: 500;
   color: hsl(var(--foreground));
 }
