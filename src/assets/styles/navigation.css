@@ -1,0 +1,80 @@
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background: hsl(var(--card) / 0.6);
+  backdrop-filter: blur(2rem);
+  -webkit-backdrop-filter: blur(2rem);
+  border-top: 1px solid hsl(var(--border));
+  padding-bottom: env(safe-area-inset-bottom, 0.8rem);
+}
+
+.nav-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: var(--space-xs) var(--space-md);
+}
+
+.nav-button {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm);
+  background: transparent;
+  transition: all 0.2s ease;
+}
+
+.nav-button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-md);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.nav-button.active::before,
+.nav-button:active::before {
+  opacity: 0.15;
+  background: var(--accent-gradient)
+}
+
+.nav-icon {
+  width: var(--icon-xl);
+  height: var(--icon-xl);
+  transition: color 0.2s ease;
+}
+
+.nav-button.active .nav-icon {
+  color: hsl(var(--primary));
+}
+
+.nav-button:not(.active) .nav-icon {
+  color: hsl(var(--muted-foreground));
+}
+
+.nav-label {
+  font-size: var(--font-xs);
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.nav-button.active .nav-label {
+  color: hsl(var(--primary));
+}
+
+.nav-button:not(.active) .nav-label {
+  color: hsl(var(--muted-foreground));
+}
+
+/* Hide navigation labels on mobile screens */
+@media (max-width: 576px) {
+  .nav-label {
+    display: none;
+  }
+}

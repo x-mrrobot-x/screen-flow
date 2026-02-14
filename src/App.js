@@ -5,6 +5,7 @@ const App = (function() {
     
     try {
       // 1. Initialize Core Services
+      Icons.init();
       Logger.init();
       EventBus.init();
       TaskQueue.init();
@@ -12,7 +13,6 @@ const App = (function() {
       SubfolderMonitor.init();
       AppMonitor.init();
       Navigation.init();
-      Icons.init();
 
       // 2. Initialize Features
       DashboardController.init();

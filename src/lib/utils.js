@@ -1,5 +1,5 @@
-const Utils = (function() {
-  'use strict';
+const Utils = (function () {
+  "use strict";
 
   function formatTimestamp(timestamp) {
     if (!timestamp) return "N/A";
@@ -12,12 +12,12 @@ const Utils = (function() {
     const diffDays = Math.floor(diffHours / 24);
 
     if (diffHours < 1) {
-      if (diffMins < 1) return "Agora mesmo";
-      return `${diffMins} min atrás`;
+      if (diffMins < 1) return "Agora";
+      return `${diffMins} min`;
     } else if (diffDays < 1) {
-      return `${diffHours}h atrás`;
+      return `${diffHours}h`;
     } else if (diffDays < 7) {
-      return `${diffDays} dia${diffDays > 1 ? "s" : ""} atrás`;
+      return `${diffDays} dia${diffDays > 1 ? "s" : ""}`;
     } else {
       const date = new Date(timestamp);
       const today = new Date();
@@ -45,14 +45,14 @@ const Utils = (function() {
   }
 
   async function generateHash(str) {
-      const buffer = new TextEncoder().encode(str);
-      const hashBuffer = await crypto.subtle.digest('SHA-1', buffer);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    const buffer = new TextEncoder().encode(str);
+    const hashBuffer = await crypto.subtle.digest("SHA-1", buffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
   }
 
   function sanitizeFolderName(name) {
-    if (typeof name !== 'string') return '';
+    if (typeof name !== "string") return "";
     return name
       .trim()
       .replace(/:/g, "-")

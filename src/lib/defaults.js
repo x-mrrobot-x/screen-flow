@@ -1,9 +1,22 @@
 const DEFAULT_STATS = {
-  lastOrganizer: Date.now(),
-  lastCleanup: Date.now() - 2 * 60 * 60 * 1000,
-  pendingFiles: 89,
-  organizerCaptures: 450,
-  removedCaptures: 389
+  organizedFiles: 0,
+  cleanedFiles: 0,
+  toOrganize: {
+    images: 0,
+    videos: 0
+  },
+  foldersCreated: {
+    images: 0,
+    videos: 0
+  },
+  lastOrganization: {
+    images: null,
+    videos: null
+  },
+  lastClean: {
+    images: null,
+    videos: null
+  }
 };
 
 const DEFAULT_SETTINGS = {

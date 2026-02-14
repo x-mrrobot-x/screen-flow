@@ -33,7 +33,7 @@ const ENV = (() => {
       tasker: {
         type: "file",
         path: "src/data/stats.json",
-        default: {}
+        default: DEFAULT_STATS
       }
     },
     ACTIVITIES: {

@@ -1,5 +1,5 @@
-const OrganizerController = (function() {
-  'use strict';
+const OrganizerController = (function () {
+  "use strict";
 
   let isInitialized = false;
 
@@ -14,23 +14,25 @@ const OrganizerController = (function() {
   let currentPopupMenu = null;
 
   const handlers = {
-    onSearch: (e) => {
+    onSearch: e => {
       OrganizerModel.setSearchTerm(e.target.value);
       render();
     },
-    onFilterClick: (e) => {
-      const filter = e.target.closest('[data-filter]').dataset.filter;
+    onFilterClick: e => {
+      const filter = e.target.closest("[data-filter]").dataset.filter;
       OrganizerModel.setFilter(filter);
       render();
     },
-    onCardClick: (e) => {
+    onCardClick: e => {
       const folderCard = e.target.closest(OrganizerConfig.SELECTORS.folderCard);
       if (!folderCard) return;
 
       const folderId = folderCard.dataset.folderId;
       if (!folderId) return;
 
-      const menuDots = e.target.closest(OrganizerConfig.SELECTORS.folderMenuDots);
+      const menuDots = e.target.closest(
+        OrganizerConfig.SELECTORS.folderMenuDots
+      );
       if (menuDots) {
         e.stopPropagation();
 
@@ -40,29 +42,36 @@ const OrganizerController = (function() {
         }
 
         const menu = OrganizerView.showActionsMenu(folderId, folderCard);
-        if(menu) {
+        if (menu) {
           currentPopupMenu = menu;
-          menu.addEventListener('click', handlers.onMenuClick);
+          menu.addEventListener("click", handlers.onMenuClick);
         }
       }
     },
-    onMenuClick: (e) => {
+    onMenuClick: e => {
       e.stopPropagation();
-      const actionItem = e.target.closest('[data-action]');
-      if(!actionItem) return;
+      const actionItem = e.target.closest("[data-action]");
+      if (!actionItem) return;
 
       const action = actionItem.dataset.action;
-      const popup = actionItem.closest(OrganizerConfig.SELECTORS.folderActionsPopup);
+      const popup = actionItem.closest(
+        OrganizerConfig.SELECTORS.folderActionsPopup
+      );
       const folderId = popup.dataset.folderId;
 
-      if (action === 'clear') {
+      if (action === "clear") {
         const activeFilter = OrganizerModel.getState().activeFilter;
-        const type = activeFilter === 'all' ? 'both' : (activeFilter === 'screenshots' ? 'ss' : 'sr');
+        const type =
+          activeFilter === "all"
+            ? "both"
+            : activeFilter === "screenshots"
+            ? "ss"
+            : "sr";
         const removedCount = OrganizerModel.clearFolderStats(folderId, type);
 
         const folders = OrganizerModel.getFolders();
         const folder = folders.find(f => f.id === folderId);
-        const folderName = folder ? folder.name : 'Unknown';
+        const folderName = folder ? folder.name : "Unknown";
 
         if (removedCount > 0) {
           AppState.addActivity({
@@ -74,44 +83,45 @@ const OrganizerController = (function() {
             timestamp: Date.now()
           });
 
-          Toast.success(`${removedCount} ${removedCount > 1 ? 'itens removidos' : 'item removido'} com sucesso!`);
+          Toast.success(
+            `${removedCount} ${
+              removedCount > 1 ? "itens removidos" : "item removido"
+            } com sucesso!`
+          );
         }
         render();
       }
       popup.remove();
       currentPopupMenu = null;
     },
-    onDocumentClick: (e) => {
+    onDocumentClick: e => {
       if (currentPopupMenu && !currentPopupMenu.contains(e.target)) {
         currentPopupMenu.remove();
         currentPopupMenu = null;
       }
     },
-    onStateChange: (data) => {
-        if (data && data.key === 'folders') {
-            Logger.info("Organizer: Folders updated, re-rendering...");
-            render();
-        }
+    onStateChange: data => {
+      if (data && data.key === "folders") {
+        Logger.info("Organizer: Folders updated, re-rendering...");
+        render();
+      }
     }
   };
 
   function attachEventListeners() {
     const searchInput = DOM.qs(OrganizerConfig.SELECTORS.searchInput);
-    if(searchInput) searchInput.addEventListener('input', handlers.onSearch);
+    if (searchInput) searchInput.addEventListener("input", handlers.onSearch);
 
     const filterButtons = DOM.qsa(OrganizerConfig.SELECTORS.filterButtons);
-    filterButtons.forEach(btn => btn.addEventListener('click', handlers.onFilterClick));
+    filterButtons.forEach(btn =>
+      btn.addEventListener("click", handlers.onFilterClick)
+    );
 
     const grid = DOM.qs(OrganizerConfig.SELECTORS.foldersGrid);
-    if(grid) grid.addEventListener('click', handlers.onCardClick);
+    if (grid) grid.addEventListener("click", handlers.onCardClick);
 
-    document.addEventListener('click', handlers.onDocumentClick);
-    EventBus.on('appstate:changed', handlers.onStateChange);
-  }
-
-  function cleanupEventListeners() {
-    document.removeEventListener('click', handlers.onDocumentClick);
-    EventBus.off('appstate:changed', handlers.onStateChange);
+    document.addEventListener("click", handlers.onDocumentClick);
+    EventBus.on("appstate:changed", handlers.onStateChange);
   }
 
   function init() {
@@ -122,15 +132,7 @@ const OrganizerController = (function() {
     isInitialized = true;
   }
 
-  function destroy() {
-    if (!isInitialized) return;
-    cleanupEventListeners();
-    currentPopupMenu = null;
-    isInitialized = false;
-  }
-
   return {
-    init,
-    destroy
+    init
   };
 })();

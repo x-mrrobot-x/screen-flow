@@ -1,68 +1,55 @@
-const DashboardController = (function() {
-  'use strict';
-  
+const DashboardController = (function () {
+  "use strict";
+
   let isInitialized = false;
-  
-  function init() {
-    if (isInitialized) {
-      Logger.warn('Dashboard already initialized');
-      return;
-    }
-    
-    try {
-      DashboardView.init(DashboardConfig.SELECTORS.CONTAINER);
-      loadAndRender();
-      attachEventListeners();
-      isInitialized = true;
-      
-    } catch (error) {
-      Logger.error('Failed to initialize dashboard:', error);
-    }
-  }
-  
-  function loadAndRender() {
+
+  function refreshUI() {
     const data = DashboardModel.getState();
-    DashboardView.render.complete(data);
+    DashboardView.update(data);
   }
-  
-  function refresh(event) {
-    const relevantKeys = ["stats", "folders", "activities"];
-    if (event && relevantKeys.includes(event.key)) {
-      loadAndRender();
+
+  function refresh(data) {
+    if (data && data.key === "stats") {
+      refreshUI();
     }
   }
 
-  function handleScanStart() {
-    DashboardView.showScanLoading();
+  async function loadStats() {
+    try {
+      const [toOrganize, foldersCreated] = await Promise.all([
+        DashboardModel.getToOrganizeFileCounts(),
+        DashboardModel.getOrganizedFolderCounts()
+      ]);
+
+      AppState.setStats({
+        toOrganize,
+        foldersCreated
+      });
+    } catch (error) {
+      Logger.error("Failed to load dashboard stats:", error);
+    }
   }
 
-  function handleScanComplete() {
-    DashboardView.hideScanLoading();
-    loadAndRender();
-  }
-  
   function attachEventListeners() {
     EventBus.on("appstate:changed", refresh);
-    EventBus.on("subfolder-scan:started", handleScanStart);
-    EventBus.on("subfolder-scan:completed", handleScanComplete);
   }
 
-  function detachEventListeners() {
-    EventBus.off("appstate:changed", refresh);
-    EventBus.off("subfolder-scan:started", handleScanStart);
-    EventBus.off("subfolder-scan:completed", handleScanComplete);
+  async function init() {
+    if (isInitialized) {
+      Logger.warn("Dashboard already initialized");
+      return;
+    }
+
+    DashboardView.init();
+    refreshUI();
+    loadStats();
+    attachEventListeners();
+    isInitialized = true;
   }
-  
-  function destroy() {
-    if (!isInitialized) return;
-    detachEventListeners();
-    DashboardView.clear();
-    isInitialized = false;
-  }
-  
+
   return {
     init,
-    destroy,
+    loadStats,
     refresh
   };
 })();

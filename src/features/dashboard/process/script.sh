@@ -47,10 +47,29 @@ scan_media_app_packages() {
     json_response "true" "[]" "null"
     return 0
   fi
-  
+
   json_array=$(echo "$package_list" | sed 's/\\/\\\\/g; s/"/\\"/g; s/^/"/; s/$/"/; H; $!d; x; s/\n/,/g; s/^,//')
-  
+
   json_response "true" "[$json_array]" "null"
+}
+
+count_media_items() {
+  file_type="$1"
+  source_folder="$2"
+
+  if [ ! -d "$source_folder" ]; then
+    json_response "true" "0" "null"
+    return 0
+  fi
+
+  item_count=$(find "$source_folder" -maxdepth 1 -type f \
+    -name "*_*.$file_type" \
+    ! -name ".trashed*" \
+    2>/dev/null \
+    | grep -vE "_[0-9]+\.${file_type}$" \
+    | wc -l)
+
+  json_response "true" "${item_count:-0}" "null"
 }
 
 create_app_media_folders() {
@@ -209,25 +228,40 @@ get_subfolders() {
     json_response "true" "[]" "null"
     return 0
   fi
-  
+
   json_array=""
   first=true
-  
+
   while IFS= read -r line; do
     escaped_line=$(printf "%s" "$line" | sed 's/\\/\\\\/g; s/"/\\"/g')
-    
+
     if [ "$first" = true ]; then
       first=false
     else
       json_array="$json_array,"
     fi
-    
+
     json_array="$json_array\"$escaped_line\""
   done << EOF
 $subfolder_list
 EOF
-  
+
   json_response "true" "[$json_array]" "null"
+}
+
+count_subfolders() {
+  base_path="$1"
+
+  if [ ! -d "$base_path" ]; then
+    json_response "true" "0" "null"
+    return 0
+  fi
+
+  folder_count=$(find "$base_path" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l)
+  folder_count=$(echo "$folder_count" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+  folder_count=${folder_count:-0}
+
+  json_response "true" "$folder_count" "null"
 }
 
 get_item_count() {
@@ -340,16 +374,19 @@ main() {
       ;;
     scan_media_app_packages)
       scan_media_app_packages "$1" "$2"
-      ;; 
+      ;;
+    count_media_items)
+      count_media_items "$1" "$2"
+      ;;
     create_app_media_folders)
       create_app_media_folders "$1" "$2"
-      ;; 
+      ;;
     run_batch_command)
       run_batch_command "$1" "$2"
-      ;; 
+      ;;
     find_expired_files)
       find_expired_files "$1" "$2" "$3"
-      ;; 
+      ;;
     delete_files_batch)
       delete_files_batch "$1"
       ;;
@@ -358,6 +395,9 @@ main() {
       ;;
     get_subfolders)
       get_subfolders "$1"
+      ;;
+    count_subfolders)
+      count_subfolders "$1"
       ;;
     get_item_count)
       get_item_count "$1"
@@ -374,7 +414,7 @@ main() {
     *)
       json_response "false" "{}" "\"Unknown command: $command\""
       exit 1
-      ;; 
+      ;;
   esac
 }
 

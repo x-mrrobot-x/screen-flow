@@ -66,7 +66,7 @@ const AppState = (() => {
     activities: () => ENV.setData("ACTIVITIES", activities),
 
     apps: () => ENV.setData("APPS", apps),
-    
+
     monitor: () => ENV.setData("MONITOR", monitor)
   };
 
@@ -112,7 +112,7 @@ const AppState = (() => {
       persist.apps();
       emitChange("apps");
     },
-    
+
     // Monitor
     getMonitorData: () => ({ ...monitor }),
     setMonitorData(newData) {
@@ -144,8 +144,8 @@ const AppState = (() => {
     // Stats (estatísticas e métricas)
     getStats: () => ({ ...stats }),
     getStat: key => stats[key],
-    setStat(key, value) {
-      stats = { ...stats, [key]: value };
+    setStats(newStats) {
+      stats = { ...stats, ...newStats };
       persist.stats();
       emitChange("stats");
     },
@@ -161,39 +161,6 @@ const AppState = (() => {
     },
     updateLastCleanup() {
       stats = { ...stats, lastCleanup: Date.now() };
-      persist.stats();
-      emitChange("stats");
-    },
-
-    updateStatsFromProcess(result) {
-      const {
-        organizerCount = 0,
-        cleanedCount = 0,
-        pendingFiles,
-        processType
-      } = result;
-
-      let newStats = { ...stats };
-
-      if (processType === "organizer") {
-        newStats = {
-          ...newStats,
-          lastOrganizer: Date.now(),
-          organizerCaptures: (newStats.organizerCaptures || 0) + organizerCount
-        };
-      } else if (processType === "cleanup") {
-        newStats = {
-          ...newStats,
-          lastCleanup: Date.now(),
-          removedCaptures: (newStats.removedCaptures || 0) + cleanedCount
-        };
-      }
-
-      if (pendingFiles !== undefined) {
-        newStats.pendingFiles = pendingFiles;
-      }
-
-      stats = newStats;
       persist.stats();
       emitChange("stats");
     },

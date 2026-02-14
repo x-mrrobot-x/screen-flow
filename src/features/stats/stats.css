@@ -13,43 +13,28 @@
   font-size: var(--font-sm);
   font-weight: 500;
   transition: all 0.2s ease;
-  border: none;
-  cursor: pointer;
-  background: hsl(var(--card));
   border: 1px solid hsl(var(--border));
   color: hsl(var(--muted-foreground));
+  background: hsl(var(--card));
 }
 
 .media-type-button.active[data-media-type="screenshots"] {
-  background: linear-gradient(
-    135deg,
-    rgba(59, 130, 246, 0.8) 0%,
-    rgba(59, 130, 246, 1) 100%
-  );
-  color: white;
+  background: hsla(var(--gradient-start) / 0.8);
   border-color: transparent;
 }
 
 .media-type-button.active[data-media-type="recordings"] {
-  background: linear-gradient(
-    135deg,
-    rgba(168, 85, 247, 0.8) 0%,
-    rgba(168, 85, 247, 1) 100%
-  );
-  color: white;
-  border-color: transparent;
+  background: hsla(var(--gradient-end) / 0.8);
 }
 
-.media-type-button:not(.active):hover {
-  background: hsl(var(--muted));
-  border-color: hsl(var(--border));
+.media-type-button.active {
+  color: hsl(var(--accent-gradient-foreground));
 }
 
 .media-type-button svg {
   width: var(--icon-md);
   height: var(--icon-md);
 }
-
 
 .chart-card {
   background: hsl(var(--card));
@@ -93,7 +78,6 @@
   gap: var(--space-md);
   margin-bottom: var(--space-lg);
 }
-
 
 /* CONTAINER PRINCIPAL */
 .activity-card {
@@ -154,38 +138,12 @@
 }
 
 .icon-box span {
-  font-size: .8rem;
+  font-size: 0.8rem;
 }
 
 .icon-box svg {
   width: var(--icon-lg);
   height: var(--icon-lg);
-}
-
-/* Variantes de cores para os ícones */
-.icon-box.yellow {
-  background: hsl(var(--warning) / 0.1); /* Amarelo transparente */
-  color: hsl(var(--warning));
-}
-
-.icon-box.orange {
-  background: hsl(38 92% 50% / 0.1); /* Laranja transparente */
-  color: hsl(38 92% 50%);
-}
-
-.icon-box.blue {
-  background: hsl(var(--primary) / 0.1); /* Azul transparente */
-  color: hsl(var(--primary));
-}
-
-.icon-box.green {
-  background: hsl(var(--success) / 0.1); /* Verde transparente */
-  color: hsl(var(--success));
-}
-
-.icon-box.gray {
-  background: hsl(215 16% 47% / 0.1); /* Cinza transparente */
-  color: hsl(215 16% 47%);
 }
 
 .item-content {
@@ -203,7 +161,7 @@
 
 /* TEXTOS */
 .item-header h3 {
-  font-size: var(--font-sm); 
+  font-size: var(--font-sm);
   font-weight: 500;
   color: hsl(var(--foreground));
 }

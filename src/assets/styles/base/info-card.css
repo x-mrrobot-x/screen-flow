@@ -57,42 +57,6 @@
   border-radius: var(--radius-md);
 }
 
-.cleaner-icon.primary,
-.setting-icon.primary {
-  background: hsl(var(--primary) / 0.2);
-}
-
-.cleaner-icon.primary svg,
-.setting-icon.primary svg {
-  color: hsl(var(--primary));
-}
-
-.cleaner-icon.accent,
-.setting-icon.accent {
-  background: hsl(var(--accent) / 0.2);
-}
-
-.cleaner-icon.accent svg,
-.setting-icon.accent svg {
-  color: hsl(var(--accent));
-}
-
-.cleaner-icon.warning,
-.setting-icon.warning {
-  background: hsl(var(--warning) / 0.2);
-}
-
-.cleaner-icon.warning svg,
-.setting-icon.warning svg {
-  color: hsl(var(--warning));
-}
-
-.cleaner-icon svg,
-.setting-icon svg {
-  width: var(--icon-lg);
-  height: var(--icon-lg);
-}
-
 .cleaner-text h4,
 .setting-text h4 {
   font-weight: 500;

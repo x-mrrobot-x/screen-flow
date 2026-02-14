@@ -1,76 +1,80 @@
 const DashboardView = (function () {
   "use strict";
 
-  let container = null;
   const elements = {};
 
-  const render = {
-    stats(data) {
-      elements.dashStatOrganizer.textContent = data.organizer.toLocaleString();
-      elements.dashStatRemoved.textContent = data.removed.toLocaleString();
-      elements.dashStatPending.textContent = data.pending;
-    },
+  function queryElements() {
+    const selectors = DashboardConfig.SELECTORS;
 
-    lastActivity(data) {
-      elements.dashLastOrganizer.textContent = data.lastOrganizer
-        ? Utils.formatTimestamp(data.lastOrganizer)
-        : "Nenhum";
-      elements.dashLastCleanup.textContent = Utils.formatTimestamp(
-        data.lastCleanup
-      );
-    },
+    // Helper function to query selectors
+    const qs = selector => document.querySelector(selector);
 
-    topApp(data) {
-      elements.dashTopAppName.textContent = data.topApp.name;
-      elements.dashTopAppCount.textContent = `${data.topApp.count} arquivos`;
-    },
-
-    complete(data) {
-      render.stats(data);
-      render.lastActivity(data);
-      render.topApp(data);
-    }
-  };
-
-  function init(containerSelector) {
-    container = DOM.qs(containerSelector);
-    if (!container) {
-      throw new Error(`Container ${containerSelector} not found`);
-    }
-
-    for (const key in DashboardConfig.SELECTORS) {
-      if (key !== "CONTAINER") {
-        elements[key] = DOM.qs(DashboardConfig.SELECTORS[key]);
-      }
-    }
-
-    return container;
+    elements.summaryCard = {
+      organized: qs(selectors.summaryCard.organized),
+      removed: qs(selectors.summaryCard.removed)
+    };
+    elements.toOrganize = {
+      images: qs(selectors.toOrganize.images),
+      videos: qs(selectors.toOrganize.videos)
+    };
+    elements.foldersCreated = {
+      images: qs(selectors.foldersCreated.images),
+      videos: qs(selectors.foldersCreated.videos)
+    };
+    elements.lastOrganization = {
+      images: qs(selectors.lastOrganization.images),
+      videos: qs(selectors.lastOrganization.videos)
+    };
+    elements.lastClean = {
+      images: qs(selectors.lastClean.images),
+      videos: qs(selectors.lastClean.videos)
+    };
+    elements.mostCapturedApp = {
+      icon: qs(selectors.mostCapturedApp.icon),
+      name: qs(selectors.mostCapturedApp.name),
+      count: qs(selectors.mostCapturedApp.count)
+    };
   }
 
-  function update(section, data) {
-    if (render[section]) {
-      render[section](data);
+  function init() {
+    try {
+      queryElements();
+    } catch (error) {
+      Logger.error("Failed to initialize DashboardView elements:", error);
     }
   }
 
-  function showScanLoading() {
-    elements.statsGrid.classList.add("loading");
-  }
+  function update(data) {
+    if (!data) return;
 
-  function hideScanLoading() {
-    elements.statsGrid.classList.remove("loading");
-  }
+    elements.summaryCard.organized.textContent =
+      data.organizedFiles.toLocaleString();
+    elements.summaryCard.removed.textContent =
+      data.removedFiles.toLocaleString();
 
-  function clear() {
-    if (container) container.innerHTML = "";
+    elements.toOrganize.images.textContent = data.toOrganize.images;
+    elements.toOrganize.videos.textContent = data.toOrganize.videos;
+
+    elements.foldersCreated.images.textContent = data.foldersCreated.images;
+    elements.foldersCreated.videos.textContent = data.foldersCreated.videos;
+
+    elements.lastOrganization.images.textContent = data.lastOrganization.images;
+    elements.lastOrganization.videos.textContent = data.lastOrganization.videos;
+
+    elements.lastClean.images.textContent = data.lastClean.images;
+    elements.lastClean.videos.textContent = data.lastClean.videos;
+
+    elements.mostCapturedApp.name.textContent = data.mostCapturedApp.name;
+    elements.mostCapturedApp.count.textContent =
+      data.mostCapturedApp.count.toLocaleString();
+
+    elements.mostCapturedApp.icon.src = ENV.resolveIconPath(
+      data.mostCapturedApp.pkg
+    );
   }
 
   return {
     init,
-    render,
-    update,
-    clear,
-    showScanLoading,
-    hideScanLoading
+    update
   };
 })();

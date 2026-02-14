@@ -4,6 +4,19 @@
   padding-right: var(--space-sm);
 }
 
+#modal-steps-container::-webkit-scrollbar {
+  width: 0.4rem;
+}
+
+#modal-steps-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#modal-steps-container::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: var(--radius-full);
+}
+
 .process-steps-container {
   margin: var(--space-md) 0;
 }
@@ -22,8 +35,14 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-5px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .step-item.incomplete {
@@ -37,9 +56,15 @@
 }
 
 @keyframes pulse {
-  0% { opacity: 0.6; }
-  50% { opacity: 1; }
-  100% { opacity: 0.6; }
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
 }
 
 .step-item.completed {
@@ -75,7 +100,9 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .step-item.completed .step-icon {
@@ -97,8 +124,12 @@
 }
 
 @keyframes bounce {
-  from { transform: translateY(0); }
-  to { transform: translateY(-3px); }
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-3px);
+  }
 }
 
 .step-item.completed .step-icon svg {
@@ -137,8 +168,14 @@
 }
 
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .completion-icon {

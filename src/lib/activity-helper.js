@@ -3,40 +3,52 @@ const ActivityHelper = (() => {
 
   const ACTIVITY_CONFIG = {
     cleaner: {
-      icon: "sparkles",
-      color: "yellow",
+      icon: "broom",
+      class: "icon-purple",
       getTitle: () => "Limpeza",
       getDescription: data => `${data.count || 0} arquivos excluídos.`
     },
     "cleaner-folder": {
       icon: "folder-minus",
-      color: "orange",
+      class: "icon-purple",
       getTitle: data => {
-        const mediaType = data.mediaType === "ss" ? "Capturas" :
-                         data.mediaType === "sr" ? "Gravações" : "Arquivos";
+        const mediaType =
+          data.mediaType === "ss"
+            ? "Capturas"
+            : data.mediaType === "sr"
+            ? "Gravações"
+            : "Arquivos";
         return `Limpeza de Pasta`;
       },
       getDescription: data => {
-        const mediaType = data.mediaType === "ss" ? "capturas de tela" :
-                         data.mediaType === "sr" ? "gravações de tela" : "arquivos";
-        return `${data.count || 0} ${mediaType} removidos da pasta "${data.folder}".`;
+        const mediaType =
+          data.mediaType === "ss"
+            ? "capturas de tela"
+            : data.mediaType === "sr"
+            ? "gravações de tela"
+            : "arquivos";
+        return `${data.count || 0} ${mediaType} removidos da pasta "${
+          data.folder
+        }".`;
       }
     },
     organizer: {
-      icon: "folder",
-      color: "orange",
+      icon: "folder-open",
+      class: "icon-green",
       getTitle: data => {
-        const mediaType = data.mediaType === "recordings" ? "Gravações" : "Capturas";
+        const mediaType =
+          data.mediaType === "recordings" ? "Gravações" : "Capturas";
         return `Organização de ${mediaType}`;
       },
       getDescription: data => {
-        const mediaType = data.mediaType === "recordings" ? "gravações" : "capturas";
+        const mediaType =
+          data.mediaType === "recordings" ? "gravações" : "capturas";
         return `${data.count || 0} ${mediaType} organizadas.`;
       }
     },
     "feature-toggle": {
       icon: "toggle-right",
-      color: "green",
+      class: "icon-green",
       getTitle: data => {
         const featureNames = {
           "auto-organizer": "Organização Automática",
@@ -47,21 +59,26 @@ const ActivityHelper = (() => {
       getDescription: data =>
         `Recurso ${data.enabled ? "ativado" : "desativado"}.`,
       getIcon: data => (data.enabled ? "toggle-right" : "toggle-left"),
-      getColor: data => (data.enabled ? "green" : "gray")
+      getClass: data => {
+        if (!data.enabled) return "icon-gray";
+        return data.feature.includes("cleaner") ? "icon-purple" : "icon-green";
+      }
     },
     "auto-cleaner-folder-toggle": {
       icon: "toggle-right",
-      color: "blue",
+      class: "icon-blue",
       getTitle: data =>
-        data.enabled
-          ? "Limpeza de Pasta"
-          : "Limpeza de Pasta",
+        data.enabled ? "Limpeza de Pasta" : "Limpeza de Pasta",
       getDescription: data => {
-        const mediaType = data.feature.includes("screenshots") ? "capturas de tela" : "gravações de tela";
-        return `Limpeza automática de ${mediaType} na pasta "${data.folder}" foi ${data.enabled ? "ativada" : "desativada"}.`;
+        const mediaType = data.feature.includes("screenshots")
+          ? "capturas de tela"
+          : "gravações de tela";
+        return `Limpeza automática de ${mediaType} na pasta "${
+          data.folder
+        }" foi ${data.enabled ? "ativada" : "desativada"}.`;
       },
       getIcon: data => (data.enabled ? "toggle-right" : "toggle-left"),
-      getColor: data => (data.enabled ? "blue" : "gray")
+      getClass: data => (data.enabled ? "icon-blue" : "icon-gray")
     }
   };
 
@@ -77,7 +94,7 @@ const ActivityHelper = (() => {
       description: config.getDescription(activity),
       timestamp: activity.timestamp,
       icon: config.getIcon ? config.getIcon(activity) : config.icon,
-      color: config.getColor ? config.getColor(activity) : config.color,
+      class: config.getClass ? config.getClass(activity) : config.class,
       ...Object.fromEntries(
         Object.entries(activity).filter(
           ([key]) =>
@@ -88,7 +105,7 @@ const ActivityHelper = (() => {
               "description",
               "timestamp",
               "icon",
-              "color"
+              "class"
             ].includes(key)
         )
       )

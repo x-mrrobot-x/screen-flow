@@ -17,6 +17,7 @@
 
     <link rel="stylesheet" href="src/assets/styles/main.css" />
     <link rel="stylesheet" href="src/assets/styles/animations.css" />
+    <link rel="stylesheet" href="src/assets/styles/navigation.css" />
 
     <!-- Feature CSS -->
     <link rel="stylesheet" href="src/features/dashboard/dashboard.css" />
@@ -33,7 +34,7 @@
     </script>
   </head>
   <body>
-    <div id="app">
+    <div id="app" class="loading">
       <!--  DASHBOARD TAB  -->
       <main
         id="tab-dashboard"
@@ -53,85 +54,146 @@
           </div>
         </header>
 
-        <section class="stats-grid">
-          <article
-            class="stat-card gradient glow card-glow animate-fade-in-up delay-1"
+        <section class="dashboard-grid">
+          <div
+            class="summary-card animate-fade-in-up"
+            style="animation-delay: 0.1s"
           >
-            <div class="overlay"></div>
-            <div class="content">
-              <div class="stat-icon-wrapper glass-icon">
-                <i class="stat-icon" data-icon="folder-check"></i>
-              </div>
-              <p class="stat-label">Capturas Organizadas</p>
-              <p class="stat-value" id="dash-stat-organizer">...</p>
-              <p class="stat-subtext">Este mês</p>
+            <div class="summary-header">
+              <i data-icon="layer-group"></i>
             </div>
-          </article>
 
-          <article
-            class="stat-card card-glow animate-fade-in-up delay-2"
-          >
-            <div class="content">
-              <div class="stat-icon-wrapper glass-icon">
-                <i class="stat-icon" data-icon="trash"></i>
+            <div class="summary-body">
+              <div class="summary-item">
+                <span id="summary-organized-files" class="summary-value"
+                  >...</span
+                >
+                <span class="summary-label">Arquivos Organizados</span>
               </div>
-              <p class="stat-label">Capturas Removidas</p>
-              <p class="stat-value" id="dash-stat-removed">...</p>
-              <p class="stat-subtext">Este mês</p>
+              <div class="summary-item">
+                <span id="summary-removed-files" class="summary-value"
+                  >...</span
+                >
+                <span class="summary-label">Arquivos Removidos</span>
+              </div>
             </div>
-          </article>
+          </div>
 
-          <article
-            class="stat-card card-glow animate-fade-in-up delay-3"
-          >
-            <div class="content">
-              <div class="stat-icon-wrapper dark-icon-blue">
-                <i class="stat-icon" data-icon="clock"></i>
+          <div class="info-grid">
+            <div
+              class="info-card animate-fade-in-up"
+              style="animation-delay: 0.2s"
+            >
+              <div class="info-header">
+                <div class="info-icon icon-blue">
+                  <i data-icon="file-circle-question"></i>
+                </div>
+                <span class="info-title">Para Organizar</span>
               </div>
-              <p class="stat-label">Última Organização</p>
-              <p class="stat-value" id="dash-last-organizer">...</p>
-              <p class="stat-subtext">Esta semana</p>
+              <div class="info-body">
+                <div class="info-item">
+                  <span id="to-organize-images" class="info-value">...</span>
+                  <span class="info-label">Imagens</span>
+                </div>
+                <div class="info-item">
+                  <span id="to-organize-videos" class="info-value">...</span>
+                  <span class="info-label">Vídeos</span>
+                </div>
+              </div>
             </div>
-          </article>
 
-          <article
-            class="stat-card card-glow animate-fade-in-up delay-4"
-          >
-            <div class="content">
-              <div class="stat-icon-wrapper dark-icon-blue">
-                <i class="stat-icon" data-icon="trash"></i>
+            <div
+              class="info-card animate-fade-in-up"
+              style="animation-delay: 0.3s"
+            >
+              <div class="info-header">
+                <div class="info-icon icon-purple">
+                  <i data-icon="folder-tree"></i>
+                </div>
+                <span class="info-title">Pastas Criadas</span>
               </div>
-              <p class="stat-label">Última Limpeza</p>
-              <p class="stat-value" id="dash-last-cleanup">...</p>
-              <p class="stat-subtext">Esta semana</p>
+              <div class="info-body">
+                <div class="info-item">
+                  <span id="folders-created-images" class="info-value"
+                    >...</span
+                  >
+                  <span class="info-label">Imagens</span>
+                </div>
+                <div class="info-item">
+                  <span id="folders-created-videos" class="info-value"
+                    >...</span
+                  >
+                  <span class="info-label">Vídeos</span>
+                </div>
+              </div>
             </div>
-          </article>
 
-          <article
-            class="stat-card card-glow animate-fade-in-up delay-5"
-          >
-            <div class="content">
-              <div class="stat-icon-wrapper dark-icon-blue">
-                <i class="stat-icon" data-icon="layers"></i>
+            <div
+              class="info-card animate-fade-in-up"
+              style="animation-delay: 0.4s"
+            >
+              <div class="info-header">
+                <div class="info-icon icon-green">
+                  <i data-icon="folder-open"></i>
+                </div>
+                <span class="info-title">Última Organização</span>
               </div>
-              <p class="stat-label">Arquivos Pendentes</p>
-              <p class="stat-value" id="dash-stat-pending">...</p>
-              <p class="stat-subtext">aguardando organização</p>
+              <div class="info-body">
+                <div class="info-item">
+                  <span id="last-organization-images" class="info-value"
+                    >...</span
+                  >
+                  <span class="info-label">Imagens</span>
+                </div>
+                <div class="info-item">
+                  <span id="last-organization-videos" class="info-value"
+                    >...</span
+                  >
+                  <span class="info-label">Vídeos</span>
+                </div>
+              </div>
             </div>
-          </article>
 
-          <article
-            class="stat-card card-glow animate-fade-in-up delay-6"
-          >
-            <div class="content">
-              <div class="stat-icon-wrapper dark-icon-blue">
-                <i class="stat-icon" data-icon="trophy"></i>
+            <div
+              class="info-card animate-fade-in-up"
+              style="animation-delay: 0.5s"
+            >
+              <div class="info-header">
+                <div class="info-icon icon-purple">
+                  <i data-icon="broom"></i>
+                </div>
+                <span class="info-title">Última Limpeza</span>
               </div>
-              <p class="stat-label">App Mais Organizado</p>
-              <p class="stat-value truncate-text" id="dash-top-app-name">...</p>
-              <p class="stat-subtext" id="dash-top-app-count">...</p>
+              <div class="info-body">
+                <div class="info-item">
+                  <span id="last-clean-images" class="info-value">...</span>
+                  <span class="info-label">Imagens</span>
+                </div>
+                <div class="info-item">
+                  <span id="last-clean-videos" class="info-value">...</span>
+                  <span class="info-label">Vídeos</span>
+                </div>
+              </div>
             </div>
-          </article>
+          </div>
+
+          <div
+            class="app-card animate-fade-in-up"
+            style="animation-delay: 0.6s"
+          >
+            <div class="app-info">
+              <img
+                id="most-captured-app-icon"
+                src="src/assets/icons/default.png"
+                class="app-icon"
+              />
+              <div class="app-text">
+                <span id="most-captured-app-name" class="app-name">...</span>
+                <span class="app-desc">App com mais capturas</span>
+              </div>
+            </div>
+            <span id="most-captured-app-count" class="app-count">...</span>
+          </div>
         </section>
 
         <section>
@@ -140,32 +202,42 @@
           </h2>
           <div class="quick-actions">
             <button
-              class="btn-card btn-blue animate-fade-in-up delay-7"
+              class="btn-card animate-fade-in-up delay-7"
               data-process-type="organize_screenshots"
             >
-              <div class="icon-wrapper">
+              <div class="icon-wrapper icon-blue">
                 <i data-icon="camera"></i>
               </div>
-              <span class="btn-label">Organizar<br />capturas</span>
+              <div class="btn-label">
+                <span>Organizar</span>
+                <span>Imagens</span>
+              </div>
             </button>
 
             <button
-              class="btn-card btn-purple animate-fade-in-up delay-8"
+              class="btn-card animate-fade-in-up delay-8"
               data-process-type="organize_recordings"
             >
-              <div class="icon-wrapper">
+              <div class="icon-wrapper icon-green">
                 <i data-icon="video"></i>
               </div>
-              <span class="btn-label">Organizar <br />gravações</span>
+              <div class="btn-label">
+                <span>Organizar</span>
+                <span>Vídeos</span>
+              </div>
             </button>
+
             <button
-              class="btn-card btn-green animate-fade-in-up delay-9"
+              class="btn-card animate-fade-in-up delay-9"
               data-process-type="cleanup_old_files"
             >
-              <div class="icon-wrapper">
-                <i data-icon="sparkles"></i>
+              <div class="icon-wrapper icon-purple">
+                <i data-icon="broom"></i>
               </div>
-              <span class="btn-label">Executar <br />limpeza</span>
+              <div class="btn-label">
+                <span>Executar</span>
+                <span>limpeza</span>
+              </div>
             </button>
           </div>
         </section>
@@ -182,21 +254,20 @@
               <i data-icon="folder-open"></i>
             </div>
             <div class="header-text">
-              <h1 class="page-title">Organização</h1>
+              <h2 class="page-title">Organização</h2>
               <p class="page-subtitle">Visualize e gerencie suas mídias</p>
             </div>
           </div>
 
           <div class="search-container animate-fade-in-up delay-1">
-            <i class="search-icon" data-icon="search"></i>
+            <div class="search-icon-wrapper">
+              <i class="search-icon" data-icon="search"></i>
+            </div>
             <input
-              type="text"
+              type="search"
               class="search-input"
               placeholder="Buscar por pasta..."
             />
-            <button class="search-filter-btn">
-              <i data-icon="sliders"></i>
-            </button>
           </div>
 
           <div class="filters-row animate-fade-in-up delay-2">
@@ -212,20 +283,7 @@
               class="filter-button tap-scale"
               data-filter="screenshots"
             >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect>
-                <circle cx="9" cy="9" r="2"></circle>
-                <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path>
-              </svg>
+              <i data-icon="camera"></i>
               Screenshots
             </button>
             <button
@@ -233,19 +291,7 @@
               class="filter-button tap-scale"
               data-filter="recordings"
             >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="m22 8-6 4 6 4V8Z"></path>
-                <rect width="14" height="12" x="2" y="6" rx="2" ry="2"></rect>
-              </svg>
+              <i data-icon="video"></i>
               Gravações
             </button>
 
@@ -267,10 +313,10 @@
         <header class="page-header animate-fade-in-down">
           <div class="header-row">
             <div class="page-header-icon">
-              <i data-icon="trash"></i>
+              <i data-icon="broom"></i>
             </div>
             <div class="header-text">
-              <h1 class="page-title">Limpeza</h1>
+              <h2 class="page-title">Limpeza</h2>
               <p class="page-subtitle" id="cleaner-count-text">
                 Limpe pastas automaticamente
               </p>
@@ -278,11 +324,11 @@
           </div>
         </header>
 
-        <section class="cleaner-card card-glow animate-fade-in-up delay-1">
+        <section class="cleaner-card animate-fade-in-up delay-1">
           <div class="cleaner-row">
             <div class="cleaner-content">
-              <div class="cleaner-icon accent">
-                <i data-icon="sparkles"></i>
+              <div class="cleaner-icon icon-purple">
+                <i data-icon="broom"></i>
               </div>
               <div class="cleaner-text">
                 <h4>Limpeza Automática</h4>
@@ -317,7 +363,7 @@
               <i data-icon="chart-column"></i>
             </div>
             <div class="header-text">
-              <h1 class="page-title">Estatísticas</h1>
+              <h2 class="page-title">Estatísticas</h2>
               <p class="page-subtitle">Acompanhe seu uso e economia</p>
             </div>
           </div>
@@ -332,7 +378,7 @@
             data-media-type="screenshots"
             data-action="setMediaType"
           >
-            <i data-icon="image"></i>
+            <i data-icon="camera"></i>
             Capturas
           </button>
           <button
@@ -345,7 +391,7 @@
           </button>
         </nav>
 
-        <article class="chart-card card-glow animate-fade-in-up delay-2">
+        <article class="chart-card animate-fade-in-up delay-2">
           <header class="chart-header">
             <i data-icon="trending-up"></i>
             <h3 id="weekly-chart-title" class="chart-title">
@@ -357,7 +403,7 @@
           </div>
         </article>
 
-        <article class="chart-card card-glow animate-fade-in-left delay-3">
+        <article class="chart-card animate-fade-in-left delay-3">
           <header class="chart-header">
             <i data-icon="pie-chart"></i>
             <h3 class="chart-title">Por Pasta</h3>
@@ -367,12 +413,10 @@
           </div>
         </article>
 
-
-        <article class="activity-card card-glow animate-fade-in-up delay-7">
+        <article class="activity-card animate-fade-in-up delay-7">
           <!-- Cabeçalho -->
           <header class="card-header">
             <div class="header-icon">
-              <!-- Ícone de Calendário (using project's icon system) -->
               <i data-icon="calendar"></i>
             </div>
             <h2 class="card-title">Atividade Recente</h2>
@@ -393,7 +437,7 @@
               <i data-icon="settings"></i>
             </div>
             <div class="header-text">
-              <h1 class="page-title">Configurações</h1>
+              <h2 class="page-title">Configurações</h2>
               <p class="page-subtitle">Personalize sua experiência</p>
             </div>
           </div>
@@ -401,7 +445,7 @@
 
         <section class="settings-section animate-fade-in-up delay-1">
           <h2 class="section-title">TEMA</h2>
-          <article class="settings-card card-glow">
+          <article class="settings-card">
             <div class="theme-grid">
               <button
                 class="theme-button tap-scale"
@@ -433,15 +477,15 @@
 
         <section class="settings-section animate-fade-in-up delay-2">
           <h2 class="section-title">AUTOMAÇÃO</h2>
-          <article class="settings-card card-glow">
+          <article class="settings-card">
             <div class="setting-row">
               <div class="setting-info">
-                <div class="setting-icon primary">
-                  <i data-icon="folder-sync"></i>
+                <div class="setting-icon icon-green">
+                  <i data-icon="folder-open"></i>
                 </div>
                 <div class="setting-text">
                   <h4>Organização Automática</h4>
-                  <p>Mover arquivos automaticamente</p>
+                  <p>Organizar arquivos automaticamente</p>
                 </div>
               </div>
               <button
@@ -455,11 +499,11 @@
 
         <section class="settings-section animate-fade-in-up delay-3">
           <h2 class="section-title">OUTROS</h2>
-          <article class="settings-card card-glow">
+          <article class="settings-card">
             <div class="setting-row">
               <div class="setting-info">
-                <div class="setting-icon primary">
-                  <i data-icon="sparkles"></i>
+                <div class="setting-icon icon-blue">
+                  <i data-icon="wand-magic-sparkles"></i>
                 </div>
                 <div class="setting-text">
                   <h4>Animações</h4>
@@ -477,10 +521,10 @@
 
         <section class="settings-section animate-fade-in-up delay-4">
           <h2 class="section-title">NOTIFICAÇÕES</h2>
-          <article class="settings-card card-glow">
+          <article class="settings-card">
             <div class="setting-row">
               <div class="setting-info">
-                <div class="setting-icon warning">
+                <div class="setting-icon icon-gray">
                   <i data-icon="bell"></i>
                 </div>
                 <div class="setting-text">
@@ -501,23 +545,8 @@
           class="settings-section glass-panel danger-zone animate-fade-in-up delay-5"
         >
           <div class="settings-section-header">
-            <div class="setting-icon danger">
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path
-                  d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
-                ></path>
-                <line x1="12" y1="9" x2="12" y2="13"></line>
-                <line x1="12" y1="17" x2="12.01" y2="17"></line>
-              </svg>
+            <div class="setting-icon icon-red">
+              <i data-icon="danger"></i>
             </div>
             <h3 class="settings-title" data-i18n="settings.danger_zone">
               Zona de Perigo
@@ -572,39 +601,38 @@
           class="nav-button active tap-scale"
           data-tab="dashboard"
         >
-          <div class="nav-bg"></div>
-          <i class="nav-icon" data-icon="dashboard"></i>
+          <i class="nav-icon" data-icon="home"></i>
           <span class="nav-label">Início</span>
         </button>
+
         <button
           id="nav-organizer"
           class="nav-button tap-scale"
           data-tab="organizer"
         >
-          <div class="nav-bg"></div>
           <i class="nav-icon" data-icon="folder-open"></i>
           <span class="nav-label">Organização</span>
         </button>
+
         <button
           id="nav-cleaner"
           class="nav-button tap-scale"
           data-tab="cleaner"
         >
-          <div class="nav-bg"></div>
-          <i class="nav-icon" data-icon="trash"></i>
+          <i class="nav-icon" data-icon="broom"></i>
           <span class="nav-label">Limpeza</span>
         </button>
+
         <button id="nav-stats" class="nav-button tap-scale" data-tab="stats">
-          <div class="nav-bg"></div>
           <i class="nav-icon" data-icon="chart-column"></i>
           <span class="nav-label">Estatísticas</span>
         </button>
+
         <button
           id="nav-settings"
           class="nav-button tap-scale"
           data-tab="settings"
         >
-          <div class="nav-bg"></div>
           <i class="nav-icon" data-icon="settings"></i>
           <span class="nav-label">Configurações</span>
         </button>

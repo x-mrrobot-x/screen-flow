@@ -30,7 +30,7 @@ const OrganizerView = (function () {
       `;
     },
     folderCard: (folder, index, activeFilter) => `
-      <div class="folder-card card-glow animate-scale-in delay-${
+      <div class="folder-card animate-scale-in delay-${
         index % 10
       }" data-folder-id="${folder.id}">
         <div class="folder-top">
@@ -51,13 +51,29 @@ const OrganizerView = (function () {
         </div>
       </div>`,
     emptyState: activeFilter => {
-      const emptyMediaText =
-        activeFilter === "screenshots" ? "capturas" : "gravações";
+      let title, subtitle;
+      
+      switch(activeFilter) {
+        case "screenshots":
+          title = "Nenhuma pasta de capturas";
+          subtitle = "Não há pastas com screenshots para exibir.";
+          break;
+        case "recordings":
+          title = "Nenhuma pasta de gravações";
+          subtitle = "Não há pastas com screen recordings para exibir.";
+          break;
+        case "all":
+        default:
+          title = "Nenhuma pasta organizada";
+          subtitle = "Não há pastas organizadas para exibir. Os arquivos serão organizados automaticamente por aplicativo.";
+          break;
+      }
+      
       return `
         <div class="empty-state animate-fade-in delay-3">
             <div class="empty-icon-wrapper">${Icons.get("folder")}</div>
-            <p class="empty-title">Nenhuma pasta encontrada</p>
-            <p class="empty-subtitle">Nenhuma pasta com ${emptyMediaText} para exibir. Tente ajustar os filtros.</p>
+            <p class="empty-title">${title}</p>
+            <p class="empty-subtitle">${subtitle}</p>
         </div>`;
     },
     actionsMenu: folderId => `
@@ -73,10 +89,30 @@ const OrganizerView = (function () {
     `
   };
 
+  function getFilteredFolders(folders, activeFilter) {
+    if (activeFilter === "all") {
+      return folders.filter(folder => 
+        folder.ss.count > 0 || folder.sr.count > 0
+      );
+    } else if (activeFilter === "screenshots") {
+      return folders.filter(folder => 
+        folder.ss.count > 0
+      );
+    } else if (activeFilter === "recordings") {
+      return folders.filter(folder => 
+        folder.sr.count > 0
+      );
+    } else {
+      return folders; // fallback to all folders
+    }
+  }
+
   const render = {
     folders: (folders, activeFilter) => {
-      if (folders.length > 0) {
-        elements.foldersGrid.innerHTML = folders
+      const filteredFolders = getFilteredFolders(folders, activeFilter);
+      
+      if (filteredFolders.length > 0) {
+        elements.foldersGrid.innerHTML = filteredFolders
           .map((f, i) => templates.folderCard(f, i, activeFilter))
           .join("");
       } else {
@@ -84,34 +120,36 @@ const OrganizerView = (function () {
       }
     },
     mediaCounter: (folders, activeFilter) => {
+      const filteredFolders = getFilteredFolders(folders, activeFilter);
+      
       let totalMedia = 0;
       let mediaIcon = "";
       if (activeFilter === "all") {
-        const totalScreenshots = folders.reduce(
+        const totalScreenshots = filteredFolders.reduce(
           (sum, f) => sum + f.ss.count,
           0
         );
-        const totalRecordings = folders.reduce((sum, f) => sum + f.sr.count, 0);
+        const totalRecordings = filteredFolders.reduce((sum, f) => sum + f.sr.count, 0);
         elements.mediaCounter.innerHTML = `
           <span style="display: flex; align-items: center; gap: 0.25rem;">${Icons.get(
             "folder"
-          )} ${folders.length}</span>
+          )} ${filteredFolders.length}</span>
           <span style="display: flex; align-items: center; gap: 0.25rem;">${Icons.get(
             "file"
           )} ${totalScreenshots + totalRecordings}</span>
         `;
       } else {
         if (activeFilter === "recordings") {
-          totalMedia = folders.reduce((sum, f) => sum + f.sr.count, 0);
+          totalMedia = filteredFolders.reduce((sum, f) => sum + f.sr.count, 0);
           mediaIcon = Icons.get("video");
         } else {
-          totalMedia = folders.reduce((sum, f) => sum + f.ss.count, 0);
+          totalMedia = filteredFolders.reduce((sum, f) => sum + f.ss.count, 0);
           mediaIcon = Icons.get("image");
         }
         elements.mediaCounter.innerHTML = `
           <span style="display: flex; align-items: center; gap: 0.25rem;">${Icons.get(
             "folder"
-          )} ${folders.length}</span>
+          )} ${filteredFolders.length}</span>
           <span style="display: flex; align-items: center; gap: 0.25rem;">${mediaIcon} ${totalMedia}</span>
         `;
       }
@@ -153,30 +191,18 @@ const OrganizerView = (function () {
     return popupElement;
   }
 
+  function queryElements() {
+    const S = OrganizerConfig.SELECTORS;
+    elements.foldersGrid = DOM.qs(S.foldersGrid);
+    elements.mediaCounter = DOM.qs(S.mediaCounter);
+    elements.filterButtons = DOM.qsa(S.filterButtons);
+  }
+
   function init(containerSelector) {
     container = DOM.qs(containerSelector);
     if (!container) throw new Error(`Container ${containerSelector} not found`);
 
-    for (const key in OrganizerConfig.SELECTORS) {
-      if (key !== "CONTAINER") {
-        if (key === "foldersGrid") {
-          elements.foldersGrid = DOM.qsa(OrganizerConfig.SELECTORS[key]);
-          if (elements.foldersGrid.length === 1) elements.foldersGrid = elements.foldersGrid[0];
-        } else if (key === "folderCard") {
-          elements.folderCard = DOM.qsa(OrganizerConfig.SELECTORS[key]);
-          if (elements.folderCard.length === 1) elements.folderCard = elements.folderCard[0];
-        } else if (key === "folderMenuDots") {
-          elements.folderMenuDots = DOM.qsa(OrganizerConfig.SELECTORS[key]);
-          if (elements.folderMenuDots.length === 1) elements.folderMenuDots = elements.folderMenuDots[0];
-        } else if (key === "folderActionsPopup") {
-          elements.folderActionsPopup = DOM.qsa(OrganizerConfig.SELECTORS[key]);
-          if (elements.folderActionsPopup.length === 1) elements.folderActionsPopup = elements.folderActionsPopup[0];
-        } else {
-          elements[key] = DOM.qsa(OrganizerConfig.SELECTORS[key]);
-          if (elements[key].length === 1) elements[key] = elements[key][0];
-        }
-      }
-    }
+    queryElements();
     return container;
   }
 

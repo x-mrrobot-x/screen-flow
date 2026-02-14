@@ -10,6 +10,7 @@
   --radius-sm: 0.8rem;
   --radius-md: 1.2rem;
   --radius-lg: 1.4rem;
+  --radius-xl: 1.8rem;
   --radius-full: 9999px;
 
   --space-xxs: 0.4rem;
@@ -26,31 +27,41 @@
   --font-md: 1.6rem;
   --font-lg: 1.8rem;
   --font-xl: 2rem;
+  --font-2xl: 2.2rem;
 
-  --background: 210 40% 98%;
-  --foreground: 222 47% 11%;
-  --card: 0 0% 100%;
-  --card-foreground: 222 47% 11%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 222 47% 11%;
-  --primary: 199 89% 48%;
+  /* Common color variables */
+  --primary: 213 94% 68%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 210 40% 96%;
-  --secondary-foreground: 222 47% 11%;
-  --muted: 210 40% 96%;
-  --muted-foreground: 215 16% 47%;
-  --accent: 265 89% 60%;
-  --accent-foreground: 0 0% 100%;
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
-  --border: 214 32% 91%;
-  --input: 214 32% 91%;
-  --ring: 199 89% 48%;
+  --ring: 213 94% 68%;
   --radius: 1.6rem;
-  --gradient-start: 199 89% 48%;
-  --gradient-end: 265 89% 60%;
+  --gradient-start: 217 91% 60%;
+  --gradient-end: 258 90% 66%;
+  --accent-gradient: linear-gradient(
+    135deg,
+    hsl(var(--gradient-start)) 0%,
+    hsl(var(--gradient-end)) 100%
+  );
+  --accent-gradient-foreground: 0 0% 100%;
   --success: 142 76% 45%;
   --warning: 38 92% 50%;
+  --accent: 255 92% 76%;
+  --accent-foreground: 0 0% 100%;
+  
+  /* Default dark theme colors */
+  --background: 222 47% 5%;
+  --foreground: 210 40% 98%;
+  --card: 222 47% 8%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222 47% 8%;
+  --popover-foreground: 210 40% 98%;
+  --secondary: 222 47% 12%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 222 47% 15%;
+  --muted-foreground: 215 20% 55%;
+  --border: 222 47% 12%;
+  --input: 222 47% 15%;
 }
 
 .light {
@@ -60,39 +71,14 @@
   --card-foreground: 222 47% 11%;
   --popover: 0 0% 100%;
   --popover-foreground: 222 47% 11%;
-  --primary: 199 89% 48%;
-  --primary-foreground: 0 0% 100%;
   --secondary: 210 40% 96%;
   --secondary-foreground: 222 47% 11%;
   --muted: 210 40% 96%;
   --muted-foreground: 215 16% 47%;
-  --accent: 265 89% 60%;
-  --accent-foreground: 0 0% 100%;
-  --destructive: 0 84% 60%;
-  --destructive-foreground: 0 0% 100%;
   --border: 214 32% 91%;
   --input: 214 32% 91%;
-  --ring: 199 89% 48%;
 }
 
 .dark {
-  --background: 222 47% 5%;
-  --foreground: 210 40% 98%;
-  --card: 222 47% 8%;
-  --card-foreground: 210 40% 98%;
-  --popover: 222 47% 8%;
-  --popover-foreground: 210 40% 98%;
-  --primary: 199 89% 48%;
-  --primary-foreground: 222 47% 5%;
-  --secondary: 222 47% 12%;
-  --secondary-foreground: 210 40% 98%;
-  --muted: 222 47% 15%;
-  --muted-foreground: 215 20% 55%;
-  --accent: 265 89% 60%;
-  --accent-foreground: 210 40% 98%;
-  --destructive: 0 84% 60%;
-  --destructive-foreground: 210 40% 98%;
-  --border: 222 47% 15%;
-  --input: 222 47% 15%;
-  --ring: 199 89% 48%;
+  /* Dark theme has no unique variables since all are defined in :root */
 }

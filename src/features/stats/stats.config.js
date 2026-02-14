@@ -25,8 +25,8 @@ const StatsConfig = {
     recordings: "Gravações"
   },
   CHART_COLOR: {
-    screenshots: "rgba(59, 130, 246, 0.6)",
-    recordings: "rgba(168, 85, 247, 0.6)"
+    screenshots: "hsla(213 94% 68% / 0.8)",
+    recordings: "hsla(255 92% 76% / 0.8)"
   },
   MEDIA_TYPE: {
     SCREENSHOTS: "screenshots",

@@ -132,12 +132,8 @@
 }
 
 .clean-day-button.active {
-  background: linear-gradient(
-    135deg,
-    hsl(var(--primary)) 0%,
-    hsl(var(--accent)) 100%
-  );
-  color: hsl(var(--primary-foreground));
+  background-image: var(--accent-gradient);
+  color: hsl(var(--accent-gradient-foreground));
 }
 
 .clean-day-button:not(.active) {

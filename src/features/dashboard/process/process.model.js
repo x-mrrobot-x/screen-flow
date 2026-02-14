@@ -149,21 +149,42 @@ const ProcessModel = (function () {
     return allExpired;
   }
 
+  function updateStats(result) {
+    const { processType, organizedCount = 0, cleanedCount = 0 } = result;
+
+    let newStats = AppState.getStats();
+    const now = Date.now();
+
+    if (processType.includes("organize")) {
+      const mediaType = processType.includes("screenshots")
+        ? "images"
+        : "videos";
+      newStats.organizedFiles = (newStats.organizedFiles || 0) + organizedCount;
+      newStats.lastOrganization = {
+        ...newStats.lastOrganization,
+        [mediaType]: now
+      };
+    } else if (processType.includes("cleanup")) {
+      newStats.cleanedFiles = (newStats.cleanedFiles || 0) + cleanedCount;
+
+      newStats.lastClean = {
+        images: now,
+        videos: now
+      };
+    }
+
+    AppState.setStats(newStats);
+  }
+
   async function saveSummary(processType, stats, activityType, mediaType) {
     // 1. Atualiza as estatísticas globais
-    const isOrganizer = processType.startsWith("organize");
-    const isCleaner = processType.startsWith("cleanup");
-
     const statsPayload = {
-      processType: isOrganizer
-        ? "organizer"
-        : isCleaner
-        ? "cleanup"
-        : "unknown",
-      organizerCount: stats.moved || 0,
+      processType: processType,
+      organizedCount: stats.moved || 0,
       cleanedCount: stats.total_removed || 0
     };
-    AppState.updateStatsFromProcess(statsPayload);
+
+    updateStats(statsPayload);
 
     // 2. Adiciona a atividade correspondente
     const activityPayload = {
