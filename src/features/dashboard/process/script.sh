@@ -170,16 +170,36 @@ EOF
     json_response "true" "[$json_array]" "null"
 }
 
-delete_files_batch() {
-  file_list_json="$1"
+delete_folder_contents() {
+  folder_path="$1"
+
+  if [ ! -d "$folder_path" ]; then
+    json_response "false" "{\"deleted\": 0, \"mtime\": null}" "\"Folder does not exist: $folder_path\""
+    return 1
+  fi
+
+  # Conta todos os arquivos antes de apagar
+  initial_count=$(find "$folder_path" -maxdepth 1 -type f 2>/dev/null | wc -l)
+  initial_count=$(echo "$initial_count" | tr -d ' ')
   
-  # Remove colchetes, aspas e substitui vírgulas por espaços
-  file_list=$(echo "$file_list_json" | tr -d '[]"' | tr ',' ' ')
+  # Apaga todos os arquivos no diretório (suprimindo a saída)
+  find "$folder_path" -maxdepth 1 -type f -delete >/dev/null 2>&1
   
-  # Remove os arquivos diretamente (sh expande a lista)
-  rm -f $file_list 2>/dev/null
+  # Conta arquivos restantes após apagar
+  remaining_count=$(find "$folder_path" -maxdepth 1 -type f 2>/dev/null | wc -l)
+  remaining_count=$(echo "$remaining_count" | tr -d ' ')
   
-  json_response "true" "null" "null"
+  deleted_count=$((initial_count - remaining_count))
+  deleted_count=$(echo "$deleted_count" | tr -d ' ')
+  
+  if [ -z "$deleted_count" ] || ! [ "$deleted_count" -ge 0 ] 2>/dev/null; then
+    deleted_count=0
+  fi
+
+  # Obtém o modification time da pasta
+  folder_mtime=$(stat -c %Y "$folder_path" 2>/dev/null)
+  
+  json_response "true" "{\"deleted\": $deleted_count, \"mtime\": $folder_mtime}" "null"
 }
 
 get_folder_stats() {
@@ -410,6 +430,9 @@ main() {
       ;;
     path_exists)
       path_exists "$1"
+      ;;
+    delete_folder_contents)
+      delete_folder_contents "$1"
       ;;
     *)
       json_response "false" "{}" "\"Unknown command: $command\""

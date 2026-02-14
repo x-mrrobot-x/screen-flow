@@ -49,10 +49,10 @@ const TaskQueue = (function () {
 
       task.monitorInterval = monitorInterval;
 
-      Logger.debug(
-        `[TaskQueue] Running task ${task.id}: ${task.action}`,
-        task.params
-      );
+      // Logger.debug(
+      //   `[TaskQueue] Running task ${task.id}: ${task.action}`,
+      //   task.params
+      // );
 
       const taskerParams = {
         id: task.id,
@@ -93,10 +93,10 @@ const TaskQueue = (function () {
   }
 
   function onResult(resultJson) {
-    Logger.debug(
-      `[TaskQueue] Received result from ${resultJson?.id} from Tasker:`,
-      resultJson
-    );
+    // Logger.debug(
+    //   `[TaskQueue] Received result from ${resultJson?.id} from Tasker:`,
+    //   resultJson
+    // );
     try {
       const { id, status, payload } =
         typeof resultJson === "string" ? JSON.parse(resultJson) : resultJson;
@@ -137,9 +137,9 @@ const TaskQueue = (function () {
   function add(action, params = {}, type = "default") {
     return new Promise((resolve, reject) => {
       const taskId = ++taskIdCounter;
-      Logger.debug(
-        `[TaskQueue] Adding new task ${taskId}: ${action} (type: ${type})`
-      );
+      // Logger.debug(
+      //   `[TaskQueue] Adding new task ${taskId}: ${action} (type: ${type})`
+      // );
 
       queue.push({
         id: taskId,

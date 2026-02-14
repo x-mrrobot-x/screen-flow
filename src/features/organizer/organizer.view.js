@@ -56,11 +56,11 @@ const OrganizerView = (function () {
       switch(activeFilter) {
         case "screenshots":
           title = "Nenhuma pasta de capturas";
-          subtitle = "Não há pastas com screenshots para exibir.";
+          subtitle = "Não há pastas com capturas de tela para exibir.";
           break;
         case "recordings":
           title = "Nenhuma pasta de gravações";
-          subtitle = "Não há pastas com screen recordings para exibir.";
+          subtitle = "Não há pastas com gravações de tela para exibir.";
           break;
         case "all":
         default:

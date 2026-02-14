@@ -1,10 +1,10 @@
-const OrganizerModel = (function() {
-  'use strict';
+const OrganizerModel = (function () {
+  "use strict";
 
   let state = {
     folders: [],
-    activeFilter: 'all',
-    searchTerm: ''
+    activeFilter: "all",
+    searchTerm: ""
   };
 
   function getFolders() {
@@ -35,28 +35,67 @@ const OrganizerModel = (function() {
     AppState.setFolders(updatedFolders);
   }
 
-  function clearFolderStats(folderId, type) {
+  async function _clearMedia(folder, mediaType, basePath) {
+    const mediaFolderPath = `${basePath}/${folder.name}`;
+    let removedCount = 0;
+
+    const pathExists = await TaskQueue.add(
+      "path_exists",
+      [mediaFolderPath],
+      "shell"
+    );
+
+    if (pathExists) {
+      const result = await TaskQueue.add(
+        "delete_folder_contents",
+        [mediaFolderPath],
+        "shell"
+      );
+      if (result && result.deleted > 0) {
+        folder[mediaType].count = 0;
+        if (result.mtime) {
+          folder[mediaType].mtime = result.mtime;
+        }
+        removedCount = result.deleted;
+      }
+    }
+    return removedCount;
+  }
+
+  async function clearFolderContents(folderId, type) {
     const folders = AppState.getFolders();
     const folderIndex = folders.findIndex(f => f.id === folderId);
 
-    if (folderIndex !== -1) {
-      const folder = folders[folderIndex];
-      let removedCount = 0;
-      if (type === 'ss') {
-        removedCount = folder.ss.count;
-        folder.ss.count = 0;
-      } else if (type === 'sr') {
-        removedCount = folder.sr.count;
-        folder.sr.count = 0;
-      } else if (type === 'both') {
-        removedCount = folder.ss.count + folder.sr.count;
-        folder.ss.count = 0;
-        folder.sr.count = 0;
-      }
-      AppState.setFolders(folders);
-      return removedCount;
+    if (folderIndex === -1) {
+      Logger.warn(`[OrganizerModel] Folder with id ${folderId} not found.`);
+      return 0;
     }
-    return 0;
+
+    const folder = folders[folderIndex];
+    
+    try {
+      const clearPromises = [];
+
+      if (type === "ss" || type === "both") {
+        clearPromises.push(_clearMedia(folder, "ss", ENV.ORGANIZED_SCREENSHOTS_PATH));
+      }
+
+      if (type === "sr" || type === "both") {
+        clearPromises.push(_clearMedia(folder, "sr", ENV.ORGANIZED_RECORDINGS_PATH));
+      }
+
+      const removedCounts = await Promise.all(clearPromises);
+      const totalRemoved = removedCounts.reduce((sum, count) => sum + count, 0);
+
+      if (totalRemoved > 0) {
+        AppState.setFolders(folders);
+      }
+
+      return totalRemoved;
+    } catch (error) {
+      Logger.error("Error clearing folder contents:", error);
+      return 0;
+    }
   }
 
   return {
@@ -64,7 +103,7 @@ const OrganizerModel = (function() {
     setFilter,
     setSearchTerm,
     deleteFolder,
-    clearFolderStats,
-    getState: () => ({...state})
+    clearFolderContents,
+    getState: () => ({ ...state })
   };
 })();

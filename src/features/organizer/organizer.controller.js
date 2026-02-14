@@ -48,7 +48,7 @@ const OrganizerController = (function () {
         }
       }
     },
-    onMenuClick: e => {
+    onMenuClick: async e => {
       e.stopPropagation();
       const actionItem = e.target.closest("[data-action]");
       if (!actionItem) return;
@@ -58,6 +58,7 @@ const OrganizerController = (function () {
         OrganizerConfig.SELECTORS.folderActionsPopup
       );
       const folderId = popup.dataset.folderId;
+      
 
       if (action === "clear") {
         const activeFilter = OrganizerModel.getState().activeFilter;
@@ -67,29 +68,49 @@ const OrganizerController = (function () {
             : activeFilter === "screenshots"
             ? "ss"
             : "sr";
-        const removedCount = OrganizerModel.clearFolderStats(folderId, type);
 
-        const folders = OrganizerModel.getFolders();
-        const folder = folders.find(f => f.id === folderId);
-        const folderName = folder ? folder.name : "Unknown";
+        const folderCard = document.querySelector(`[data-folder-id="${folderId}"]`);
 
-        if (removedCount > 0) {
-          AppState.addActivity({
-            type: "cleaner-folder",
-            count: removedCount,
-            execution: "manual",
-            folder: folderName,
-            mediaType: type,
-            timestamp: Date.now()
-          });
-
-          Toast.success(
-            `${removedCount} ${
-              removedCount > 1 ? "itens removidos" : "item removido"
-            } com sucesso!`
-          );
+        if (folderCard) {
+          folderCard.style.opacity = "0.2";
+          folderCard.style.pointerEvents = "none";
         }
-        render();
+
+        try {
+          const removedCount = await OrganizerModel.clearFolderContents(folderId, type);
+          const folders = OrganizerModel.getFolders();
+          const folder = folders.find(f => f.id === folderId);
+          const folderName = folder ? folder.name : "Unknown";
+
+          if (removedCount > 0) {
+            AppState.addActivity({
+              type: "cleaner-folder",
+              count: removedCount,
+              execution: "manual",
+              folder: folderName,
+              mediaType: type,
+              timestamp: Date.now()
+            });
+
+            Toast.success(
+              `${removedCount} ${
+                removedCount > 1 ? "itens removidos" : "item removido"
+              } com sucesso!`
+            );
+          } else {
+            Toast.info("Nenhum arquivo foi removido.");
+          }
+          
+          render();
+        } catch (error) {
+          Logger.error("Error clearing folder:", error);
+          Toast.error("Erro ao limpar a pasta. Tente novamente.");
+        } finally {
+          if (folderCard) {
+            folderCard.style.opacity = "1";
+            folderCard.style.pointerEvents = "auto";
+          }
+        }
       }
       popup.remove();
       currentPopupMenu = null;
