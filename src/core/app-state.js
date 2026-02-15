@@ -9,15 +9,49 @@ const AppState = (() => {
   let monitor = {};
   let isReady = false;
 
-  async function init() {
-    const [
-      settingsData,
-      statsData,
-      foldersData,
-      activitiesData,
-      appsData,
-      monitorData
-    ] = await Promise.all([
+  const EVENTS = {
+    STATE_CHANGED: "appstate:changed"
+  };
+
+  let statsTimer = null;
+  let settingsTimer = null;
+
+  function clearPersistTimer(timer) {
+    if (timer) {
+      clearTimeout(timer);
+    }
+    return null;
+  }
+
+  function debouncedPersist(dataKey, data, delay) {
+    if (dataKey === "SETTINGS") {
+      settingsTimer = clearPersistTimer(settingsTimer);
+      settingsTimer = setTimeout(() => ENV.setData(dataKey, data), delay);
+    } else if (dataKey === "STATS") {
+      statsTimer = clearPersistTimer(statsTimer);
+      statsTimer = setTimeout(() => ENV.setData(dataKey, data), delay);
+    }
+  }
+
+  function persistImmediate(dataKey, data) {
+    ENV.setData(dataKey, data);
+  }
+
+  const persist = {
+    folders: () => persistImmediate("FOLDERS", folders),
+    settings: () => debouncedPersist("SETTINGS", settings, 500),
+    stats: () => debouncedPersist("STATS", stats, 500),
+    activities: () => persistImmediate("ACTIVITIES", activities),
+    apps: () => persistImmediate("APPS", apps),
+    monitor: () => persistImmediate("MONITOR", monitor)
+  };
+
+  function emitChange(key) {
+    EventBus.emit(EVENTS.STATE_CHANGED, { key });
+  }
+
+  async function loadAllData() {
+    return await Promise.all([
       ENV.getData("SETTINGS"),
       ENV.getData("STATS"),
       ENV.getData("FOLDERS"),
@@ -25,64 +59,110 @@ const AppState = (() => {
       ENV.getData("APPS"),
       ENV.getData("MONITOR")
     ]);
+  }
 
-    // Logger.debug("Initial data loaded:", {
-    //   settingsData,
-    //   statsData,
-    //   foldersData,
-    //   activitiesData,
-    //   appsData
-    // });
-
+  function assignLoadedData([
+    settingsData,
+    statsData,
+    foldersData,
+    activitiesData,
+    appsData,
+    monitorData
+  ]) {
     settings = settingsData;
     stats = statsData;
     folders = foldersData;
     activities = activitiesData;
     apps = appsData;
     monitor = monitorData;
-
-    isReady = true;
-    EventBus.emit("appstate:ready");
-    Logger.debug("[AppState] Evento 'appstate:ready' emitido.");
   }
 
-  // Auto-save com debounce
-  let statsTimer = null;
-  let settingsTimer = null;
+  function markAsReady() {
+    isReady = true;
+    EventBus.emit("appstate:ready");
+  }
 
-  const persist = {
-    folders: () => ENV.setData("FOLDERS", folders),
+  async function init() {
+    const loadedData = await loadAllData();
+    assignLoadedData(loadedData);
+    markAsReady();
+  }
 
-    settings: () => {
-      clearTimeout(settingsTimer);
-      settingsTimer = setTimeout(() => ENV.setData("SETTINGS", settings), 500);
-    },
+  function createActivity(activity) {
+    return {
+      id: Date.now().toString(),
+      timestamp: Date.now(),
+      ...activity
+    };
+  }
 
-    stats: () => {
-      clearTimeout(statsTimer);
-      statsTimer = setTimeout(() => ENV.setData("STATS", stats), 500);
-    },
+  function limitActivities(activitiesList, maxCount = 10) {
+    return activitiesList.slice(0, maxCount);
+  }
 
-    activities: () => ENV.setData("ACTIVITIES", activities),
+  function getTopFoldersByType(type) {
+    const key = type === "screenshots" ? "ss" : "sr";
+    const topFolders = [];
 
-    apps: () => ENV.setData("APPS", apps),
+    for (const folder of folders) {
+      topFolders.push({
+        name: folder.name,
+        count: folder[key]?.count ?? 0
+      });
+    }
 
-    monitor: () => ENV.setData("MONITOR", monitor)
-  };
+    topFolders.sort((a, b) => b.count - a.count);
+    return topFolders.slice(0, 5);
+  }
 
-  const EVENTS = {
-    STATE_CHANGED: "appstate:changed"
-  };
+  function resetAllToDefaults() {
+    stats = ENV.getDefault("STATS");
+    folders = ENV.getDefault("FOLDERS");
+    activities = ENV.getDefault("ACTIVITIES");
+    settings = ENV.getDefault("SETTINGS");
+    apps = ENV.getDefault("APPS");
+    monitor = ENV.getDefault("MONITOR");
+  }
 
-  function emitChange(key) {
-    EventBus.emit(EVENTS.STATE_CHANGED, { key });
+  function persistAll() {
+    persist.stats();
+    persist.folders();
+    persist.activities();
+    persist.settings();
+    persist.apps();
+    persist.monitor();
+  }
+
+  function emitAllChanges() {
+    const keys = [
+      "stats",
+      "folders",
+      "activities",
+      "settings",
+      "apps",
+      "monitor"
+    ];
+    for (const key of keys) {
+      emitChange(key);
+    }
+  }
+
+  function deleteAll() {
+    try {
+      resetAllToDefaults();
+      persistAll();
+      emitAllChanges();
+      return true;
+    } catch (error) {
+      Logger.error("Error deleting all data:", error);
+      return false;
+    }
   }
 
   return {
     init,
     isReady: () => isReady,
 
-    // Folders
     getFolders: () => [...folders],
     setFolders(newFolders) {
       folders = [...newFolders];
@@ -90,22 +170,14 @@ const AppState = (() => {
       emitChange("folders");
     },
 
-    // Activities
     getActivities: () => ActivityHelper.enrichActivities([...activities]),
     addActivity(activity) {
-      activities = [
-        {
-          id: Date.now().toString(),
-          timestamp: Date.now(),
-          ...activity
-        },
-        ...activities.slice(0, 9)
-      ];
+      const newActivity = createActivity(activity);
+      activities = [newActivity, ...limitActivities(activities, 9)];
       persist.activities();
       emitChange("activities");
     },
 
-    // Apps
     getApps: () => [...apps],
     setApps(newApps) {
       apps = [...newApps];
@@ -113,7 +185,6 @@ const AppState = (() => {
       emitChange("apps");
     },
 
-    // Monitor
     getMonitorData: () => ({ ...monitor }),
     setMonitorData(newData) {
       monitor = { ...monitor, ...newData };
@@ -121,7 +192,6 @@ const AppState = (() => {
       emitChange("monitor");
     },
 
-    // Settings (configurações do usuário)
     getSettings: () => ({ ...settings }),
     getSetting: key => settings[key],
     setSetting(key, value) {
@@ -141,7 +211,6 @@ const AppState = (() => {
       return settings[key];
     },
 
-    // Stats (estatísticas e métricas)
     getStats: () => ({ ...stats }),
     getStat: key => stats[key],
     setStats(newStats) {
@@ -165,50 +234,13 @@ const AppState = (() => {
       emitChange("stats");
     },
 
-    // Reset & Delete
     resetConfig() {
       settings = ENV.getDefault("SETTINGS");
       persist.settings();
       emitChange("settings");
     },
 
-    deleteAll() {
-      try {
-        stats = ENV.getDefault("STATS");
-        folders = ENV.getDefault("FOLDERS");
-        activities = ENV.getDefault("ACTIVITIES");
-        settings = ENV.getDefault("SETTINGS");
-        apps = ENV.getDefault("APPS");
-        monitor = ENV.getDefault("MONITOR");
-
-        persist.stats();
-        persist.folders();
-        persist.activities();
-        persist.settings();
-        persist.apps();
-        persist.monitor();
-
-        emitChange("stats");
-        emitChange("folders");
-        emitChange("activities");
-        emitChange("settings");
-        emitChange("apps");
-        emitChange("monitor");
-
-        return true;
-      } catch (error) {
-        Logger.error("Error deleting all data:", error);
-        return false;
-      }
-    },
-
-    // Utils
-    getTopFoldersByType(type) {
-      const key = type === "screenshots" ? "ss" : "sr";
-      return [...folders]
-        .sort((a, b) => b[key].count - a[key].count)
-        .slice(0, 5)
-        .map(f => ({ name: f.name, count: f[key].count }));
-    }
+    deleteAll,
+    getTopFoldersByType
   };
 })();

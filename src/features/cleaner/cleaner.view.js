@@ -4,63 +4,96 @@ const CleanerView = (function () {
   let container = null;
   const elements = {};
 
+  function createDayButton(mediaType, days, isActive) {
+    const activeClass = isActive ? "active" : "";
+    return `<button class="clean-day-button tap-scale ${activeClass}" data-action="setFolderDays" data-media-type="${mediaType}" data-days="${days}">${days} dias</button>`;
+  }
+
+  function createCleanGroup(folder, mediaType, key, label) {
+    if (!folder[key] || !folder[key].cleaner.on) {
+      return "";
+    }
+
+    const optionId = `option-group-${folder.id}-${mediaType}`;
+    const currentDays = folder[key].cleaner.days;
+
+    const optionsHtml = CleanerConfig.DAY_OPTIONS.map(days =>
+      createDayButton(mediaType, days, currentDays === days)
+    ).join("");
+
+    return `
+      <div class="folder-clean-group" id="${optionId}">
+        <p>${label} - Remover após:</p>
+        <div class="clean-days-options">${optionsHtml}</div>
+      </div>
+    `;
+  }
+
+  function createSwitchContainer(folder, mediaType, key, label) {
+    if (!folder[key]) return "";
+
+    const cleanerOn = folder[key].cleaner.on;
+    return `
+      <div class="clean-switch-container" data-action="toggleDayConfigVisibility" data-media-type="${mediaType}">
+        <span class="switch-label">${label}</span>
+        <button class="switch ${
+          cleanerOn ? "active" : ""
+        }" data-action="toggleFolderClean" data-media-type="${mediaType}"></button>
+      </div>
+    `;
+  }
+
   const templates = {
     folderOptions: (folder, mediaType) => {
-      const config = CleanerConfig;
       const key = mediaType === "screenshots" ? "ss" : "sr";
-      const isActive = folder[key].cleaner.on;
-      if (!isActive) return "";
-
-      const optionId = `option-group-${folder.id}-${mediaType}`;
       const label = mediaType === "screenshots" ? "Capturas" : "Gravações";
-      const currentDays = folder[key].cleaner.days;
-
-      let optionsHtml = config.DAY_OPTIONS.map(days => {
-        const activeClass = currentDays === days ? "active" : "";
-        return `<button class="clean-day-button tap-scale ${activeClass}" data-action="setFolderDays" data-media-type="${mediaType}" data-days="${days}">${days} dias</button>`;
-      }).join("");
-
-      return `
-        <div class="folder-clean-group" id="${optionId}">
-          <p>${label} - Remover após:</p>
-          <div class="clean-days-options">${optionsHtml}</div>
-        </div>
-      `;
+      return createCleanGroup(folder, mediaType, key, label);
     },
+
     folderCard: (folder, index) => {
-      const isEnabled = folder.ss.cleaner.on || folder.sr.cleaner.on;
-      const enabledClass = isEnabled ? "enabled" : "";
+      if (!folder.ss && !folder.sr) return "";
+
+      const screenshotsSwitch = createSwitchContainer(
+        folder,
+        "screenshots",
+        "ss",
+        "Capturas"
+      );
+      const recordingsSwitch = createSwitchContainer(
+        folder,
+        "screenrecordings",
+        "sr",
+        "Gravações"
+      );
+
+      if (!screenshotsSwitch && !recordingsSwitch) return "";
+
+      const ssCleanerOn = folder.ss && folder.ss.cleaner.on;
+      const srCleanerOn = folder.sr && folder.sr.cleaner.on;
+      const isEnabled = ssCleanerOn || srCleanerOn;
 
       return `
-        <div class="folder-clean-card ${enabledClass} animate-fade-in-left delay-${
-          index % 10
-        }" data-folder-id="${folder.id}">
+        <div class="folder-clean-card ${
+          isEnabled ? "enabled" : ""
+        } animate-fade-in-left delay-${index % 10}" data-folder-id="${
+          folder.id
+        }">
           <div class="folder-clean-header">
             ${Icons.getFolderIcon(folder)}
-            <span class="folder-clean-name truncate-text">${
-              folder.name
-            }</span>
+            <span class="folder-clean-name truncate-text">${folder.name}</span>
             <div class="folder-clean-switches">
-              <div class="clean-switch-container" data-action="toggleDayConfigVisibility" data-media-type="screenshots">
-                <span class="switch-label">Capturas</span>
-                <button class="switch ${
-                  folder.ss.cleaner.on ? "active" : ""
-                }" data-action="toggleFolderClean" data-media-type="screenshots"></button>
-              </div>
-              <div class="clean-switch-container" data-action="toggleDayConfigVisibility" data-media-type="screenrecordings">
-                <span class="switch-label">Gravações</span>
-                <button class="switch ${
-                  folder.sr.cleaner.on ? "active" : ""
-                }" data-action="toggleFolderClean" data-media-type="screenrecordings"></button>
-              </div>
+              ${screenshotsSwitch}
+              ${recordingsSwitch}
             </div>
           </div>
           ${
             isEnabled
-              ? `<div class="folder-clean-options">
-            ${templates.folderOptions(folder, "screenshots")}
-            ${templates.folderOptions(folder, "screenrecordings")}
-          </div>`
+              ? `
+            <div class="folder-clean-options">
+              ${createCleanGroup(folder, "screenshots", "ss", "Capturas")}
+              ${createCleanGroup(folder, "screenrecordings", "sr", "Gravações")}
+            </div>
+          `
               : ""
           }
         </div>
@@ -83,11 +116,13 @@ const CleanerView = (function () {
         elements.cleanerCountText.textContent = "Limpe pastas automaticamente";
       }
     },
+
     folderList: folders => {
       elements.folderCleanList.innerHTML = folders
         .map((folder, index) => templates.folderCard(folder, index))
         .join("");
     },
+
     cleaner: (folders, autoCleaner) => {
       render.counts(folders, autoCleaner);
       render.folderList(folders);

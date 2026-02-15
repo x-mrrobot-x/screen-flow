@@ -35,30 +35,24 @@ const OrganizerModel = (function () {
     AppState.setFolders(updatedFolders);
   }
 
-  async function _clearMedia(folder, mediaType, basePath) {
+  async function clearMedia(folder, mediaType, basePath) {
     const mediaFolderPath = `${basePath}/${folder.name}`;
-    let removedCount = 0;
 
-    const pathExists = await TaskQueue.add(
-      "path_exists",
+    const result = await TaskQueue.add(
+      "delete_folder_contents",
       [mediaFolderPath],
       "shell"
     );
 
-    if (pathExists) {
-      const result = await TaskQueue.add(
-        "delete_folder_contents",
-        [mediaFolderPath],
-        "shell"
-      );
-      if (result && result.deleted > 0) {
-        folder[mediaType].count = 0;
-        if (result.mtime) {
-          folder[mediaType].mtime = result.mtime;
-        }
-        removedCount = result.deleted;
+    let removedCount = 0;
+    if (result && result.deleted > 0) {
+      folder[mediaType].count = 0;
+      if (result.mtime) {
+        folder[mediaType].mtime = result.mtime;
       }
+      removedCount = result.deleted;
     }
+
     return removedCount;
   }
 
@@ -72,16 +66,22 @@ const OrganizerModel = (function () {
     }
 
     const folder = folders[folderIndex];
-    
+
     try {
       const clearPromises = [];
 
-      if (type === "ss" || type === "both") {
-        clearPromises.push(_clearMedia(folder, "ss", ENV.ORGANIZED_SCREENSHOTS_PATH));
+      const canClearSs = (type === "ss" || type === "both") && folder.ss;
+      if (canClearSs) {
+        clearPromises.push(
+          clearMedia(folder, "ss", ENV.ORGANIZED_SCREENSHOTS_PATH)
+        );
       }
 
-      if (type === "sr" || type === "both") {
-        clearPromises.push(_clearMedia(folder, "sr", ENV.ORGANIZED_RECORDINGS_PATH));
+      const canClearSr = (type === "sr" || type === "both") && folder.sr;
+      if (canClearSr) {
+        clearPromises.push(
+          clearMedia(folder, "sr", ENV.ORGANIZED_RECORDINGS_PATH)
+        );
       }
 
       const removedCounts = await Promise.all(clearPromises);

@@ -16,7 +16,6 @@ const AppMonitor = (() => {
   };
 
   const isEmpty = array => !array || array.length === 0;
-
   const shouldSkipRename = (oldName, newName) => oldName === newName;
 
   async function pathExists(fullPath) {
@@ -39,6 +38,10 @@ const AppMonitor = (() => {
     );
   }
 
+  function createRenameResult() {
+    return { attempted: false, success: false, timestamp: null };
+  }
+
   async function renameFolderAndLog(
     folder,
     oldName,
@@ -47,7 +50,7 @@ const AppMonitor = (() => {
     basePath,
     timestampKey
   ) {
-    const result = { attempted: false, success: false, timestamp: null };
+    const result = createRenameResult();
     const fullPath = `${basePath}/${oldName}`;
 
     if (!(await pathExists(fullPath))) {
@@ -105,16 +108,18 @@ const AppMonitor = (() => {
     ]);
   }
 
-  function notifyRenameResult(appName, results) {
-    const [screenshotResult, recordingResult] = results;
-    const successfullyRenamed =
-      screenshotResult.success || recordingResult.success;
-    const attemptedRename =
-      screenshotResult.attempted || recordingResult.attempted;
+  function hasSuccessfulRename(results) {
+    return results.some(result => result.success);
+  }
 
-    if (successfullyRenamed) {
+  function hasAttemptedRename(results) {
+    return results.some(result => result.attempted);
+  }
+
+  function notifyRenameResult(appName, results) {
+    if (hasSuccessfulRename(results)) {
       Toast.success(`Pasta(s) do app '${appName}' foram atualizadas.`);
-    } else if (attemptedRename) {
+    } else if (hasAttemptedRename(results)) {
       Toast.error(`Falha ao renomear pasta(s) para '${appName}'.`);
     }
   }
@@ -139,24 +144,86 @@ const AppMonitor = (() => {
     };
   }
 
+  function extractFolderName(item) {
+    if (typeof item !== "string") {
+      return item.name;
+    }
+
+    const commaIndex = item.indexOf(",");
+    if (commaIndex !== -1) {
+      return item.slice(0, commaIndex);
+    }
+
+    return item;
+  }
+
   function getUniqueFolderNames({ screenshotFolders, recordingFolders }) {
-    const extractFolderName = item => {
-      if (typeof item === "string" && item.includes(",")) {
-        return item.split(",")[0];
-      }
-      return typeof item === "string" ? item : item.name;
-    };
-    const allFolders = [...screenshotFolders, ...recordingFolders];
-    const folderNames = allFolders.map(extractFolderName);
-    return [...new Set(folderNames)];
+    const uniqueNames = new Set();
+
+    for (const folder of screenshotFolders) {
+      uniqueNames.add(extractFolderName(folder));
+    }
+
+    for (const folder of recordingFolders) {
+      uniqueNames.add(extractFolderName(folder));
+    }
+
+    return Array.from(uniqueNames);
   }
 
   function createPackageMap(apps) {
-    return new Map(apps.map(app => [app.pkg, app]));
+    const map = new Map();
+    for (const app of apps) {
+      map.set(app.pkg, app);
+    }
+    return map;
+  }
+
+  function shouldProcessFolder(folderName, packageMap) {
+    return packageMap.has(folderName);
+  }
+
+  function updateFolderTimestamps(folder, screenshotResult, recordingResult) {
+    const updated = { ...folder };
+
+    if (screenshotResult.timestamp && updated.ss) {
+      updated.ss.mtime = screenshotResult.timestamp;
+    }
+
+    if (recordingResult.timestamp && updated.sr) {
+      updated.sr.mtime = recordingResult.timestamp;
+    }
+
+    return updated;
+  }
+
+  function updateFoldersState(
+    oldName,
+    newName,
+    screenshotResult,
+    recordingResult
+  ) {
+    const folders = AppState.getFolders();
+    const folderIndex = folders.findIndex(folder => folder.name === oldName);
+
+    if (folderIndex === -1) {
+      return;
+    }
+
+    const updatedFolder = updateFolderTimestamps(
+      { ...folders[folderIndex], name: newName },
+      screenshotResult,
+      recordingResult
+    );
+
+    const updatedFolders = [...folders];
+    updatedFolders[folderIndex] = updatedFolder;
+
+    AppState.setFolders(updatedFolders);
   }
 
   async function processFolder(folderName, packageMap) {
-    if (!packageMap.has(folderName)) {
+    if (!shouldProcessFolder(folderName, packageMap)) {
       return;
     }
 
@@ -169,7 +236,6 @@ const AppMonitor = (() => {
     }
 
     const results = await renameMediaFolders(oldName, newName);
-
     const [screenshotResult, recordingResult] = results;
 
     if (screenshotResult.success || recordingResult.success) {
@@ -177,34 +243,6 @@ const AppMonitor = (() => {
     }
 
     notifyRenameResult(newName, results);
-  }
-
-  function updateFoldersState(
-    oldName,
-    newName,
-    screenshotResult,
-    recordingResult
-  ) {
-    const folders = AppState.getFolders();
-
-    const updatedFolders = folders.map(folder => {
-      if (folder.name === oldName) {
-        const updatedFolder = { ...folder, name: newName };
-
-        if (screenshotResult.timestamp) {
-          updatedFolder.ss.mtime = screenshotResult.timestamp;
-        }
-
-        if (recordingResult.timestamp) {
-          updatedFolder.sr.mtime = recordingResult.timestamp;
-        }
-
-        return updatedFolder;
-      }
-      return folder;
-    });
-
-    AppState.setFolders(updatedFolders);
   }
 
   async function renameFoldersForNewApps(newApps) {
@@ -218,9 +256,7 @@ const AppMonitor = (() => {
 
     try {
       const mediaFolders = await fetchMediaFolders();
-
       const diskFolderNames = getUniqueFolderNames(mediaFolders);
-
       const packageMap = createPackageMap(newApps);
 
       await Promise.all(
@@ -238,8 +274,16 @@ const AppMonitor = (() => {
     }
   }
 
+  function createPackageSet(apps) {
+    const packages = new Set();
+    for (const app of apps) {
+      packages.add(app.pkg);
+    }
+    return packages;
+  }
+
   function filterNewApps(newApps, existingApps) {
-    const existingPackages = new Set(existingApps.map(app => app.pkg));
+    const existingPackages = createPackageSet(existingApps);
     return newApps.filter(app => !existingPackages.has(app.pkg));
   }
 
@@ -300,7 +344,7 @@ const AppMonitor = (() => {
   }
 
   function identifyNewPackages(allPackages, existingApps) {
-    const existingPackages = new Set(existingApps.map(app => app.pkg));
+    const existingPackages = createPackageSet(existingApps);
     return allPackages.filter(pkg => !existingPackages.has(pkg));
   }
 
@@ -337,9 +381,7 @@ const AppMonitor = (() => {
 
     try {
       const allPackages = await fetchAllPackages();
-
       const currentHash = await generatePackagesHash(allPackages);
-
       const monitorData = AppState.getMonitorData();
       const lastHash = monitorData[CONFIG.HASH_KEY];
 

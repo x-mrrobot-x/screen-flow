@@ -58,9 +58,18 @@ const OrganizerController = (function () {
         OrganizerConfig.SELECTORS.folderActionsPopup
       );
       const folderId = popup.dataset.folderId;
-      
 
       if (action === "clear") {
+        const folders = OrganizerModel.getFolders();
+        const folder = folders.find(f => f.id === folderId);
+
+        if (!folder) {
+          Toast.error("Pasta não encontrada.");
+          popup.remove();
+          currentPopupMenu = null;
+          return;
+        }
+
         const activeFilter = OrganizerModel.getState().activeFilter;
         const type =
           activeFilter === "all"
@@ -69,7 +78,9 @@ const OrganizerController = (function () {
             ? "ss"
             : "sr";
 
-        const folderCard = document.querySelector(`[data-folder-id="${folderId}"]`);
+        const folderCard = document.querySelector(
+          `[data-folder-id="${folderId}"]`
+        );
 
         if (folderCard) {
           folderCard.style.opacity = "0.2";
@@ -77,9 +88,10 @@ const OrganizerController = (function () {
         }
 
         try {
-          const removedCount = await OrganizerModel.clearFolderContents(folderId, type);
-          const folders = OrganizerModel.getFolders();
-          const folder = folders.find(f => f.id === folderId);
+          const removedCount = await OrganizerModel.clearFolderContents(
+            folderId,
+            type
+          );
           const folderName = folder ? folder.name : "Unknown";
 
           if (removedCount > 0) {
@@ -98,9 +110,11 @@ const OrganizerController = (function () {
               } com sucesso!`
             );
           } else {
-            Toast.info("Nenhum arquivo foi removido.");
+            Toast.info(
+              "Nenhum arquivo foi removido ou a pasta já estava vazia."
+            );
           }
-          
+
           render();
         } catch (error) {
           Logger.error("Error clearing folder:", error);

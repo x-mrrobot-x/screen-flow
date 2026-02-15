@@ -178,25 +178,14 @@ delete_folder_contents() {
     return 1
   fi
 
-  # Conta todos os arquivos antes de apagar
-  initial_count=$(find "$folder_path" -maxdepth 1 -type f 2>/dev/null | wc -l)
-  initial_count=$(echo "$initial_count" | tr -d ' ')
+  initial_count=$(cd "$folder_path" && ls -1 2>/dev/null | wc -l)
   
-  # Apaga todos os arquivos no diretório (suprimindo a saída)
-  find "$folder_path" -maxdepth 1 -type f -delete >/dev/null 2>&1
+  rm "$folder_path"/* 2>/dev/null
   
-  # Conta arquivos restantes após apagar
-  remaining_count=$(find "$folder_path" -maxdepth 1 -type f 2>/dev/null | wc -l)
-  remaining_count=$(echo "$remaining_count" | tr -d ' ')
+  remaining_count=$(cd "$folder_path" && ls -1 2>/dev/null | wc -l)
   
   deleted_count=$((initial_count - remaining_count))
-  deleted_count=$(echo "$deleted_count" | tr -d ' ')
   
-  if [ -z "$deleted_count" ] || ! [ "$deleted_count" -ge 0 ] 2>/dev/null; then
-    deleted_count=0
-  fi
-
-  # Obtém o modification time da pasta
   folder_mtime=$(stat -c %Y "$folder_path" 2>/dev/null)
   
   json_response "true" "{\"deleted\": $deleted_count, \"mtime\": $folder_mtime}" "null"

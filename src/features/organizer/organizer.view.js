@@ -6,18 +6,21 @@ const OrganizerView = (function () {
 
   const templates = {
     organizerBadges: (item, activeFilter) => {
+      const ssCount = item.ss ? item.ss.count : 0;
+      const srCount = item.sr ? item.sr.count : 0;
+
       if (activeFilter === "all") {
         return `
           <div class="folder-badge">
-            ${Icons.get("image")} ${item.ss.count}
+            ${Icons.get("image")} ${ssCount}
           </div>
           <div class="folder-badge">
-            ${Icons.get("video")} ${item.sr.count}
+            ${Icons.get("video")} ${srCount}
           </div>
         `;
       }
       const mediaCount =
-        activeFilter === "recordings" ? item.sr.count : item.ss.count;
+        activeFilter === "recordings" ? srCount : ssCount;
       const mediaIcon = Icons.get(
         activeFilter === "recordings" ? "video" : "image"
       );
@@ -91,17 +94,11 @@ const OrganizerView = (function () {
 
   function getFilteredFolders(folders, activeFilter) {
     if (activeFilter === "all") {
-      return folders.filter(folder => 
-        folder.ss.count > 0 || folder.sr.count > 0
-      );
+      return folders.filter(folder => folder.ss || folder.sr);
     } else if (activeFilter === "screenshots") {
-      return folders.filter(folder => 
-        folder.ss.count > 0
-      );
+      return folders.filter(folder => folder.ss);
     } else if (activeFilter === "recordings") {
-      return folders.filter(folder => 
-        folder.sr.count > 0
-      );
+      return folders.filter(folder => folder.sr);
     } else {
       return folders; // fallback to all folders
     }
@@ -126,10 +123,10 @@ const OrganizerView = (function () {
       let mediaIcon = "";
       if (activeFilter === "all") {
         const totalScreenshots = filteredFolders.reduce(
-          (sum, f) => sum + f.ss.count,
+          (sum, f) => sum + (f.ss ? f.ss.count : 0),
           0
         );
-        const totalRecordings = filteredFolders.reduce((sum, f) => sum + f.sr.count, 0);
+        const totalRecordings = filteredFolders.reduce((sum, f) => sum + (f.sr ? f.sr.count : 0), 0);
         elements.mediaCounter.innerHTML = `
           <span style="display: flex; align-items: center; gap: 0.25rem;">${Icons.get(
             "folder"
@@ -140,10 +137,10 @@ const OrganizerView = (function () {
         `;
       } else {
         if (activeFilter === "recordings") {
-          totalMedia = filteredFolders.reduce((sum, f) => sum + f.sr.count, 0);
+          totalMedia = filteredFolders.reduce((sum, f) => sum + (f.sr ? f.sr.count : 0), 0);
           mediaIcon = Icons.get("video");
         } else {
-          totalMedia = filteredFolders.reduce((sum, f) => sum + f.ss.count, 0);
+          totalMedia = filteredFolders.reduce((sum, f) => sum + (f.ss ? f.ss.count : 0), 0);
           mediaIcon = Icons.get("image");
         }
         elements.mediaCounter.innerHTML = `
