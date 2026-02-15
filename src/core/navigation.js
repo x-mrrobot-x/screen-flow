@@ -3,7 +3,8 @@ const Navigation = (function () {
 
   const elements = {
     navButtons: DOM.qsa(".nav-button"),
-    tabContents: DOM.qsa(".tab-content")
+    tabContents: DOM.qsa(".tab-content"),
+    app: DOM.qs("#app")
   };
 
   function navigateTo(tabId) {
@@ -22,7 +23,7 @@ const Navigation = (function () {
       targetTab.style.display = "";
     }
 
-    window.scrollTo({ top: 0 });
+    elements.app.scrollTo({ top: 0 });
   }
 
   function attachListeners(callback) {
