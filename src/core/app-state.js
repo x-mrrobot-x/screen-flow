@@ -13,36 +13,32 @@ const AppState = (() => {
     STATE_CHANGED: "appstate:changed"
   };
 
-  let statsTimer = null;
-  let settingsTimer = null;
-
-  function clearPersistTimer(timer) {
-    if (timer) {
-      clearTimeout(timer);
-    }
-    return null;
-  }
+  const timers = {};
 
   function debouncedPersist(dataKey, data, delay) {
-    if (dataKey === "SETTINGS") {
-      settingsTimer = clearPersistTimer(settingsTimer);
-      settingsTimer = setTimeout(() => ENV.setData(dataKey, data), delay);
-    } else if (dataKey === "STATS") {
-      statsTimer = clearPersistTimer(statsTimer);
-      statsTimer = setTimeout(() => ENV.setData(dataKey, data), delay);
+    if (timers[dataKey]) {
+      clearTimeout(timers[dataKey]);
     }
+    timers[dataKey] = setTimeout(() => {
+      ENV.setData(dataKey, data);
+      delete timers[dataKey];
+    }, delay);
   }
 
   function persistImmediate(dataKey, data) {
+    if (timers[dataKey]) {
+      clearTimeout(timers[dataKey]);
+      delete timers[dataKey];
+    }
     ENV.setData(dataKey, data);
   }
 
   const persist = {
-    folders: () => persistImmediate("FOLDERS", folders),
+    folders: () => debouncedPersist("FOLDERS", folders, 1000),
     settings: () => debouncedPersist("SETTINGS", settings, 500),
     stats: () => debouncedPersist("STATS", stats, 500),
-    activities: () => persistImmediate("ACTIVITIES", activities),
-    apps: () => persistImmediate("APPS", apps),
+    activities: () => debouncedPersist("ACTIVITIES", activities, 1000),
+    apps: () => debouncedPersist("APPS", apps, 1000),
     monitor: () => persistImmediate("MONITOR", monitor)
   };
 
@@ -223,23 +219,12 @@ const AppState = (() => {
       persist.stats();
       emitChange("stats");
     },
-    updateLastOrganizer() {
-      stats = { ...stats, lastOrganizer: Date.now() };
-      persist.stats();
-      emitChange("stats");
-    },
-    updateLastCleanup() {
-      stats = { ...stats, lastCleanup: Date.now() };
-      persist.stats();
-      emitChange("stats");
-    },
 
     resetConfig() {
       settings = ENV.getDefault("SETTINGS");
       persist.settings();
       emitChange("settings");
     },
-
     deleteAll,
     getTopFoldersByType
   };

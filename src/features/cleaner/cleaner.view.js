@@ -10,7 +10,7 @@ const CleanerView = (function () {
   }
 
   function createCleanGroup(folder, mediaType, key, label) {
-    if (!folder[key] || !folder[key].cleaner.on) {
+    if (!folder[key]?.cleaner?.on) {
       return "";
     }
 
@@ -32,7 +32,7 @@ const CleanerView = (function () {
   function createSwitchContainer(folder, mediaType, key, label) {
     if (!folder[key]) return "";
 
-    const cleanerOn = folder[key].cleaner.on;
+    const cleanerOn = folder[key]?.cleaner?.on;
     return `
       <div class="clean-switch-container" data-action="toggleDayConfigVisibility" data-media-type="${mediaType}">
         <span class="switch-label">${label}</span>
@@ -68,8 +68,8 @@ const CleanerView = (function () {
 
       if (!screenshotsSwitch && !recordingsSwitch) return "";
 
-      const ssCleanerOn = folder.ss && folder.ss.cleaner.on;
-      const srCleanerOn = folder.sr && folder.sr.cleaner.on;
+      const ssCleanerOn = folder.ss?.cleaner?.on;
+      const srCleanerOn = folder.sr?.cleaner?.on;
       const isEnabled = ssCleanerOn || srCleanerOn;
 
       return `
@@ -104,10 +104,10 @@ const CleanerView = (function () {
   const render = {
     counts: (folders, autoCleaner) => {
       const screenshotsCount = folders.filter(
-        f => f.ss && f.ss.cleaner.on
+        f => f.ss?.cleaner?.on
       ).length;
       const recordingsCount = folders.filter(
-        f => f.sr && f.sr.cleaner.on
+        f => f.sr?.cleaner?.on
       ).length;
 
       if (autoCleaner) {

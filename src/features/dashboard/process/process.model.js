@@ -15,21 +15,11 @@ const ProcessModel = (function () {
 
     for (const identifier of packageNames) {
       const appName = identifierToAppNameMap[identifier] || identifier;
-      const sanitizedName = sanitizeFolderName(appName);
+      const sanitizedName = Utils.sanitizeFolderName(appName);
       resolvedMap[identifier] = sanitizedName;
     }
 
     return resolvedMap;
-  }
-
-  function sanitizeFolderName(name) {
-    return name
-      .trim()
-      .replace(/:/g, "-")
-      .replace(/"/g, "")
-      .replace(/\$/g, "")
-      .replace(/`/g, "")
-      .replace(/\\/g, "-");
   }
 
   async function buildMoveCommands(
@@ -84,23 +74,23 @@ const ProcessModel = (function () {
   }
 
   async function loadCleanupRules() {
-    const folders = await ENV.getData("FOLDERS");
+    const folders = AppState.getFolders();
     const rules = {
       screenshots: [],
       recordings: []
     };
 
     folders.forEach(folder => {
-      if (folder.ss.cleaner.on) {
+      if (folder.ss?.cleaner?.on) {
         rules.screenshots.push({
           folder: folder.name,
-          days: folder.ss.cleaner.days
+          days: folder.ss?.cleaner?.days
         });
       }
-      if (folder.sr.cleaner.on) {
+      if (folder.sr?.cleaner?.on) {
         rules.recordings.push({
           folder: folder.name,
-          days: folder.sr.cleaner.days
+          days: folder.sr?.cleaner?.days
         });
       }
     });
@@ -215,8 +205,8 @@ const ProcessModel = (function () {
   }
 
   async function hasCleanerConfigs() {
-    const folders = await ENV.getData("FOLDERS");
-    return folders.some(folder => folder.ss.cleaner.on || folder.sr.cleaner.on);
+    const folders = AppState.getFolders();
+    return folders.some(folder => folder.ss?.cleaner?.on || folder.sr?.cleaner?.on);
   }
 
   return {

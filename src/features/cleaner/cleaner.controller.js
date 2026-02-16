@@ -3,11 +3,13 @@ const CleanerController = (function () {
 
   let isInitialized = false;
 
-  function render() {
+  function renderUI() {
     const folders = CleanerModel.getFolders();
     const state = CleanerModel.getState();
     CleanerView.render.cleaner(folders, state.autoCleaner);
   }
+
+  const debouncedRender = Utils.debounce(renderUI, 100);
 
   const handlers = {
     handleEvent: e => {
@@ -27,25 +29,23 @@ const CleanerController = (function () {
       switch (action) {
         case "toggleFolderClean":
           CleanerModel.toggleFolderClean(folderId, mediaType);
-          render();
+          renderUI();
           break;
         case "setFolderDays":
           const days = parseInt(actionBtn.getAttribute("data-days"));
           CleanerModel.setFolderDays(folderId, mediaType, days);
-          render();
+          renderUI();
           break;
       }
     },
     toggleAutoCleaner: () => {
       CleanerModel.toggleAutoCleaner();
-      render();
+      renderUI();
     },
     onStateChange: data => {
-      if (!data || !data.key) return;
-
       const relevantKeys = ["settings", "folders"];
       if (relevantKeys.includes(data.key)) {
-        render();
+        debouncedRender();
       }
     }
   };
@@ -69,7 +69,7 @@ const CleanerController = (function () {
   function init() {
     if (isInitialized) return;
     CleanerView.init(CleanerConfig.SELECTORS.CONTAINER);
-    render();
+    renderUI();
     updateSwitchState();
     attachEventListeners();
     isInitialized = true;

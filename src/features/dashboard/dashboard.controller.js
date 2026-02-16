@@ -3,14 +3,17 @@ const DashboardController = (function () {
 
   let isInitialized = false;
 
-  function refreshUI() {
+  function updateUI() {
     const data = DashboardModel.getState();
     DashboardView.update(data);
   }
 
+  const debouncedUpdateUI = Utils.debounce(updateUI, 100);
+
   function refresh(data) {
-    if (data && data.key === "stats") {
-      refreshUI();
+    const keysToRefresh = ["stats", "folders"];
+    if (keysToRefresh.includes(data.key)) {
+      debouncedUpdateUI();
     }
   }
 
@@ -41,7 +44,7 @@ const DashboardController = (function () {
     }
 
     DashboardView.init();
-    refreshUI();
+    updateUI();
     loadStats();
     attachEventListeners();
     isInitialized = true;

@@ -30,6 +30,8 @@ const StatsController = (function () {
     StatsView.render.foldersChart(data);
   }
 
+  const debouncedRefresh = Utils.debounce(refresh, 100);
+
   const handlers = {
     onMediaTypeChange: e => {
       const button = e.target.closest(".media-type-button");
@@ -51,7 +53,7 @@ const StatsController = (function () {
           break;
         }
         case "stats": {
-          refresh();
+          debouncedRefresh();
           break;
         }
       }

@@ -170,6 +170,31 @@ EOF
     json_response "true" "[$json_array]" "null"
 }
 
+delete_files_batch() {
+    files_json="$1"
+    
+    # Remove colchetes e aspas para processar a lista
+    file_list=$(echo "$files_json" | tr -d '[]"' | tr ',' '\n')
+    
+    deleted_count=0
+    
+    while IFS= read -r file_path; do
+        # Remove espaços em branco e escapes
+        clean_path=$(echo "$file_path" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//;s/\\\\/\\/g')
+        
+        if [ -n "$clean_path" ] && [ -f "$clean_path" ]; then
+            rm "$clean_path" 2>/dev/null
+            if [ $? -eq 0 ]; then
+                deleted_count=$((deleted_count + 1))
+            fi
+        fi
+    done << EOF
+$file_list
+EOF
+
+    json_response "true" "{\"deleted\": $deleted_count}" "null"
+}
+
 delete_folder_contents() {
   folder_path="$1"
 

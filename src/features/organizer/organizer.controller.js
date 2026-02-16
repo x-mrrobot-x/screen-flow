@@ -3,7 +3,7 @@ const OrganizerController = (function () {
 
   let isInitialized = false;
 
-  function render() {
+  function renderUI() {
     const folders = OrganizerModel.getFolders();
     const state = OrganizerModel.getState();
     OrganizerView.render.folders(folders, state.activeFilter);
@@ -11,17 +11,23 @@ const OrganizerController = (function () {
     OrganizerView.render.filters(state.activeFilter);
   }
 
+  const debouncedRender = Utils.debounce(renderUI, 100);
+
+  const debouncedSearch = Utils.debounce((value) => {
+    OrganizerModel.setSearchTerm(value);
+    renderUI();
+  }, 300);
+
   let currentPopupMenu = null;
 
   const handlers = {
     onSearch: e => {
-      OrganizerModel.setSearchTerm(e.target.value);
-      render();
+      debouncedSearch(e.target.value);
     },
     onFilterClick: e => {
       const filter = e.target.closest("[data-filter]").dataset.filter;
       OrganizerModel.setFilter(filter);
-      render();
+      renderUI();
     },
     onCardClick: e => {
       const folderCard = e.target.closest(OrganizerConfig.SELECTORS.folderCard);
@@ -104,6 +110,8 @@ const OrganizerController = (function () {
               timestamp: Date.now()
             });
 
+            AppState.incrementStat("cleanedFiles", removedCount);
+            
             Toast.success(
               `${removedCount} ${
                 removedCount > 1 ? "itens removidos" : "item removido"
@@ -115,7 +123,7 @@ const OrganizerController = (function () {
             );
           }
 
-          render();
+          renderUI();
         } catch (error) {
           Logger.error("Error clearing folder:", error);
           Toast.error("Erro ao limpar a pasta. Tente novamente.");
@@ -138,7 +146,7 @@ const OrganizerController = (function () {
     onStateChange: data => {
       if (data && data.key === "folders") {
         Logger.info("Organizer: Folders updated, re-rendering...");
-        render();
+        debouncedRender();
       }
     }
   };
@@ -162,7 +170,7 @@ const OrganizerController = (function () {
   function init() {
     if (isInitialized) return;
     OrganizerView.init(OrganizerConfig.SELECTORS.CONTAINER);
-    render();
+    renderUI();
     attachEventListeners();
     isInitialized = true;
   }
