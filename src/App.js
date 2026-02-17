@@ -5,8 +5,8 @@ const App = (function() {
     
     try {
       // 1. Initialize Core Services
-      Icons.init();
       Logger.init();
+      Icons.init();
       EventBus.init();
       TaskQueue.init();
       await AppState.init();

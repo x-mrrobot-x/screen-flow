@@ -4,31 +4,51 @@ const Icons = (function () {
     toReplace: DOM.qsa("[data-icon]")
   };
 
-  const buildAttrs = attrs =>
+  const SPRITE_CONTAINER_ID = "icon-sprites";
+  const ICON_PREFIX = "icon-";
+
+  const buildAttrString = attrs =>
     Object.entries(attrs)
       .map(([key, value]) => `${key}="${value}"`)
       .join(" ");
 
-  const buildSvg = (content, attrs = {}) => {
-    const attrString = buildAttrs(attrs);
-    return `<svg ${attrString}>${content}</svg>`;
+  const createSymbol = (name, content) => {
+    const isFontAwesome = ICON_FONTAWESOME_LIST.has(name);
+    const viewBox = isFontAwesome
+      ? ICON_FONTAWESOME_ATTRS.viewBox
+      : ICON_DEFAULT_ATTRS.viewBox;
+
+    return `<symbol id="${ICON_PREFIX}${name}" viewBox="${viewBox}">${content}</symbol>`;
+  };
+
+  const injectSprites = () => {
+    const symbols = Object.entries(ICON_SVGS)
+      .map(([name, content]) => createSymbol(name, content))
+      .join("");
+
+    const spriteContainer = document.createElement("div");
+    spriteContainer.id = SPRITE_CONTAINER_ID;
+    spriteContainer.style.display = "none";
+    spriteContainer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg">${symbols}</svg>`;
+
+    document.body.prepend(spriteContainer);
   };
 
   const getIcon = (name, attrs = {}) => {
-    const content = ICON_SVGS[name];
-
-    if (!content) {
+    if (!ICON_SVGS[name]) {
       Logger.warn(`[Icons]: Icon "${name}" not found`);
       return "";
     }
 
-    const baseAttrs = ICON_FONTAWESOME_LIST.has(name)
+    const isFontAwesome = ICON_FONTAWESOME_LIST.has(name);
+    const baseAttrs = isFontAwesome
       ? ICON_FONTAWESOME_ATTRS
       : ICON_DEFAULT_ATTRS;
 
     const mergedAttrs = { ...baseAttrs, ...attrs };
+    const attrString = buildAttrString(mergedAttrs);
 
-    return buildSvg(content, mergedAttrs);
+    return `<svg ${attrString}><use href="#${ICON_PREFIX}${name}"/></svg>`;
   };
 
   const getFolderIcon = (item, attrs = {}) => {
@@ -39,7 +59,9 @@ const Icons = (function () {
   };
 
   const replace = () => {
-    elements.toReplace.forEach(el => {
+    const nodes = document.querySelectorAll("[data-icon]");
+
+    nodes.forEach(el => {
       const name = el.getAttribute("data-icon");
       if (!name) return;
 
@@ -69,6 +91,7 @@ const Icons = (function () {
   };
 
   const init = () => {
+    injectSprites();
     replace();
     attachErrorHandler();
     elements.app.classList.remove("loading");
