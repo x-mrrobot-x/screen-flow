@@ -34,7 +34,7 @@ const Icons = (function () {
     document.body.prepend(spriteContainer);
   };
 
-  const getIcon = (name, attrs = {}) => {
+  const getSvg = (name, attrs = {}) => {
     if (!ICON_SVGS[name]) {
       Logger.warn(`[Icons]: Icon "${name}" not found`);
       return "";
@@ -51,11 +51,11 @@ const Icons = (function () {
     return `<svg ${attrString}><use href="#${ICON_PREFIX}${name}"/></svg>`;
   };
 
-  const getFolderIcon = (item, attrs = {}) => {
+  const getAppIcon = (item, attrs = {}) => {
     const className = attrs.class ? ` ${attrs.class}` : "";
     const iconPath = ENV.resolveIconPath(item.pkg);
 
-    return `<img src="${iconPath}" alt="${item.name}" class="folder-icon${className}" />`;
+    return `<img src="${iconPath}" alt="${item.name}" class="folder-icon${className}" loading="lazy" decoding="async" />`;
   };
 
   const replace = () => {
@@ -65,7 +65,7 @@ const Icons = (function () {
       const name = el.getAttribute("data-icon");
       if (!name) return;
 
-      const icon = getIcon(name, { class: el.className });
+      const icon = getSvg(name, { class: el.className });
       if (icon) el.outerHTML = icon;
     });
   };
@@ -98,8 +98,8 @@ const Icons = (function () {
   };
 
   return {
-    get: getIcon,
-    getFolderIcon,
+    getSvg,
+    getAppIcon,
     init
   };
 })();

@@ -79,7 +79,7 @@ const CleanerView = (function () {
           folder.id
         }">
           <div class="folder-clean-header">
-            ${Icons.getFolderIcon(folder)}
+            ${Icons.getAppIcon(folder)}
             <span class="folder-clean-name truncate-text">${folder.name}</span>
             <div class="folder-clean-switches">
               ${screenshotsSwitch}

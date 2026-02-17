@@ -47,7 +47,7 @@ const ProcessView = (function () {
       const stepElement = document.createElement("div");
       stepElement.className = "step-item incomplete";
       stepElement.innerHTML = `
-        <div class="step-icon">${Icons.get("loader")}</div>
+        <div class="step-icon">${Icons.getSvg("loader")}</div>
         <span class="step-label">${step.label}</span>
       `;
       elements.stepsContainer.appendChild(stepElement);
@@ -63,10 +63,10 @@ const ProcessView = (function () {
 
     if (status === "completed") {
       stepElements[index].querySelector(".step-icon").innerHTML =
-        Icons.get("check");
+        Icons.getSvg("check");
     } else {
       stepElements[index].querySelector(".step-icon").innerHTML =
-        Icons.get("loader");
+        Icons.getSvg("loader");
     }
   }
 

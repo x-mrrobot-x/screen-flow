@@ -35,7 +35,7 @@ const StatsView = (function () {
     activityItem: activity => `
       <li class="activity-item">
         <div class="icon-box ${activity.class}">
-          ${Icons.get(activity.icon)}
+          ${Icons.getSvg(activity.icon)}
           <span>${activity.execution ? activity.execution : ""}</span>
         </div>
           
@@ -52,7 +52,7 @@ const StatsView = (function () {
     activityCard: activities => `
       <article class="activity-card animate-fade-in-up delay-7">
         <div class="card-header">
-          <div class="header-icon">${Icons.get("calendar")}</div>
+          <div class="header-icon">${Icons.getSvg("calendar")}</div>
           <h2 class="card-title">Atividade Recente</h2>
         </div>
         <ul class="activity-list">${templates.activityList(activities)}</ul>

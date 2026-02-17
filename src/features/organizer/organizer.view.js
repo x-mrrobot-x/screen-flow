@@ -12,16 +12,16 @@ const OrganizerView = (function () {
       if (activeFilter === "all") {
         return `
           <div class="folder-badge">
-            ${Icons.get("image")} ${ssCount}
+            ${Icons.getSvg("image")} ${ssCount}
           </div>
           <div class="folder-badge">
-            ${Icons.get("video")} ${srCount}
+            ${Icons.getSvg("video")} ${srCount}
           </div>
         `;
       }
       const mediaCount =
         activeFilter === "recordings" ? srCount : ssCount;
-      const mediaIcon = Icons.get(
+      const mediaIcon = Icons.getSvg(
         activeFilter === "recordings" ? "video" : "image"
       );
       const mediaType =
@@ -41,7 +41,7 @@ const OrganizerView = (function () {
             ${templates.organizerBadges(folder, activeFilter)}
           </div>
           <div class="folder-app-icon">
-            ${Icons.getFolderIcon(folder)}
+            ${Icons.getAppIcon(folder)}
           </div>
         </div>
         <div class="folder-bottom">
@@ -74,7 +74,7 @@ const OrganizerView = (function () {
       
       return `
         <div class="empty-state animate-fade-in delay-3">
-            <div class="empty-icon-wrapper">${Icons.get("folder")}</div>
+            <div class="empty-icon-wrapper">${Icons.getSvg("folder")}</div>
             <p class="empty-title">${title}</p>
             <p class="empty-subtitle">${subtitle}</p>
         </div>`;
@@ -128,23 +128,23 @@ const OrganizerView = (function () {
         );
         const totalRecordings = filteredFolders.reduce((sum, f) => sum + (f.sr ? f.sr.count : 0), 0);
         elements.mediaCounter.innerHTML = `
-          <span style="display: flex; align-items: center; gap: 0.25rem;">${Icons.get(
+          <span style="display: flex; align-items: center; gap: 0.25rem;">${Icons.getSvg(
             "folder"
           )} ${filteredFolders.length}</span>
-          <span style="display: flex; align-items: center; gap: 0.25rem;">${Icons.get(
+          <span style="display: flex; align-items: center; gap: 0.25rem;">${Icons.getSvg(
             "file"
           )} ${totalScreenshots + totalRecordings}</span>
         `;
       } else {
         if (activeFilter === "recordings") {
           totalMedia = filteredFolders.reduce((sum, f) => sum + (f.sr ? f.sr.count : 0), 0);
-          mediaIcon = Icons.get("video");
+          mediaIcon = Icons.getSvg("video");
         } else {
           totalMedia = filteredFolders.reduce((sum, f) => sum + (f.ss ? f.ss.count : 0), 0);
-          mediaIcon = Icons.get("image");
+          mediaIcon = Icons.getSvg("image");
         }
         elements.mediaCounter.innerHTML = `
-          <span style="display: flex; align-items: center; gap: 0.25rem;">${Icons.get(
+          <span style="display: flex; align-items: center; gap: 0.25rem;">${Icons.getSvg(
             "folder"
           )} ${filteredFolders.length}</span>
           <span style="display: flex; align-items: center; gap: 0.25rem;">${mediaIcon} ${totalMedia}</span>
