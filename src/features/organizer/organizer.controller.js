@@ -2,6 +2,7 @@ const OrganizerController = (function () {
   "use strict";
 
   let isInitialized = false;
+  let suppressNextRender = false;
 
   function renderUI() {
     const folders = OrganizerModel.getFolders();
@@ -9,6 +10,16 @@ const OrganizerController = (function () {
     OrganizerView.render.folders(folders, state.activeFilter);
     OrganizerView.render.mediaCounter(folders, state.activeFilter);
     OrganizerView.render.filters(state.activeFilter);
+  }
+
+  function updatePartial(folderId) {
+    const folders = OrganizerModel.getFolders();
+    const state = OrganizerModel.getState();
+    const folder = folders.find(f => f.id === folderId);
+    if (folder) {
+      OrganizerView.updateCard(folder, state.activeFilter);
+      OrganizerView.render.mediaCounter(folders, state.activeFilter);
+    }
   }
 
   const debouncedRender = Utils.debounce(renderUI, 100);
@@ -94,6 +105,7 @@ const OrganizerController = (function () {
         }
 
         try {
+          suppressNextRender = true;
           const removedCount = await OrganizerModel.clearFolderContents(
             folderId,
             type
@@ -123,11 +135,12 @@ const OrganizerController = (function () {
             );
           }
 
-          renderUI();
+          updatePartial(folderId);
         } catch (error) {
           Logger.error("Error clearing folder:", error);
           Toast.error("Erro ao limpar a pasta. Tente novamente.");
         } finally {
+          suppressNextRender = false;
           if (folderCard) {
             folderCard.style.opacity = "1";
             folderCard.style.pointerEvents = "auto";
@@ -144,8 +157,12 @@ const OrganizerController = (function () {
       }
     },
     onStateChange: data => {
-      if (data && data.key === "folders") {
-        Logger.info("Organizer: Folders updated, re-rendering...");
+      const relevantKeys = ["folders"];
+      if (relevantKeys.includes(data.key)) {
+        if (data.key === "folders" && suppressNextRender) {
+          return;
+        }
+        Logger.info(`Organizer: ${data.key} updated, re-rendering...`);
         debouncedRender();
       }
     }

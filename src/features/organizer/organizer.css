@@ -81,6 +81,12 @@
   color: hsl(var(--muted-foreground));
 }
 
+.media-counter span {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
 .media-counter svg {
   width: var(--icon-xs);
   height: var(--icon-xs);

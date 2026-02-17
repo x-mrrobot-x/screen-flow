@@ -32,7 +32,7 @@ const CleanerModel = (function() {
         const isEnabled = folder[key].cleaner.on;
 
         AppState.addActivity({
-          type: "auto-cleaner-folder-toggle",
+          type: "cleaner-folder-toggle",
           feature: `cleaner-folder-${actionType}`,
           folder: folder.name,
           enabled: isEnabled

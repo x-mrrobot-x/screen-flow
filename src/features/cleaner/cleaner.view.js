@@ -103,15 +103,19 @@ const CleanerView = (function () {
 
   const render = {
     counts: (folders, autoCleaner) => {
-      const screenshotsCount = folders.filter(
-        f => f.ss?.cleaner?.on
-      ).length;
-      const recordingsCount = folders.filter(
-        f => f.sr?.cleaner?.on
-      ).length;
+      const screenshotsCount = folders.filter(f => f.ss?.cleaner?.on).length;
+      const recordingsCount = folders.filter(f => f.sr?.cleaner?.on).length;
 
       if (autoCleaner) {
-        elements.cleanerCountText.innerHTML = `<span class="subtitle-item"><span class="dot dot-screenshot"></span>${screenshotsCount} pastas com limpeza de capturas</span>, <span class="subtitle-item"><span class="dot dot-recording"></span>${recordingsCount} com limpeza de gravações</span>`;
+        elements.cleanerCountText.innerHTML = `<div class="subtitle-item">
+            <span class="dot dot-screenshot"></span>
+            <span>${screenshotsCount} pastas com limpeza de capturas</span>
+          </div>
+            
+          <div class="subtitle-item">
+            <span class="dot dot-recording"></span>
+            <span>${recordingsCount} com limpeza de gravações</span>
+          </div>`;
       } else {
         elements.cleanerCountText.textContent = "Limpe pastas automaticamente";
       }
@@ -131,6 +135,17 @@ const CleanerView = (function () {
     }
   };
 
+  function updateCard(folder) {
+    if (!folder) return;
+    const card = elements.folderCleanList.querySelector(
+      `.folder-clean-card[data-folder-id="${folder.id}"]`
+    );
+    if (card) {
+      const newHtml = templates.folderCard(folder, 0);
+      card.outerHTML = newHtml;
+    }
+  }
+
   function init(containerSelector) {
     container = DOM.qs(containerSelector);
     if (!container) throw new Error(`Container ${containerSelector} not found`);
@@ -149,6 +164,7 @@ const CleanerView = (function () {
 
   return {
     init,
-    render
+    render,
+    updateCard
   };
 })();

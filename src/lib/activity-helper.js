@@ -64,7 +64,7 @@ const ActivityHelper = (() => {
         return data.feature.includes("cleaner") ? "icon-purple" : "icon-green";
       }
     },
-    "auto-cleaner-folder-toggle": {
+    "cleaner-folder-toggle": {
       icon: "toggle-right",
       class: "icon-blue",
       getTitle: data =>
@@ -73,7 +73,7 @@ const ActivityHelper = (() => {
         const mediaType = data.feature.includes("screenshots")
           ? "capturas de tela"
           : "gravações de tela";
-        return `Limpeza automática de ${mediaType} na pasta "${
+        return `Limpeza de ${mediaType} na pasta "${
           data.folder
         }" foi ${data.enabled ? "ativada" : "desativada"}.`;
       },

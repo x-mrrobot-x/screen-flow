@@ -19,8 +19,7 @@ const OrganizerView = (function () {
           </div>
         `;
       }
-      const mediaCount =
-        activeFilter === "recordings" ? srCount : ssCount;
+      const mediaCount = activeFilter === "recordings" ? srCount : ssCount;
       const mediaIcon = Icons.getSvg(
         activeFilter === "recordings" ? "video" : "image"
       );
@@ -55,8 +54,8 @@ const OrganizerView = (function () {
       </div>`,
     emptyState: activeFilter => {
       let title, subtitle;
-      
-      switch(activeFilter) {
+
+      switch (activeFilter) {
         case "screenshots":
           title = "Nenhuma pasta de capturas";
           subtitle = "Não há pastas com capturas de tela para exibir.";
@@ -68,10 +67,11 @@ const OrganizerView = (function () {
         case "all":
         default:
           title = "Nenhuma pasta organizada";
-          subtitle = "Não há pastas organizadas para exibir. Os arquivos serão organizados automaticamente por aplicativo.";
+          subtitle =
+            "Não há pastas organizadas para exibir. Os arquivos serão organizados automaticamente por aplicativo.";
           break;
       }
-      
+
       return `
         <div class="empty-state animate-fade-in delay-3">
             <div class="empty-icon-wrapper">${Icons.getSvg("folder")}</div>
@@ -107,7 +107,7 @@ const OrganizerView = (function () {
   const render = {
     folders: (folders, activeFilter) => {
       const filteredFolders = getFilteredFolders(folders, activeFilter);
-      
+
       if (filteredFolders.length > 0) {
         elements.foldersGrid.innerHTML = filteredFolders
           .map((f, i) => templates.folderCard(f, i, activeFilter))
@@ -118,7 +118,7 @@ const OrganizerView = (function () {
     },
     mediaCounter: (folders, activeFilter) => {
       const filteredFolders = getFilteredFolders(folders, activeFilter);
-      
+
       let totalMedia = 0;
       let mediaIcon = "";
       if (activeFilter === "all") {
@@ -126,28 +126,37 @@ const OrganizerView = (function () {
           (sum, f) => sum + (f.ss ? f.ss.count : 0),
           0
         );
-        const totalRecordings = filteredFolders.reduce((sum, f) => sum + (f.sr ? f.sr.count : 0), 0);
+        const totalRecordings = filteredFolders.reduce(
+          (sum, f) => sum + (f.sr ? f.sr.count : 0),
+          0
+        );
         elements.mediaCounter.innerHTML = `
-          <span style="display: flex; align-items: center; gap: 0.25rem;">${Icons.getSvg(
+          <span>${Icons.getSvg(
             "folder"
           )} ${filteredFolders.length}</span>
-          <span style="display: flex; align-items: center; gap: 0.25rem;">${Icons.getSvg(
+          <span>${Icons.getSvg(
             "file"
           )} ${totalScreenshots + totalRecordings}</span>
         `;
       } else {
         if (activeFilter === "recordings") {
-          totalMedia = filteredFolders.reduce((sum, f) => sum + (f.sr ? f.sr.count : 0), 0);
+          totalMedia = filteredFolders.reduce(
+            (sum, f) => sum + (f.sr ? f.sr.count : 0),
+            0
+          );
           mediaIcon = Icons.getSvg("video");
         } else {
-          totalMedia = filteredFolders.reduce((sum, f) => sum + (f.ss ? f.ss.count : 0), 0);
+          totalMedia = filteredFolders.reduce(
+            (sum, f) => sum + (f.ss ? f.ss.count : 0),
+            0
+          );
           mediaIcon = Icons.getSvg("image");
         }
         elements.mediaCounter.innerHTML = `
-          <span style="display: flex; align-items: center; gap: 0.25rem;">${Icons.getSvg(
+          <span>${Icons.getSvg(
             "folder"
           )} ${filteredFolders.length}</span>
-          <span style="display: flex; align-items: center; gap: 0.25rem;">${mediaIcon} ${totalMedia}</span>
+          <span>${mediaIcon} ${totalMedia}</span>
         `;
       }
     },
@@ -158,6 +167,17 @@ const OrganizerView = (function () {
       DOM.qs(`#filter-${activeFilter}`).classList.add("active", "glow");
     }
   };
+
+  function updateCard(folder, activeFilter) {
+    if (!folder) return;
+    const card = elements.foldersGrid.querySelector(
+      `.folder-card[data-folder-id="${folder.id}"]`
+    );
+    if (card) {
+      const newHtml = templates.folderCard(folder, 0, activeFilter);
+      card.outerHTML = newHtml;
+    }
+  }
 
   function showActionsMenu(folderId, folderCard) {
     const existingMenu = DOM.qs(
@@ -206,6 +226,7 @@ const OrganizerView = (function () {
   return {
     init,
     render,
+    updateCard,
     showActionsMenu
   };
 })();

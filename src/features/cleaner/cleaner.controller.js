@@ -2,11 +2,22 @@ const CleanerController = (function () {
   "use strict";
 
   let isInitialized = false;
+  let suppressNextRender = false;
 
   function renderUI() {
     const folders = CleanerModel.getFolders();
     const state = CleanerModel.getState();
     CleanerView.render.cleaner(folders, state.autoCleaner);
+  }
+
+  function updatePartial(folderId) {
+    const folders = CleanerModel.getFolders();
+    const state = CleanerModel.getState();
+    const folder = folders.find(f => f.id === folderId);
+    if (folder) {
+      CleanerView.updateCard(folder);
+      CleanerView.render.counts(folders, state.autoCleaner);
+    }
   }
 
   const debouncedRender = Utils.debounce(renderUI, 100);
@@ -28,13 +39,17 @@ const CleanerController = (function () {
 
       switch (action) {
         case "toggleFolderClean":
+          suppressNextRender = true;
           CleanerModel.toggleFolderClean(folderId, mediaType);
-          renderUI();
+          updatePartial(folderId);
+          suppressNextRender = false;
           break;
         case "setFolderDays":
+          suppressNextRender = true;
           const days = parseInt(actionBtn.getAttribute("data-days"));
           CleanerModel.setFolderDays(folderId, mediaType, days);
-          renderUI();
+          updatePartial(folderId);
+          suppressNextRender = false;
           break;
       }
     },
@@ -45,6 +60,9 @@ const CleanerController = (function () {
     onStateChange: data => {
       const relevantKeys = ["settings", "folders"];
       if (relevantKeys.includes(data.key)) {
+        if (data.key === "folders" && suppressNextRender) {
+          return;
+        }
         debouncedRender();
       }
     }

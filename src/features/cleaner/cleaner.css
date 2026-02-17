@@ -141,25 +141,24 @@
   color: hsl(var(--muted-foreground));
 }
 
-/* Styles for colored dots in subtitle */
 .subtitle-item {
-  display: inline-flex;
+  display: flex;
   align-items: center;
 }
 
 .dot {
   display: inline-block;
-  width: 8px;
-  height: 8px;
+  width: .6rem;
+  height: .6rem;
   border-radius: 50%;
-  margin-right: 6px;
+  margin-right: var(--space-xxs);
   vertical-align: middle;
 }
 
 .dot-screenshot {
-  background-color: hsl(var(--ring));
+  background-color: hsla(var(--primary) / 0.6);
 }
 
 .dot-recording {
-  background-color: hsl(var(--accent));
+  background-color: hsla(var(--accent) / 0.6);
 }
