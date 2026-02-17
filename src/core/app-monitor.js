@@ -1,6 +1,5 @@
 const AppMonitor = (() => {
   const CONFIG = {
-    HASH_KEY: "apps_hash",
     MEDIA_TYPES: {
       SCREENSHOTS: {
         name: "screenshots",
@@ -324,25 +323,6 @@ const AppMonitor = (() => {
     }
   }
 
-  async function fetchAllPackages() {
-    const packages = await TaskQueue.add("get_all_app_packages", {}, "app");
-
-    if (!packages) {
-      throw new Error("A lista de pacotes retornada pelo Tasker é nula.");
-    }
-
-    return packages;
-  }
-
-  async function generatePackagesHash(packages) {
-    const listAsString = packages.sort().join(",");
-    return await Utils.generateHash(listAsString);
-  }
-
-  function hasChanges(currentHash, lastHash) {
-    return currentHash !== lastHash;
-  }
-
   function identifyNewPackages(allPackages, existingApps) {
     const existingPackages = createPackageSet(existingApps);
     return allPackages.filter(pkg => !existingPackages.has(pkg));
@@ -370,25 +350,19 @@ const AppMonitor = (() => {
     await updateAppsData(appDetails);
   }
 
-  function saveCurrentHash(hash) {
-    AppState.setMonitorData({ [CONFIG.HASH_KEY]: hash });
-  }
-
   async function loadInstalledApps() {
-    Logger.debug(
-      "[AppMonitor] Iniciando verificação de novos aplicativos instalados."
-    );
+    Logger.debug("[AppMonitor] Iniciando verificação de novos aplicativos");
 
     try {
-      const allPackages = await fetchAllPackages();
-      const currentHash = await generatePackagesHash(allPackages);
-      const monitorData = AppState.getMonitorData();
-      const lastHash = monitorData[CONFIG.HASH_KEY];
+      const appsPath = ENV.getFilePath("APPS");
+      const result = await TaskQueue.add(
+        "check_installed_apps",
+        { appsPath: appsPath },
+        "app"
+      );
 
-      if (!hasChanges(currentHash, lastHash)) {
-        Logger.debug(
-          "[AppMonitor] Nenhum aplicativo novo detectado (hash correspondente)."
-        );
+      if (!result?.changed) {
+        Logger.debug("[AppMonitor] Nenhum aplicativo novo detectado.");
         return;
       }
 
@@ -397,9 +371,7 @@ const AppMonitor = (() => {
       );
 
       const existingApps = AppState.getApps();
-      await processNewPackages(allPackages, existingApps);
-
-      saveCurrentHash(currentHash);
+      await processNewPackages(result.packages, existingApps);
     } catch (error) {
       Logger.error(
         "[AppMonitor] Falha ao sincronizar a lista de aplicativos:",

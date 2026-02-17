@@ -49,11 +49,6 @@ const TaskQueue = (function () {
 
       task.monitorInterval = monitorInterval;
 
-      // Logger.debug(
-      //   `[TaskQueue] Running task ${task.id}: ${task.action}`,
-      //   task.params
-      // );
-
       const taskerParams = {
         id: task.id,
         action: task.action,

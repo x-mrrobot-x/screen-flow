@@ -6,7 +6,6 @@ const AppState = (() => {
   let activities = [];
   let folders = [];
   let apps = [];
-  let monitor = {};
   let isReady = false;
 
   const EVENTS = {
@@ -25,21 +24,12 @@ const AppState = (() => {
     }, delay);
   }
 
-  function persistImmediate(dataKey, data) {
-    if (timers[dataKey]) {
-      clearTimeout(timers[dataKey]);
-      delete timers[dataKey];
-    }
-    ENV.setData(dataKey, data);
-  }
-
   const persist = {
     folders: () => debouncedPersist("FOLDERS", folders, 1000),
     settings: () => debouncedPersist("SETTINGS", settings, 500),
     stats: () => debouncedPersist("STATS", stats, 500),
     activities: () => debouncedPersist("ACTIVITIES", activities, 1000),
-    apps: () => debouncedPersist("APPS", apps, 1000),
-    monitor: () => persistImmediate("MONITOR", monitor)
+    apps: () => debouncedPersist("APPS", apps, 1000)
   };
 
   function emitChange(key) {
@@ -52,8 +42,7 @@ const AppState = (() => {
       ENV.getData("STATS"),
       ENV.getData("FOLDERS"),
       ENV.getData("ACTIVITIES"),
-      ENV.getData("APPS"),
-      ENV.getData("MONITOR")
+      ENV.getData("APPS")
     ]);
   }
 
@@ -62,15 +51,13 @@ const AppState = (() => {
     statsData,
     foldersData,
     activitiesData,
-    appsData,
-    monitorData
+    appsData
   ]) {
     settings = settingsData;
     stats = statsData;
     folders = foldersData;
     activities = activitiesData;
     apps = appsData;
-    monitor = monitorData;
   }
 
   function markAsReady() {
@@ -117,7 +104,6 @@ const AppState = (() => {
     activities = ENV.getDefault("ACTIVITIES");
     settings = ENV.getDefault("SETTINGS");
     apps = ENV.getDefault("APPS");
-    monitor = ENV.getDefault("MONITOR");
   }
 
   function persistAll() {
@@ -126,18 +112,10 @@ const AppState = (() => {
     persist.activities();
     persist.settings();
     persist.apps();
-    persist.monitor();
   }
 
   function emitAllChanges() {
-    const keys = [
-      "stats",
-      "folders",
-      "activities",
-      "settings",
-      "apps",
-      "monitor"
-    ];
+    const keys = ["stats", "folders", "activities", "settings", "apps"];
     for (const key of keys) {
       emitChange(key);
     }
@@ -179,13 +157,6 @@ const AppState = (() => {
       apps = [...newApps];
       persist.apps();
       emitChange("apps");
-    },
-
-    getMonitorData: () => ({ ...monitor }),
-    setMonitorData(newData) {
-      monitor = { ...monitor, ...newData };
-      persist.monitor();
-      emitChange("monitor");
     },
 
     getSettings: () => ({ ...settings }),

@@ -71,18 +71,6 @@ const ENV = (() => {
         path: "src/data/apps.json",
         default: []
       }
-    },
-    MONITOR: {
-      web: {
-        type: "localStorage",
-        key: "monitor",
-        default: {}
-      },
-      tasker: {
-        type: "file",
-        path: "src/data/monitor.json",
-        default: {}
-      }
     }
   };
 
@@ -210,6 +198,10 @@ const ENV = (() => {
       return true;
     }
 
+    function getFilePath() {
+      return "";
+    }
+
     return {
       WORK_DIR,
       isWeb: true,
@@ -221,6 +213,7 @@ const ENV = (() => {
       runTask,
       cancelProcess,
       isTaskRunning,
+      getFilePath,
       SOURCE_SCREENSHOTS_PATH,
       SOURCE_RECORDINGS_PATH,
       ORGANIZED_SCREENSHOTS_PATH,
@@ -243,7 +236,7 @@ const ENV = (() => {
       return `content://net.dinglisch.android.taskerm.iconprovider//app/${pkg}`;
     }
 
-    function getPath(key, params = {}) {
+    function getFilePath(key, params = {}) {
       const cfg = STORAGE_CONFIG[key].tasker;
       const relative = cfg.pathTemplate
         ? resolvePath(cfg.pathTemplate, params)
@@ -255,7 +248,7 @@ const ENV = (() => {
       try {
         const result = await execute({
           command: "read_file",
-          args: [getPath(key, params), JSON.stringify(getDefault(key))]
+          args: [getFilePath(key, params), JSON.stringify(getDefault(key))]
         });
         return result;
       } catch (e) {
@@ -268,7 +261,7 @@ const ENV = (() => {
       try {
         await execute({
           command: "write_file",
-          args: [getPath(key, params), JSON.stringify(data)]
+          args: [getFilePath(key, params), JSON.stringify(data)]
         });
         return true;
       } catch (e) {
@@ -358,6 +351,7 @@ const ENV = (() => {
       runTask,
       isTaskRunning,
       cancelProcess,
+      getFilePath,
       SOURCE_SCREENSHOTS_PATH,
       SOURCE_RECORDINGS_PATH,
       ORGANIZED_SCREENSHOTS_PATH,

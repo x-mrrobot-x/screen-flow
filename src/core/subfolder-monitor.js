@@ -213,7 +213,7 @@ const SubfolderMonitor = (function () {
     }
   }
 
-  function reconcileFolders(
+  function syncFolders(
     foldersInState,
     screenshotFolders,
     screenrecordingFolders
@@ -260,20 +260,16 @@ const SubfolderMonitor = (function () {
         processFolderType("screenrecordings", ENV.ORGANIZED_RECORDINGS_PATH)
       ]);
 
-      Logger.debug(
-        "[SubfolderMonitor] Verificações concluídas. Executando a reconciliação de estado."
-      );
-
       const foldersInState = AppState.getFolders();
 
       if (!foldersInState?.length) {
         Logger.debug(
-          "[SubfolderMonitor] Nenhuma pasta no estado para reconciliar."
+          "[SubfolderMonitor] Nenhuma pasta no state para sincronizar com o disco."
         );
         return;
       }
 
-      const { finalFolders, hasChanges } = reconcileFolders(
+      const { finalFolders, hasChanges } = syncFolders(
         foldersInState,
         screenshotFolders,
         screenrecordingFolders
@@ -281,12 +277,12 @@ const SubfolderMonitor = (function () {
 
       if (hasChanges) {
         Logger.info(
-          `[SubfolderMonitor] Reconciliação concluída. Pastas no estado: ${foldersInState.length} -> ${finalFolders.length}. Atualizando AppState.`
+          `[SubfolderMonitor] Sincronização concluída. Pastas sincronizadas: ${foldersInState.length} no state -> ${finalFolders.length} finais no disco.`
         );
         AppState.setFolders(finalFolders);
       } else {
         Logger.debug(
-          "[SubfolderMonitor] Nenhuma alteração de estado detectada na reconciliação."
+          "[SubfolderMonitor] Nenhuma divergência entre as pastas do state (folders) e as do disco."
         );
       }
     } catch (error) {
