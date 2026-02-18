@@ -32,8 +32,8 @@ const StatsView = (function () {
   }
 
   const templates = {
-    activityItem: activity => `
-      <li class="activity-item">
+    activityItem: (activity, index) => `
+      <li class="activity-item animate-fade-in-up" style="animation-delay: ${0.4 + index * 0.05}s">
         <div class="icon-box ${activity.class}">
           ${Icons.getSvg(activity.icon)}
           <span>${activity.execution ? activity.execution : ""}</span>
@@ -48,9 +48,9 @@ const StatsView = (function () {
         </div>
       </li>`,
     activityList: activities =>
-      activities.slice(0, 5).map(templates.activityItem).join(""),
+      activities.slice(0, 5).map((a, i) => templates.activityItem(a, i)).join(""),
     activityCard: activities => `
-      <article class="activity-card animate-fade-in-up delay-7">
+      <article class="activity-card animate-fade-in-up" style="animation-delay: 0.4s">
         <div class="card-header">
           <div class="header-icon">${Icons.getSvg("calendar")}</div>
           <h2 class="card-title">Atividade Recente</h2>

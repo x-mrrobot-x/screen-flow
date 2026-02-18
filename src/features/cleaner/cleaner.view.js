@@ -75,7 +75,7 @@ const CleanerView = (function () {
       return `
         <div class="folder-clean-card ${
           isEnabled ? "enabled" : ""
-        } animate-fade-in-left delay-${index % 10}" data-folder-id="${
+        } animate-fade-in-up" style="animation-delay: ${0.2 + index * 0.05}s" data-folder-id="${
           folder.id
         }">
           <div class="folder-clean-header">

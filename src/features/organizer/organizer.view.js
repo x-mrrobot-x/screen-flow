@@ -32,9 +32,7 @@ const OrganizerView = (function () {
       `;
     },
     folderCard: (folder, index, activeFilter) => `
-      <div class="folder-card animate-scale-in delay-${
-        index % 10
-      }" data-folder-id="${folder.id}">
+      <div class="folder-card animate-scale-in" style="animation-delay: ${0.3 + index * 0.05}s" data-folder-id="${folder.id}">
         <div class="folder-top">
           <div class="folder-badges">
             ${templates.organizerBadges(folder, activeFilter)}
@@ -73,7 +71,7 @@ const OrganizerView = (function () {
       }
 
       return `
-        <div class="empty-state animate-fade-in delay-3">
+        <div class="empty-state animate-fade-in" style="animation-delay: 0.3s">
             <div class="empty-icon-wrapper">${Icons.getSvg("folder")}</div>
             <p class="empty-title">${title}</p>
             <p class="empty-subtitle">${subtitle}</p>

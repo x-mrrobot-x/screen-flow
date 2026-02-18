@@ -21,6 +21,7 @@ const Navigation = (function () {
     if (targetTab) {
       targetTab.classList.add("active", "page-enter");
       targetTab.style.display = "";
+      EventBus.emit("navigation:changed", { tab: tabId });
     }
 
     elements.app.scrollTo({ top: 0 });

@@ -57,6 +57,11 @@ const StatsController = (function () {
           break;
         }
       }
+    },
+    onNavigationChange: data => {
+      if (data.tab === "stats") {
+        refresh();
+      }
     }
   };
 
@@ -68,6 +73,7 @@ const StatsController = (function () {
       btn.addEventListener("click", handlers.onMediaTypeChange);
     });
     EventBus.on("appstate:changed", handlers.onStateChange);
+    EventBus.on("navigation:changed", handlers.onNavigationChange);
   }
 
   return {
