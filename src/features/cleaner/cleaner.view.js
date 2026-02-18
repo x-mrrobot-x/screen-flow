@@ -75,9 +75,9 @@ const CleanerView = (function () {
       return `
         <div class="folder-clean-card ${
           isEnabled ? "enabled" : ""
-        } animate-fade-in-up" style="animation-delay: ${0.2 + index * 0.05}s" data-folder-id="${
-          folder.id
-        }">
+        } animate-fade-in-up" style="animation-delay: ${
+        0.2 + index * 0.05
+      }s" data-folder-id="${folder.id}">
           <div class="folder-clean-header">
             ${Icons.getAppIcon(folder)}
             <span class="folder-clean-name truncate-text">${folder.name}</span>
@@ -91,7 +91,12 @@ const CleanerView = (function () {
               ? `
             <div class="folder-clean-options">
               ${createCleanGroup(folder, "screenshots", "ss", "Capturas")}
-              ${createCleanGroup(folder, "screenrecordings", "sr", "Gravações")}
+              ${createCleanGroup(
+                folder,
+                "screenrecordings",
+                "sr",
+                "Gravações"
+              )}
             </div>
           `
               : ""
@@ -140,9 +145,51 @@ const CleanerView = (function () {
     const card = elements.folderCleanList.querySelector(
       `.folder-clean-card[data-folder-id="${folder.id}"]`
     );
-    if (card) {
-      const newHtml = templates.folderCard(folder, 0);
-      card.outerHTML = newHtml;
+    if (!card) return;
+
+    const ssCleanerOn = folder.ss?.cleaner?.on;
+    const srCleanerOn = folder.sr?.cleaner?.on;
+    const isEnabled = ssCleanerOn || srCleanerOn;
+
+    card.classList.toggle("enabled", isEnabled);
+
+    const ssSwitch = card.querySelector(
+      'button[data-media-type="screenshots"]'
+    );
+    if (ssSwitch) {
+      ssSwitch.classList.toggle("active", !!ssCleanerOn);
+    }
+    const srSwitch = card.querySelector(
+      'button[data-media-type="screenrecordings"]'
+    );
+    if (srSwitch) {
+      srSwitch.classList.toggle("active", !!srCleanerOn);
+    }
+
+    let optionsDiv = card.querySelector(".folder-clean-options");
+    if (isEnabled) {
+      if (!optionsDiv) {
+        optionsDiv = document.createElement("div");
+        optionsDiv.className = "folder-clean-options";
+        card.appendChild(optionsDiv);
+      }
+      const ssOptions = createCleanGroup(
+        folder,
+        "screenshots",
+        "ss",
+        "Capturas"
+      );
+      const srOptions = createCleanGroup(
+        folder,
+        "screenrecordings",
+        "sr",
+        "Gravações"
+      );
+      optionsDiv.innerHTML = ssOptions + srOptions;
+    } else {
+      if (optionsDiv) {
+        optionsDiv.remove();
+      }
     }
   }
 

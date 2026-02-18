@@ -5,7 +5,10 @@ const SubfolderMonitor = (function () {
     const map = new Map();
     if (apps?.length) {
       for (const app of apps) {
-        map.set(app.name, app.pkg);
+        const sanitizedName = Utils.sanitizeFolderName(app.name);
+        if (!map.has(sanitizedName)) {
+          map.set(sanitizedName, app.pkg);
+        }
       }
     }
     return map;

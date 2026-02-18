@@ -32,7 +32,9 @@ const OrganizerView = (function () {
       `;
     },
     folderCard: (folder, index, activeFilter) => `
-      <div class="folder-card animate-scale-in" style="animation-delay: ${0.3 + index * 0.05}s" data-folder-id="${folder.id}">
+      <div class="folder-card animate-scale-in" style="animation-delay: ${
+        0.3 + index * 0.05
+      }s" data-folder-id="${folder.id}">
         <div class="folder-top">
           <div class="folder-badges">
             ${templates.organizerBadges(folder, activeFilter)}
@@ -172,8 +174,13 @@ const OrganizerView = (function () {
       `.folder-card[data-folder-id="${folder.id}"]`
     );
     if (card) {
-      const newHtml = templates.folderCard(folder, 0, activeFilter);
-      card.outerHTML = newHtml;
+      const badgesContainer = card.querySelector(".folder-badges");
+      if (badgesContainer) {
+        badgesContainer.innerHTML = templates.organizerBadges(
+          folder,
+          activeFilter
+        );
+      }
     }
   }
 

@@ -7,10 +7,6 @@
   animation-delay: 0s !important;
 }
 
-.no-animation {
-  animation: none !important;
-}
-
 /* Smooth transitions for UI elements */
 .switch-container {
   transition: all 0.3s ease;
