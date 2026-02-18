@@ -7,6 +7,10 @@
   animation-delay: 0s !important;
 }
 
+.no-animation {
+  animation: none !important;
+}
+
 /* Smooth transitions for UI elements */
 .switch-container {
   transition: all 0.3s ease;
@@ -81,6 +85,19 @@
   }
 }
 
+@keyframes pulseHighlight {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+    color: hsl(var(--primary));
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
 .animate-fade-in-up {
   animation: fadeInUp 0.5s ease-out both;
 }
@@ -103,6 +120,10 @@
 
 .animate-scale-in {
   animation: scaleIn 0.4s ease-out both;
+}
+
+.animate-pulse-highlight {
+  animation: pulseHighlight 0.4s ease-out;
 }
 
 /* Delay classes */

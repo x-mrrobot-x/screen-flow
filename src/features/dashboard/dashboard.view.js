@@ -44,33 +44,94 @@ const DashboardView = (function () {
     }
   }
 
+  function updateWithAnimation(element, newValue) {
+    if (!element) return;
+    const currentText = element.textContent;
+    const newText = String(newValue);
+
+    if (currentText !== newText) {
+      element.textContent = newText;
+
+      const runPulse = () => {
+        element.classList.remove("animate-pulse-highlight");
+        void element.offsetWidth; // Trigger reflow
+        element.classList.add("animate-pulse-highlight");
+
+        const onAnimationEnd = () => {
+          element.classList.remove("animate-pulse-highlight");
+          element.removeEventListener("animationend", onAnimationEnd);
+        };
+        element.addEventListener("animationend", onAnimationEnd);
+      };
+
+      const entranceParent = element.closest(
+        ".animate-fade-in-up, .animate-fade-in, .animate-scale-in"
+      );
+
+      // If it's a first load or there's an active entrance animation
+      if (entranceParent && entranceParent.getAnimations) {
+        const animations = entranceParent.getAnimations();
+        if (animations.length > 0) {
+          Promise.all(animations.map(a => a.finished)).then(runPulse);
+        } else {
+          runPulse();
+        }
+      } else {
+        runPulse();
+      }
+    }
+  }
+
   function update(data) {
     if (!data) return;
 
-    elements.summaryCard.organized.textContent =
-      data.organizedFiles.toLocaleString();
-    elements.summaryCard.removed.textContent =
-      data.removedFiles.toLocaleString();
-
-    elements.toOrganize.images.textContent = data.toOrganize.images;
-    elements.toOrganize.videos.textContent = data.toOrganize.videos;
-
-    elements.foldersCreated.images.textContent = data.foldersCreated.images;
-    elements.foldersCreated.videos.textContent = data.foldersCreated.videos;
-
-    elements.lastOrganization.images.textContent = data.lastOrganization.images;
-    elements.lastOrganization.videos.textContent = data.lastOrganization.videos;
-
-    elements.lastClean.images.textContent = data.lastClean.images;
-    elements.lastClean.videos.textContent = data.lastClean.videos;
-
-    elements.mostCapturedApp.name.textContent = data.mostCapturedApp.name;
-    elements.mostCapturedApp.count.textContent =
-      data.mostCapturedApp.count.toLocaleString();
-
-    elements.mostCapturedApp.icon.src = ENV.resolveIconPath(
-      data.mostCapturedApp.pkg
+    updateWithAnimation(
+      elements.summaryCard.organized,
+      data.organizedFiles.toLocaleString()
     );
+    updateWithAnimation(
+      elements.summaryCard.removed,
+      data.removedFiles.toLocaleString()
+    );
+
+    updateWithAnimation(elements.toOrganize.images, data.toOrganize.images);
+    updateWithAnimation(elements.toOrganize.videos, data.toOrganize.videos);
+
+    updateWithAnimation(
+      elements.foldersCreated.images,
+      data.foldersCreated.images
+    );
+    updateWithAnimation(
+      elements.foldersCreated.videos,
+      data.foldersCreated.videos
+    );
+
+    updateWithAnimation(
+      elements.lastOrganization.images,
+      data.lastOrganization.images
+    );
+    updateWithAnimation(
+      elements.lastOrganization.videos,
+      data.lastOrganization.videos
+    );
+
+    updateWithAnimation(elements.lastClean.images, data.lastClean.images);
+    updateWithAnimation(elements.lastClean.videos, data.lastClean.videos);
+
+    // App name doesn't need highlight usually, but count does
+    if (elements.mostCapturedApp.name.textContent !== data.mostCapturedApp.name) {
+       elements.mostCapturedApp.name.textContent = data.mostCapturedApp.name;
+    }
+    
+    updateWithAnimation(
+      elements.mostCapturedApp.count,
+      data.mostCapturedApp.count.toLocaleString()
+    );
+
+    const newIconSrc = ENV.resolveIconPath(data.mostCapturedApp.pkg);
+    if (elements.mostCapturedApp.icon.getAttribute('src') !== newIconSrc) {
+       elements.mostCapturedApp.icon.src = newIconSrc;
+    }
   }
 
   return {
