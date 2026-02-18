@@ -131,12 +131,10 @@ const OrganizerView = (function () {
           0
         );
         elements.mediaCounter.innerHTML = `
-          <span>${Icons.getSvg(
-            "folder"
-          )} ${filteredFolders.length}</span>
-          <span>${Icons.getSvg(
-            "file"
-          )} ${totalScreenshots + totalRecordings}</span>
+          <span>${Icons.getSvg("folder")} ${filteredFolders.length}</span>
+          <span>${Icons.getSvg("file")} ${
+            totalScreenshots + totalRecordings
+          }</span>
         `;
       } else {
         if (activeFilter === "recordings") {
@@ -153,9 +151,7 @@ const OrganizerView = (function () {
           mediaIcon = Icons.getSvg("image");
         }
         elements.mediaCounter.innerHTML = `
-          <span>${Icons.getSvg(
-            "folder"
-          )} ${filteredFolders.length}</span>
+          <span>${Icons.getSvg("folder")} ${filteredFolders.length}</span>
           <span>${mediaIcon} ${totalMedia}</span>
         `;
       }
@@ -170,11 +166,12 @@ const OrganizerView = (function () {
 
   function updateCard(folder, activeFilter) {
     if (!folder) return;
-    const card = elements.foldersGrid.querySelector(
-      `.folder-card[data-folder-id="${folder.id}"]`
+    const card = DOM.qs(
+      `.folder-card[data-folder-id="${folder.id}"]`,
+      elements.foldersGrid
     );
     if (card) {
-      const badgesContainer = card.querySelector(".folder-badges");
+      const badgesContainer = DOM.qs(".folder-badges", card);
       if (badgesContainer) {
         badgesContainer.innerHTML = templates.organizerBadges(
           folder,
@@ -197,7 +194,7 @@ const OrganizerView = (function () {
     menu.innerHTML = templates.actionsMenu(folderId).trim();
     const popupElement = menu.firstChild;
 
-    const menuDots = folderCard.querySelector(".folder-menu-dots");
+    const menuDots = DOM.qs(".folder-menu-dots", folderCard);
     if (menuDots) {
       if (getComputedStyle(folderCard).position === "static") {
         folderCard.style.position = "relative";

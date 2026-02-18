@@ -24,7 +24,7 @@ const OrganizerController = (function () {
 
   const debouncedRender = Utils.debounce(renderUI, 100);
 
-  const debouncedSearch = Utils.debounce((value) => {
+  const debouncedSearch = Utils.debounce(value => {
     OrganizerModel.setSearchTerm(value);
     renderUI();
   }, 300);
@@ -95,9 +95,7 @@ const OrganizerController = (function () {
             ? "ss"
             : "sr";
 
-        const folderCard = document.querySelector(
-          `[data-folder-id="${folderId}"]`
-        );
+        const folderCard = DOM.qs(`[data-folder-id="${folderId}"]`);
 
         if (folderCard) {
           folderCard.style.opacity = "0.2";
@@ -123,7 +121,7 @@ const OrganizerController = (function () {
             });
 
             AppState.incrementStat("cleanedFiles", removedCount);
-            
+
             Toast.success(
               `${removedCount} ${
                 removedCount > 1 ? "itens removidos" : "item removido"

@@ -76,8 +76,8 @@ const CleanerView = (function () {
         <div class="folder-clean-card ${
           isEnabled ? "enabled" : ""
         } animate-fade-in-up" style="animation-delay: ${
-        0.2 + index * 0.05
-      }s" data-folder-id="${folder.id}">
+          0.2 + index * 0.05
+        }s" data-folder-id="${folder.id}">
           <div class="folder-clean-header">
             ${Icons.getAppIcon(folder)}
             <span class="folder-clean-name truncate-text">${folder.name}</span>
@@ -91,12 +91,7 @@ const CleanerView = (function () {
               ? `
             <div class="folder-clean-options">
               ${createCleanGroup(folder, "screenshots", "ss", "Capturas")}
-              ${createCleanGroup(
-                folder,
-                "screenrecordings",
-                "sr",
-                "Gravações"
-              )}
+              ${createCleanGroup(folder, "screenrecordings", "sr", "Gravações")}
             </div>
           `
               : ""
@@ -142,8 +137,9 @@ const CleanerView = (function () {
 
   function updateCard(folder) {
     if (!folder) return;
-    const card = elements.folderCleanList.querySelector(
-      `.folder-clean-card[data-folder-id="${folder.id}"]`
+    const card = DOM.qs(
+      `.folder-clean-card[data-folder-id="${folder.id}"]`,
+      elements.folderCleanList
     );
     if (!card) return;
 
@@ -153,20 +149,16 @@ const CleanerView = (function () {
 
     card.classList.toggle("enabled", isEnabled);
 
-    const ssSwitch = card.querySelector(
-      'button[data-media-type="screenshots"]'
-    );
+    const ssSwitch = DOM.qs('button[data-media-type="screenshots"]', card);
     if (ssSwitch) {
       ssSwitch.classList.toggle("active", !!ssCleanerOn);
     }
-    const srSwitch = card.querySelector(
-      'button[data-media-type="screenrecordings"]'
-    );
+    const srSwitch = DOM.qs('button[data-media-type="screenrecordings"]', card);
     if (srSwitch) {
       srSwitch.classList.toggle("active", !!srCleanerOn);
     }
 
-    let optionsDiv = card.querySelector(".folder-clean-options");
+    let optionsDiv = DOM.qs(".folder-clean-options", card);
     if (isEnabled) {
       if (!optionsDiv) {
         optionsDiv = document.createElement("div");

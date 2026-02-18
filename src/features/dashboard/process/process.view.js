@@ -61,12 +61,11 @@ const ProcessView = (function () {
     stepElements[index].classList.remove("incomplete", "running", "completed");
     stepElements[index].classList.add(status);
 
+    const stepIcon = DOM.qs(".step-icon", stepElements[index]);
     if (status === "completed") {
-      stepElements[index].querySelector(".step-icon").innerHTML =
-        Icons.getSvg("check");
+      stepIcon.innerHTML = Icons.getSvg("check");
     } else {
-      stepElements[index].querySelector(".step-icon").innerHTML =
-        Icons.getSvg("loader");
+      stepIcon.innerHTML = Icons.getSvg("loader");
     }
   }
 

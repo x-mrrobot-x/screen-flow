@@ -33,7 +33,9 @@ const StatsView = (function () {
 
   const templates = {
     activityItem: (activity, index) => `
-      <li class="activity-item animate-fade-in-up" style="animation-delay: ${0.4 + index * 0.05}s">
+      <li class="activity-item animate-fade-in-up" style="animation-delay: ${
+        0.4 + index * 0.05
+      }s">
         <div class="icon-box ${activity.class}">
           ${Icons.getSvg(activity.icon)}
           <span>${activity.execution ? activity.execution : ""}</span>
@@ -48,7 +50,10 @@ const StatsView = (function () {
         </div>
       </li>`,
     activityList: activities =>
-      activities.slice(0, 5).map((a, i) => templates.activityItem(a, i)).join(""),
+      activities
+        .slice(0, 5)
+        .map((a, i) => templates.activityItem(a, i))
+        .join(""),
     activityCard: activities => `
       <article class="activity-card animate-fade-in-up" style="animation-delay: 0.4s">
         <div class="card-header">
@@ -63,7 +68,7 @@ const StatsView = (function () {
     activityCard: activities => {
       const card = DOM.qs(StatsConfig.SELECTORS.activityCard);
       if (card) {
-        const list = card.querySelector(StatsConfig.SELECTORS.activityList);
+        const list = DOM.qs(StatsConfig.SELECTORS.activityList, card);
         if (list) list.innerHTML = templates.activityList(activities);
       }
     },
@@ -86,35 +91,35 @@ const StatsView = (function () {
           ]
         },
         options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        animations: {
-          x: { duration: 0 },
-          y: {
-            duration: 1000,
-            easing: "easeOutQuart",
-            from: 0
-          }
-        },
-        plugins: {
-          legend: {
-            display: true,
-            position: "top",
-            labels: { color: colors.text }
-          }
-        },
-        scales: {
-          x: {
-            grid: { display: false },
-            ticks: { color: colors.text, font: { size: 11 } }
+          responsive: true,
+          maintainAspectRatio: false,
+          animations: {
+            x: { duration: 0 },
+            y: {
+              duration: 1000,
+              easing: "easeOutQuart",
+              from: 0
+            }
           },
-          y: {
-            beginAtZero: true,
-            grid: { color: colors.grid },
-            ticks: { color: colors.text, font: { size: 11 } }
+          plugins: {
+            legend: {
+              display: true,
+              position: "top",
+              labels: { color: colors.text }
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: { color: colors.text, font: { size: 11 } }
+            },
+            y: {
+              beginAtZero: true,
+              grid: { color: colors.grid },
+              ticks: { color: colors.text, font: { size: 11 } }
+            }
           }
         }
-      }
       });
     },
     foldersChart: data => {
@@ -146,32 +151,32 @@ const StatsView = (function () {
           ]
         },
         options: {
-        indexAxis: "y",
-        responsive: true,
-        maintainAspectRatio: false,
-        animations: {
-          x: {
-            duration: 1500,
-            easing: "easeOutQuart",
-            from: 0
+          indexAxis: "y",
+          responsive: true,
+          maintainAspectRatio: false,
+          animations: {
+            x: {
+              duration: 1500,
+              easing: "easeOutQuart",
+              from: 0
+            },
+            y: { duration: 0 }
           },
-          y: { duration: 0 }
-        },
-        plugins: {
-          legend: { display: false }
-        },
-        scales: {
-          x: {
-            beginAtZero: true,
-            grid: { display: false },
-            ticks: { color: colors.text, font: { size: 11 } }
+          plugins: {
+            legend: { display: false }
           },
-          y: {
-            grid: { color: colors.grid },
-            ticks: { color: colors.text, font: { size: 11 } }
+          scales: {
+            x: {
+              beginAtZero: true,
+              grid: { display: false },
+              ticks: { color: colors.text, font: { size: 11 } }
+            },
+            y: {
+              grid: { color: colors.grid },
+              ticks: { color: colors.text, font: { size: 11 } }
+            }
           }
         }
-      }
       });
     },
     mediaTypeUI: mediaType => {

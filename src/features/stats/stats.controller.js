@@ -66,9 +66,7 @@ const StatsController = (function () {
   };
 
   function attachEventListeners() {
-    const mediaButtons = document.querySelectorAll(
-      StatsConfig.SELECTORS.mediaTypeButtons
-    );
+    const mediaButtons = DOM.qsa(StatsConfig.SELECTORS.mediaTypeButtons);
     mediaButtons.forEach(btn => {
       btn.addEventListener("click", handlers.onMediaTypeChange);
     });

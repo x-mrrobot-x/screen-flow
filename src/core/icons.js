@@ -59,7 +59,7 @@ const Icons = (function () {
   };
 
   const replace = () => {
-    const nodes = document.querySelectorAll("[data-icon]");
+    const nodes = DOM.qsa("[data-icon]");
 
     nodes.forEach(el => {
       const name = el.getAttribute("data-icon");

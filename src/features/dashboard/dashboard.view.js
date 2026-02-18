@@ -6,33 +6,30 @@ const DashboardView = (function () {
   function queryElements() {
     const selectors = DashboardConfig.SELECTORS;
 
-    // Helper function to query selectors
-    const qs = selector => document.querySelector(selector);
-
     elements.summaryCard = {
-      organized: qs(selectors.summaryCard.organized),
-      removed: qs(selectors.summaryCard.removed)
+      organized: DOM.qs(selectors.summaryCard.organized),
+      removed: DOM.qs(selectors.summaryCard.removed)
     };
     elements.toOrganize = {
-      images: qs(selectors.toOrganize.images),
-      videos: qs(selectors.toOrganize.videos)
+      images: DOM.qs(selectors.toOrganize.images),
+      videos: DOM.qs(selectors.toOrganize.videos)
     };
     elements.foldersCreated = {
-      images: qs(selectors.foldersCreated.images),
-      videos: qs(selectors.foldersCreated.videos)
+      images: DOM.qs(selectors.foldersCreated.images),
+      videos: DOM.qs(selectors.foldersCreated.videos)
     };
     elements.lastOrganization = {
-      images: qs(selectors.lastOrganization.images),
-      videos: qs(selectors.lastOrganization.videos)
+      images: DOM.qs(selectors.lastOrganization.images),
+      videos: DOM.qs(selectors.lastOrganization.videos)
     };
     elements.lastClean = {
-      images: qs(selectors.lastClean.images),
-      videos: qs(selectors.lastClean.videos)
+      images: DOM.qs(selectors.lastClean.images),
+      videos: DOM.qs(selectors.lastClean.videos)
     };
     elements.mostCapturedApp = {
-      icon: qs(selectors.mostCapturedApp.icon),
-      name: qs(selectors.mostCapturedApp.name),
-      count: qs(selectors.mostCapturedApp.count)
+      icon: DOM.qs(selectors.mostCapturedApp.icon),
+      name: DOM.qs(selectors.mostCapturedApp.name),
+      count: DOM.qs(selectors.mostCapturedApp.count)
     };
   }
 
@@ -119,18 +116,20 @@ const DashboardView = (function () {
     updateWithAnimation(elements.lastClean.videos, data.lastClean.videos);
 
     // App name doesn't need highlight usually, but count does
-    if (elements.mostCapturedApp.name.textContent !== data.mostCapturedApp.name) {
-       elements.mostCapturedApp.name.textContent = data.mostCapturedApp.name;
+    if (
+      elements.mostCapturedApp.name.textContent !== data.mostCapturedApp.name
+    ) {
+      elements.mostCapturedApp.name.textContent = data.mostCapturedApp.name;
     }
-    
+
     updateWithAnimation(
       elements.mostCapturedApp.count,
       data.mostCapturedApp.count.toLocaleString()
     );
 
     const newIconSrc = ENV.resolveIconPath(data.mostCapturedApp.pkg);
-    if (elements.mostCapturedApp.icon.getAttribute('src') !== newIconSrc) {
-       elements.mostCapturedApp.icon.src = newIconSrc;
+    if (elements.mostCapturedApp.icon.getAttribute("src") !== newIconSrc) {
+      elements.mostCapturedApp.icon.src = newIconSrc;
     }
   }
 
