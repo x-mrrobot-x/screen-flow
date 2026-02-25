@@ -3,6 +3,7 @@ const OrganizerController = (function () {
 
   let isInitialized = false;
   let suppressNextRender = false;
+  let currentPopupMenu = null;
 
   function renderUI() {
     const folders = OrganizerModel.getFolders();
@@ -10,187 +11,180 @@ const OrganizerController = (function () {
     OrganizerView.render.folders(folders, state.activeFilter);
     OrganizerView.render.mediaCounter(folders, state.activeFilter);
     OrganizerView.render.filters(state.activeFilter);
+    OrganizerView.update.autoOrganizer(
+      OrganizerModel.getAutoOrganizerSetting()
+    );
   }
 
   function updatePartial(folderId) {
     const folders = OrganizerModel.getFolders();
     const state = OrganizerModel.getState();
     const folder = folders.find(f => f.id === folderId);
-    if (folder) {
-      OrganizerView.updateCard(folder, state.activeFilter);
-      OrganizerView.render.mediaCounter(folders, state.activeFilter);
-    }
+    if (!folder) return;
+    OrganizerView.update.card(folder, state.activeFilter);
+    OrganizerView.render.mediaCounter(folders, state.activeFilter);
   }
 
   const debouncedRender = Utils.debounce(renderUI, 100);
-
   const debouncedSearch = Utils.debounce(value => {
     OrganizerModel.setSearchTerm(value);
+    Navigation.scrollToTop();
     renderUI();
   }, 300);
 
-  let currentPopupMenu = null;
+  function closePopupMenu() {
+    if (currentPopupMenu) {
+      currentPopupMenu.remove();
+      currentPopupMenu = null;
+    }
+  }
+
+  async function handleClearAction(folderId) {
+    const folders = OrganizerModel.getFolders();
+    const folder = folders.find(f => f.id === folderId);
+    if (!folder) {
+      Toast.error("Pasta não encontrada.");
+      return;
+    }
+
+    const { activeFilter } = OrganizerModel.getState();
+    const type =
+      activeFilter === "all"
+        ? "both"
+        : activeFilter === "screenshots"
+        ? "ss"
+        : "sr";
+
+    const { grid } = OrganizerView.getElements();
+    const folderCard = DOM.qs(`[data-folder-id="${folderId}"]`, grid);
+    if (folderCard) {
+      folderCard.style.opacity = "0.2";
+      folderCard.style.pointerEvents = "none";
+    }
+
+    suppressNextRender = true;
+    try {
+      const removedCount = await OrganizerModel.clearFolderContents(
+        folderId,
+        type
+      );
+
+      if (removedCount > 0) {
+        AppState.addActivity({
+          type: "cleaner-folder",
+          count: removedCount,
+          execution: "manual",
+          folder: folder.name,
+          mediaType: type,
+          timestamp: Date.now()
+        });
+        AppState.incrementStat("cleanedFiles", removedCount);
+        Toast.success(
+          `${Utils.pluralize(removedCount, "item")} 
+          ${Utils.pluralize(removedCount, "removido", false)}`
+        );
+      } else {
+        Toast.info("Nenhum arquivo foi removido ou a pasta já estava vazia.");
+      }
+
+      updatePartial(folderId);
+    } catch (error) {
+      Logger.error("Error clearing folder:", error);
+      Toast.error("Erro ao limpar a pasta. Tente novamente.");
+    } finally {
+      suppressNextRender = false;
+      if (folderCard) {
+        folderCard.style.opacity = "1";
+        folderCard.style.pointerEvents = "auto";
+      }
+    }
+  }
 
   const handlers = {
-    onSearch: e => {
-      debouncedSearch(e.target.value);
-    },
+    onSearch: e => debouncedSearch(e.target.value),
+
     onFilterClick: e => {
-      const filter = e.target.closest("[data-filter]").dataset.filter;
+      const filter = e.target.closest("[data-filter]")?.dataset.filter;
+      if (!filter) return;
       OrganizerModel.setFilter(filter);
       renderUI();
     },
-    onCardClick: e => {
-      const folderCard = e.target.closest(OrganizerConfig.SELECTORS.folderCard);
-      if (!folderCard) return;
 
-      const folderId = folderCard.dataset.folderId;
-      if (!folderId) return;
+    onSwitchClick: e => {
+      const switchEl = e.target.closest("[data-setting-key]");
+      if (!switchEl) return;
+      const newValue = OrganizerModel.toggleAutoOrganizer();
+      OrganizerView.update.autoOrganizer(newValue);
+    },
 
-      const menuDots = e.target.closest(
-        OrganizerConfig.SELECTORS.folderMenuDots
+    onGridClick: e => {
+      const card = e.target.closest(".organizer-folder-card");
+      if (!card || !e.target.closest(".organizer-folder-menu-dots")) return;
+      e.stopPropagation();
+      closePopupMenu();
+      const popup = OrganizerView.update.actionsMenu(
+        card.dataset.folderId,
+        card
       );
-      if (menuDots) {
-        e.stopPropagation();
-
-        if (currentPopupMenu) {
-          currentPopupMenu.remove();
-          currentPopupMenu = null;
-        }
-
-        const menu = OrganizerView.showActionsMenu(folderId, folderCard);
-        if (menu) {
-          currentPopupMenu = menu;
-          menu.addEventListener("click", handlers.onMenuClick);
-        }
+      if (popup) {
+        currentPopupMenu = popup;
+        popup.addEventListener("click", handlers.onMenuClick);
       }
     },
+
     onMenuClick: async e => {
       e.stopPropagation();
       const actionItem = e.target.closest("[data-action]");
-      if (!actionItem) return;
-
-      const action = actionItem.dataset.action;
-      const popup = actionItem.closest(
-        OrganizerConfig.SELECTORS.folderActionsPopup
-      );
-      const folderId = popup.dataset.folderId;
-
-      if (action === "clear") {
-        const folders = OrganizerModel.getFolders();
-        const folder = folders.find(f => f.id === folderId);
-
-        if (!folder) {
-          Toast.error("Pasta não encontrada.");
-          popup.remove();
-          currentPopupMenu = null;
-          return;
-        }
-
-        const activeFilter = OrganizerModel.getState().activeFilter;
-        const type =
-          activeFilter === "all"
-            ? "both"
-            : activeFilter === "screenshots"
-            ? "ss"
-            : "sr";
-
-        const folderCard = DOM.qs(`[data-folder-id="${folderId}"]`);
-
-        if (folderCard) {
-          folderCard.style.opacity = "0.2";
-          folderCard.style.pointerEvents = "none";
-        }
-
-        try {
-          suppressNextRender = true;
-          const removedCount = await OrganizerModel.clearFolderContents(
-            folderId,
-            type
-          );
-          const folderName = folder ? folder.name : "Unknown";
-
-          if (removedCount > 0) {
-            AppState.addActivity({
-              type: "cleaner-folder",
-              count: removedCount,
-              execution: "manual",
-              folder: folderName,
-              mediaType: type,
-              timestamp: Date.now()
-            });
-
-            AppState.incrementStat("cleanedFiles", removedCount);
-
-            Toast.success(
-              `${removedCount} ${
-                removedCount > 1 ? "itens removidos" : "item removido"
-              } com sucesso!`
-            );
-          } else {
-            Toast.info(
-              "Nenhum arquivo foi removido ou a pasta já estava vazia."
-            );
-          }
-
-          updatePartial(folderId);
-        } catch (error) {
-          Logger.error("Error clearing folder:", error);
-          Toast.error("Erro ao limpar a pasta. Tente novamente.");
-        } finally {
-          suppressNextRender = false;
-          if (folderCard) {
-            folderCard.style.opacity = "1";
-            folderCard.style.pointerEvents = "auto";
-          }
-        }
-      }
-      popup.remove();
-      currentPopupMenu = null;
+      const folderId = actionItem?.closest(".organizer-folder-actions-popup")
+        ?.dataset.folderId;
+      if (!folderId) return;
+      closePopupMenu();
+      if (actionItem.dataset.action === "clear")
+        await handleClearAction(folderId);
     },
+
     onDocumentClick: e => {
-      if (currentPopupMenu && !currentPopupMenu.contains(e.target)) {
-        currentPopupMenu.remove();
-        currentPopupMenu = null;
-      }
+      if (currentPopupMenu && !currentPopupMenu.contains(e.target))
+        closePopupMenu();
     },
+
     onStateChange: data => {
-      const relevantKeys = ["folders"];
-      if (relevantKeys.includes(data.key)) {
-        if (data.key === "folders" && suppressNextRender) {
-          return;
-        }
-        Logger.info(`Organizer: ${data.key} updated, re-rendering...`);
+      if (data.key === "settings") {
+        OrganizerView.update.autoOrganizer(
+          OrganizerModel.getAutoOrganizerSetting()
+        );
+      }
+      if (data.key === "folders" && !suppressNextRender) {
         debouncedRender();
       }
     }
   };
 
-  function attachEventListeners() {
-    const searchInput = DOM.qs(OrganizerConfig.SELECTORS.searchInput);
-    if (searchInput) searchInput.addEventListener("input", handlers.onSearch);
+  function attachEvents() {
+    const { grid, search, tabContent, filterContainer } =
+      OrganizerView.getElements();
 
-    const filterButtons = DOM.qsa(OrganizerConfig.SELECTORS.filterButtons);
-    filterButtons.forEach(btn =>
-      btn.addEventListener("click", handlers.onFilterClick)
+    const events = [
+      [search, "input", handlers.onSearch],
+      [grid, "click", handlers.onGridClick],
+      [filterContainer, "click", handlers.onFilterClick],
+      [tabContent, "click", handlers.onSwitchClick],
+      [document, "click", handlers.onDocumentClick]
+    ];
+    events.forEach(([el, event, handler]) =>
+      el.addEventListener(event, handler)
     );
 
-    const grid = DOM.qs(OrganizerConfig.SELECTORS.foldersGrid);
-    if (grid) grid.addEventListener("click", handlers.onCardClick);
-
-    document.addEventListener("click", handlers.onDocumentClick);
     EventBus.on("appstate:changed", handlers.onStateChange);
   }
 
   function init() {
     if (isInitialized) return;
-    OrganizerView.init(OrganizerConfig.SELECTORS.CONTAINER);
+    OrganizerView.init();
     renderUI();
-    attachEventListeners();
+    attachEvents();
     isInitialized = true;
   }
 
-  return {
-    init
-  };
+  return { init };
 })();

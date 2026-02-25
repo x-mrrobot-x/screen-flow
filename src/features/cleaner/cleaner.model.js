@@ -1,6 +1,6 @@
-const CleanerModel = (function() {
-  'use strict';
-  
+const CleanerModel = (function () {
+  "use strict";
+
   function updateFolderState(folderId, mediaType, updateFn) {
     const folders = AppState.getFolders();
     const updatedFolders = folders.map(folder => {
@@ -18,24 +18,23 @@ const CleanerModel = (function() {
   function toggleFolderClean(folderId, mediaType) {
     const updatedFolders = updateFolderState(folderId, mediaType, folder => {
       const key = mediaType === "screenshots" ? "ss" : "sr";
-      if (folder[key] && folder[key].cleaner) {
+      if (folder[key]?.cleaner) {
         folder[key].cleaner.on = !folder[key].cleaner.on;
       }
     });
 
     const folder = updatedFolders.find(f => f.id === folderId);
     if (folder) {
-      const actionType = mediaType === "screenshots" ? "screenshots" : "recordings";
+      const actionType =
+        mediaType === "screenshots" ? "screenshots" : "recordings";
       const key = mediaType === "screenshots" ? "ss" : "sr";
-      
-      if (folder[key] && folder[key].cleaner) {
-        const isEnabled = folder[key].cleaner.on;
 
+      if (folder[key]?.cleaner) {
         AppState.addActivity({
           type: "cleaner-folder-toggle",
           feature: `cleaner-folder-${actionType}`,
           folder: folder.name,
-          enabled: isEnabled
+          enabled: folder[key].cleaner.on
         });
       }
     }
@@ -44,15 +43,14 @@ const CleanerModel = (function() {
   function setFolderDays(folderId, mediaType, days) {
     updateFolderState(folderId, mediaType, folder => {
       const key = mediaType === "screenshots" ? "ss" : "sr";
-      if (folder[key] && folder[key].cleaner) {
+      if (folder[key]?.cleaner) {
         folder[key].cleaner.days = days;
       }
     });
   }
 
   function toggleAutoCleaner() {
-    const newValue = AppState.toggleSetting('autoCleaner');
-
+    const newValue = AppState.toggleSetting("autoCleaner");
     AppState.addActivity({
       type: "feature-toggle",
       feature: "auto-cleaner",
@@ -65,11 +63,8 @@ const CleanerModel = (function() {
     return AppState.getFolders();
   }
 
-  function getState() {
-    return {
-      autoCleaner: AppState.getSetting('autoCleaner'),
-      ...AppState.getStats()
-    };
+  function getAutoCleanerSetting() {
+    return AppState.getSetting("autoCleaner");
   }
 
   return {
@@ -77,6 +72,6 @@ const CleanerModel = (function() {
     setFolderDays,
     toggleAutoCleaner,
     getFolders,
-    getState
+    getAutoCleanerSetting
   };
 })();

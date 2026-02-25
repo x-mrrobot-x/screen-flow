@@ -3,53 +3,51 @@ const SubfolderMonitor = (function () {
 
   function createAppPackageMap(apps) {
     const map = new Map();
-    if (apps?.length) {
-      for (const app of apps) {
-        const sanitizedName = Utils.sanitizeFolderName(app.name);
-        if (!map.has(sanitizedName)) {
-          map.set(sanitizedName, app.pkg);
-        }
-      }
+    for (const app of apps ?? []) {
+      const sanitizedName = Utils.sanitizeFolderName(app.name);
+      if (!map.has(sanitizedName)) map.set(sanitizedName, app.pkg);
     }
     return map;
   }
 
   function createFolderMap(folders) {
-    const map = new Map();
-    for (const folder of folders) {
-      map.set(folder.name, folder);
-    }
-    return map;
+    return new Map(folders.map(f => [f.name, f]));
   }
 
   function parseFolderLine(line) {
     const commaIndex = line.indexOf(",");
     if (commaIndex === -1) return null;
-
     return {
       name: line.slice(0, commaIndex).trim(),
       count: parseInt(line.slice(commaIndex + 1).trim(), 10) || 0
     };
   }
 
-  function updateExistingFolder(folder, statsKey, count, timestamp) {
-    if (!folder[statsKey]) {
-      folder[statsKey] = { cleaner: { on: false, days: 7 } };
+  function parseDiskFolders(subfolderList) {
+    const map = new Map();
+    for (const item of subfolderList) {
+      const commaIndex = item.indexOf(",");
+      if (commaIndex !== -1) {
+        map.set(item.slice(0, commaIndex), item.slice(commaIndex + 1));
+      }
     }
-    folder[statsKey].count = count;
-    folder[statsKey].mtime = timestamp;
+    return map;
   }
 
-  function createNewFolder(name, pkg, statsKey, count, timestamp) {
+  function buildUpdatedFolder(existing, name, pkg, statsKey, count, timestamp) {
+    const mediaEntry = {
+      count,
+      mtime: timestamp,
+      cleaner: existing?.[statsKey]?.cleaner ?? { on: false, days: 7 }
+    };
+
+    if (existing) return { ...existing, [statsKey]: mediaEntry };
+
     return {
       id: Math.random().toString(36).substring(2),
-      name: name,
-      pkg: pkg,
-      [statsKey]: {
-        count: count,
-        cleaner: { on: false, days: 7 },
-        mtime: timestamp
-      }
+      name,
+      pkg,
+      [statsKey]: mediaEntry
     };
   }
 
@@ -59,12 +57,10 @@ const SubfolderMonitor = (function () {
     existingFolders,
     folderTimestamps
   ) {
-    if (!scriptOutput?.length) {
-      return existingFolders;
-    }
+    if (!scriptOutput?.length) return existingFolders;
 
     const statsKey = type === "screenshots" ? "ss" : "sr";
-    const appNameToPkgMap = createAppPackageMap(AppState.getApps());
+    const appNameToPkg = createAppPackageMap(AppState.getApps());
     const folderMap = createFolderMap(existingFolders);
 
     for (const line of scriptOutput) {
@@ -72,37 +68,31 @@ const SubfolderMonitor = (function () {
       if (!parsed) continue;
 
       const { name, count } = parsed;
-      const diskTimestamp =
-        folderTimestamps.get?.(name) || folderTimestamps[name];
-      let folder = folderMap.get(name);
+      const timestamp = folderTimestamps.get?.(name) ?? folderTimestamps[name];
+      const existing = folderMap.get(name) ?? null;
 
-      if (folder) {
-        updateExistingFolder(folder, statsKey, count, diskTimestamp);
-      } else {
-        const pkg = appNameToPkgMap.get(name) || name;
-
-        if (!appNameToPkgMap.has(name)) {
-          Logger.warn(
-            `Package não encontrado para a pasta: ${name}, usando o nome da pasta como pkg.`
-          );
-        }
-
-        folder = createNewFolder(name, pkg, statsKey, count, diskTimestamp);
-        folderMap.set(name, folder);
+      if (!existing && !appNameToPkg.has(name)) {
+        Logger.warn(
+          `[SubfolderMonitor] Package not found for folder '${name}'. Using name as pkg.`
+        );
       }
+
+      const pkg = appNameToPkg.get(name) ?? name;
+      const updated = buildUpdatedFolder(
+        existing,
+        name,
+        pkg,
+        statsKey,
+        count,
+        timestamp
+      );
+      folderMap.set(name, updated);
     }
 
-    Logger.debug(
-      `[SubfolderMonitor] Dados de pastas atualizados para o tipo '${type}'.`
-    );
     return Array.from(folderMap.values());
   }
 
   function updateFoldersData(scriptOutput, type, folderTimestamps) {
-    Logger.info(
-      `[SubfolderMonitor] Recebendo dados de contagem para o tipo: ${type}.`
-    );
-
     try {
       const existingFolders = AppState.getFolders();
       const updatedFolders = updateFoldersFromScan(
@@ -114,54 +104,26 @@ const SubfolderMonitor = (function () {
       AppState.setFolders(updatedFolders);
     } catch (error) {
       Logger.error(
-        `[SubfolderMonitor] Falha ao processar dados para o tipo: ${type}`,
+        `[SubfolderMonitor] Failed to process data for type: ${type}`,
         error
       );
     }
   }
 
-  function parseDiskFolders(subfolderList) {
-    const diskFolders = new Map();
-
-    for (const item of subfolderList) {
-      const commaIndex = item.indexOf(",");
-      if (commaIndex !== -1) {
-        const name = item.slice(0, commaIndex);
-        const timestamp = item.slice(commaIndex + 1);
-        diskFolders.set(name, timestamp);
-      }
-    }
-
-    return diskFolders;
-  }
-
-  function needsFolderUpdate(folderInState, statsKey, diskTimestamp) {
-    return (
-      !folderInState ||
-      !folderInState[statsKey] ||
-      String(folderInState[statsKey].mtime) !== diskTimestamp
-    );
-  }
-
   function findFoldersToUpdate(diskFolders, stateFolderMap, statsKey) {
-    const foldersToUpdate = [];
-
+    const toUpdate = [];
     for (const [name, diskTimestamp] of diskFolders) {
-      const folderInState = stateFolderMap.get(name);
-
-      if (needsFolderUpdate(folderInState, statsKey, diskTimestamp)) {
-        foldersToUpdate.push(name);
-      }
+      const folder = stateFolderMap.get(name);
+      const stale =
+        !folder ||
+        !folder[statsKey] ||
+        String(folder[statsKey].mtime) !== diskTimestamp;
+      if (stale) toUpdate.push(name);
     }
-
-    return foldersToUpdate;
+    return toUpdate;
   }
 
   async function processFolderType(type, path) {
-    Logger.debug(
-      `[SubfolderMonitor] Iniciando verificação para o tipo: ${type}`
-    );
-
     try {
       const subfolderList = await TaskQueue.add(
         "get_subfolders",
@@ -169,12 +131,7 @@ const SubfolderMonitor = (function () {
         "shell"
       );
 
-      if (!subfolderList?.length) {
-        Logger.debug(
-          `[SubfolderMonitor] Nenhuma subpasta encontrada para ${type}.`
-        );
-        return new Map();
-      }
+      if (!subfolderList?.length) return new Map();
 
       const diskFolders = parseDiskFolders(subfolderList);
       const stateFolderMap = createFolderMap(AppState.getFolders());
@@ -186,118 +143,79 @@ const SubfolderMonitor = (function () {
       );
 
       if (foldersToUpdate.length > 0) {
-        Logger.info(
-          `[SubfolderMonitor] ${foldersToUpdate.length} pasta(s) precisam de atualização para ${type}:`,
-          foldersToUpdate
-        );
-
         const countsResult = await TaskQueue.add(
           "get_item_counts_batch",
           [path, JSON.stringify(foldersToUpdate)],
           "shell"
         );
-
         if (countsResult?.length) {
           updateFoldersData(countsResult, type, diskFolders);
         }
-      } else {
-        Logger.debug(
-          `[SubfolderMonitor] Sem alterações de timestamp detectadas para ${type}.`
-        );
       }
 
       return diskFolders;
     } catch (error) {
-      Logger.error(
-        `[SubfolderMonitor] Erro ao processar o tipo de pasta '${type}':`,
-        error
-      );
+      Logger.error(`[SubfolderMonitor] Error processing '${type}':`, error);
       return new Map();
     }
   }
 
-  function syncFolders(
-    foldersInState,
-    screenshotFolders,
-    screenrecordingFolders
-  ) {
-    const ssNamesOnDisk = new Set(screenshotFolders.keys());
-    const srNamesOnDisk = new Set(screenrecordingFolders.keys());
+  function syncFolders(foldersInState, ssOnDisk, srOnDisk) {
+    let hasChanges = false;
     const finalFolders = [];
-    let removedCount = 0;
 
     for (const folder of foldersInState) {
-      let modified = false;
+      const hasSs = folder.ss && ssOnDisk.has(folder.name);
+      const hasSr = folder.sr && srOnDisk.has(folder.name);
 
-      if (folder.ss && !ssNamesOnDisk.has(folder.name)) {
-        delete folder.ss;
-        modified = true;
-      }
-
-      if (folder.sr && !srNamesOnDisk.has(folder.name)) {
-        delete folder.sr;
-        modified = true;
-      }
-
-      if (folder.ss || folder.sr) {
-        finalFolders.push(folder);
+      if (hasSs || hasSr) {
+        const cleaned = { ...folder };
+        if (!hasSs && cleaned.ss) {
+          delete cleaned.ss;
+          hasChanges = true;
+        }
+        if (!hasSr && cleaned.sr) {
+          delete cleaned.sr;
+          hasChanges = true;
+        }
+        finalFolders.push(cleaned);
       } else {
-        removedCount++;
+        hasChanges = true;
       }
-
-      if (modified) removedCount++;
     }
 
     return {
       finalFolders,
-      removedCount,
-      hasChanges:
-        removedCount > 0 || finalFolders.length !== foldersInState.length
+      hasChanges: hasChanges || finalFolders.length !== foldersInState.length
     };
   }
 
   async function loadFoldersData() {
     try {
-      const [screenshotFolders, screenrecordingFolders] = await Promise.all([
+      const [ssOnDisk, srOnDisk] = await Promise.all([
         processFolderType("screenshots", ENV.ORGANIZED_SCREENSHOTS_PATH),
         processFolderType("screenrecordings", ENV.ORGANIZED_RECORDINGS_PATH)
       ]);
 
       const foldersInState = AppState.getFolders();
-
-      if (!foldersInState?.length) {
-        Logger.debug(
-          "[SubfolderMonitor] Nenhuma pasta no state para sincronizar com o disco."
-        );
-        return;
-      }
+      if (!foldersInState.length) return;
 
       const { finalFolders, hasChanges } = syncFolders(
         foldersInState,
-        screenshotFolders,
-        screenrecordingFolders
+        ssOnDisk,
+        srOnDisk
       );
 
       if (hasChanges) {
-        Logger.info(
-          `[SubfolderMonitor] Sincronização concluída. Pastas sincronizadas: ${foldersInState.length} no state -> ${finalFolders.length} finais no disco.`
-        );
         AppState.setFolders(finalFolders);
-      } else {
-        Logger.debug(
-          "[SubfolderMonitor] Nenhuma divergência entre as pastas do state (folders) e as do disco."
-        );
       }
     } catch (error) {
-      Logger.error(
-        "[SubfolderMonitor] Erro durante o ciclo de verificação e limpeza:",
-        error
-      );
+      Logger.error("[SubfolderMonitor] Error during scan cycle:", error);
     }
   }
 
   function init() {
-    EventBus.on("appmonitor:ready", loadFoldersData);
+    EventBus.once("appmonitor:ready", loadFoldersData);
   }
 
   function runScan() {
@@ -305,7 +223,7 @@ const SubfolderMonitor = (function () {
   }
 
   return {
-    runScan,
-    init
+    init,
+    runScan
   };
 })();

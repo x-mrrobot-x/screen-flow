@@ -8,16 +8,11 @@ const AppState = (() => {
   let apps = [];
   let isReady = false;
 
-  const EVENTS = {
-    STATE_CHANGED: "appstate:changed"
-  };
-
+  const MAX_ACTIVITIES = 10;
   const timers = {};
 
   function debouncedPersist(dataKey, data, delay) {
-    if (timers[dataKey]) {
-      clearTimeout(timers[dataKey]);
-    }
+    clearTimeout(timers[dataKey]);
     timers[dataKey] = setTimeout(() => {
       ENV.setData(dataKey, data);
       delete timers[dataKey];
@@ -32,70 +27,21 @@ const AppState = (() => {
     apps: () => debouncedPersist("APPS", apps, 1000)
   };
 
+  function persistAll() {
+    Object.values(persist).forEach(fn => fn());
+  }
+
   function emitChange(key) {
-    EventBus.emit(EVENTS.STATE_CHANGED, { key });
+    EventBus.emit("appstate:changed", { key });
   }
 
-  async function loadAllData() {
-    return await Promise.all([
-      ENV.getData("SETTINGS"),
-      ENV.getData("STATS"),
-      ENV.getData("FOLDERS"),
-      ENV.getData("ACTIVITIES"),
-      ENV.getData("APPS")
-    ]);
-  }
-
-  function assignLoadedData([
-    settingsData,
-    statsData,
-    foldersData,
-    activitiesData,
-    appsData
-  ]) {
-    settings = settingsData;
-    stats = statsData;
-    folders = foldersData;
-    activities = activitiesData;
-    apps = appsData;
-  }
-
-  function markAsReady() {
-    isReady = true;
-    EventBus.emit("appstate:ready");
-  }
-
-  async function init() {
-    const loadedData = await loadAllData();
-    assignLoadedData(loadedData);
-    markAsReady();
+  function emitAllChanges() {
+    Object.keys(persist).forEach(emitChange);
   }
 
   function createActivity(activity) {
-    return {
-      id: Date.now().toString(),
-      timestamp: Date.now(),
-      ...activity
-    };
-  }
-
-  function limitActivities(activitiesList, maxCount = 10) {
-    return activitiesList.slice(0, maxCount);
-  }
-
-  function getTopFoldersByType(type) {
-    const key = type === "screenshots" ? "ss" : "sr";
-    const topFolders = [];
-
-    for (const folder of folders) {
-      topFolders.push({
-        name: folder.name,
-        count: folder[key]?.count ?? 0
-      });
-    }
-
-    topFolders.sort((a, b) => b.count - a.count);
-    return topFolders.slice(0, 5);
+    const now = Date.now();
+    return { id: String(now), timestamp: now, ...activity };
   }
 
   function resetAllToDefaults() {
@@ -104,21 +50,6 @@ const AppState = (() => {
     activities = ENV.getDefault("ACTIVITIES");
     settings = ENV.getDefault("SETTINGS");
     apps = ENV.getDefault("APPS");
-  }
-
-  function persistAll() {
-    persist.stats();
-    persist.folders();
-    persist.activities();
-    persist.settings();
-    persist.apps();
-  }
-
-  function emitAllChanges() {
-    const keys = ["stats", "folders", "activities", "settings", "apps"];
-    for (const key of keys) {
-      emitChange(key);
-    }
   }
 
   function deleteAll() {
@@ -133,8 +64,33 @@ const AppState = (() => {
     }
   }
 
+  function getTopFoldersByType(type) {
+    const key = type === "screenshots" ? "ss" : "sr";
+    return folders
+      .map(folder => ({ name: folder.name, count: folder[key]?.count ?? 0 }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+  }
+
+  async function loadStates() {
+    [settings, stats, folders, activities, apps] = await Promise.all([
+      ENV.getData("SETTINGS"),
+      ENV.getData("STATS"),
+      ENV.getData("FOLDERS"),
+      ENV.getData("ACTIVITIES"),
+      ENV.getData("APPS")
+    ]);
+  }
+
+  async function init() {
+    await loadStates();
+    isReady = true;
+    EventBus.emit("appstate:ready");
+  }
+
   return {
     init,
+    loadStates,
     isReady: () => isReady,
 
     getFolders: () => [...folders],
@@ -147,7 +103,7 @@ const AppState = (() => {
     getActivities: () => ActivityHelper.enrichActivities([...activities]),
     addActivity(activity) {
       const newActivity = createActivity(activity);
-      activities = [newActivity, ...limitActivities(activities, 9)];
+      activities = [newActivity, ...activities].slice(0, MAX_ACTIVITIES);
       persist.activities();
       emitChange("activities");
     },
@@ -186,7 +142,10 @@ const AppState = (() => {
       emitChange("stats");
     },
     incrementStat(key, amount = 1) {
-      stats = { ...stats, [key]: (stats[key] || 0) + amount };
+      stats = {
+        ...stats,
+        [key]: (stats[key] || 0) + amount
+      };
       persist.stats();
       emitChange("stats");
     },

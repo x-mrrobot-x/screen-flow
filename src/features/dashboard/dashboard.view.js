@@ -1,140 +1,184 @@
 const DashboardView = (function () {
   "use strict";
 
-  const elements = {};
+  let elements = null;
 
   function queryElements() {
-    const selectors = DashboardConfig.SELECTORS;
-
-    elements.summaryCard = {
-      organized: DOM.qs(selectors.summaryCard.organized),
-      removed: DOM.qs(selectors.summaryCard.removed)
-    };
-    elements.toOrganize = {
-      images: DOM.qs(selectors.toOrganize.images),
-      videos: DOM.qs(selectors.toOrganize.videos)
-    };
-    elements.foldersCreated = {
-      images: DOM.qs(selectors.foldersCreated.images),
-      videos: DOM.qs(selectors.foldersCreated.videos)
-    };
-    elements.lastOrganization = {
-      images: DOM.qs(selectors.lastOrganization.images),
-      videos: DOM.qs(selectors.lastOrganization.videos)
-    };
-    elements.lastClean = {
-      images: DOM.qs(selectors.lastClean.images),
-      videos: DOM.qs(selectors.lastClean.videos)
-    };
-    elements.mostCapturedApp = {
-      icon: DOM.qs(selectors.mostCapturedApp.icon),
-      name: DOM.qs(selectors.mostCapturedApp.name),
-      count: DOM.qs(selectors.mostCapturedApp.count)
+    elements = {
+      tabContent: DOM.qs("#tab-dashboard"),
+      summary: {
+        organized: DOM.qs("#dashboard-summary-organized-files"),
+        removed: DOM.qs("#dashboard-summary-removed-files")
+      },
+      toOrganize: {
+        screenshots: DOM.qs("#to-organize-screenshots"),
+        recordings: DOM.qs("#to-organize-recordings")
+      },
+      foldersCreated: {
+        screenshots: DOM.qs("#folders-created-screenshots"),
+        recordings: DOM.qs("#folders-created-recordings")
+      },
+      lastOrg: {
+        screenshots: DOM.qs("#last-organization-screenshots"),
+        recordings: DOM.qs("#last-organization-recordings")
+      },
+      lastClean: {
+        screenshots: DOM.qs("#last-cleanup-screenshots"),
+        recordings: DOM.qs("#last-cleanup-recordings")
+      },
+      topApp: {
+        icon: DOM.qs("#top-app-icon"),
+        name: DOM.qs("#top-app-name"),
+        count: DOM.qs("#top-app-count")
+      },
+      automations: {
+        section: DOM.qs("#automations"),
+        organizerStatus: DOM.qs("#automation-organizer-status"),
+        organizerBadge: DOM.qs("#automation-organizer-badge"),
+        cleanerStatus: DOM.qs("#automation-cleaner-status"),
+        cleanerBadge: DOM.qs("#automation-cleaner-badge")
+      }
     };
   }
 
-  function init() {
-    try {
-      queryElements();
-    } catch (error) {
-      Logger.error("Failed to initialize DashboardView elements:", error);
-    }
+  function getElements() {
+    return elements;
   }
 
-  function updateWithAnimation(element, newValue) {
+  function animateValue(element, newValue) {
     if (!element) return;
-    const currentText = element.textContent;
     const newText = String(newValue);
+    if (element.textContent === newText) return;
 
-    if (currentText !== newText) {
-      element.textContent = newText;
+    element.textContent = newText;
 
-      const runPulse = () => {
+    const pulse = () => {
+      element.classList.remove("animate-pulse-highlight");
+      void element.offsetWidth;
+      element.classList.add("animate-pulse-highlight");
+      element.addEventListener("animationend", function onEnd() {
         element.classList.remove("animate-pulse-highlight");
-        void element.offsetWidth; // Trigger reflow
-        element.classList.add("animate-pulse-highlight");
+        element.removeEventListener("animationend", onEnd);
+      });
+    };
 
-        const onAnimationEnd = () => {
-          element.classList.remove("animate-pulse-highlight");
-          element.removeEventListener("animationend", onAnimationEnd);
-        };
-        element.addEventListener("animationend", onAnimationEnd);
-      };
-
-      const entranceParent = element.closest(
-        ".animate-fade-in-up, .animate-fade-in, .animate-scale-in"
-      );
-
-      // If it's a first load or there's an active entrance animation
-      if (entranceParent && entranceParent.getAnimations) {
-        const animations = entranceParent.getAnimations();
-        if (animations.length > 0) {
-          Promise.all(animations.map(a => a.finished)).then(runPulse);
-        } else {
-          runPulse();
-        }
-      } else {
-        runPulse();
+    const entranceParent = element.closest(
+      ".animate-fade-in-up, .animate-fade-in, .animate-scale-in"
+    );
+    if (entranceParent?.getAnimations) {
+      const animations = entranceParent.getAnimations();
+      if (animations.length > 0) {
+        Promise.all(animations.map(a => a.finished)).then(pulse);
+        return;
       }
     }
+    pulse();
   }
 
-  function update(data) {
-    if (!data) return;
+  const update = {
+    summary: (organizedFiles, removedFiles) => {
+      animateValue(elements.summary.organized, organizedFiles.toLocaleString());
+      animateValue(elements.summary.removed, removedFiles.toLocaleString());
+    },
 
-    updateWithAnimation(
-      elements.summaryCard.organized,
-      data.organizedFiles.toLocaleString()
-    );
-    updateWithAnimation(
-      elements.summaryCard.removed,
-      data.removedFiles.toLocaleString()
-    );
+    toOrganize: (screenshots, recordings) => {
+      animateValue(elements.toOrganize.screenshots, screenshots ?? 0);
+      animateValue(elements.toOrganize.recordings, recordings ?? 0);
+    },
 
-    updateWithAnimation(elements.toOrganize.images, data.toOrganize.images);
-    updateWithAnimation(elements.toOrganize.videos, data.toOrganize.videos);
+    foldersCreated: (screenshots, recordings) => {
+      animateValue(elements.foldersCreated.screenshots, screenshots ?? 0);
+      animateValue(elements.foldersCreated.recordings, recordings ?? 0);
+    },
 
-    updateWithAnimation(
-      elements.foldersCreated.images,
-      data.foldersCreated.images
-    );
-    updateWithAnimation(
-      elements.foldersCreated.videos,
-      data.foldersCreated.videos
-    );
+    lastOrganization: (screenshots, recordings) => {
+      animateValue(elements.lastOrg.screenshots, screenshots);
+      animateValue(elements.lastOrg.recordings, recordings);
+    },
 
-    updateWithAnimation(
-      elements.lastOrganization.images,
-      data.lastOrganization.images
-    );
-    updateWithAnimation(
-      elements.lastOrganization.videos,
-      data.lastOrganization.videos
-    );
+    lastClean: (screenshots, recordings) => {
+      animateValue(elements.lastClean.screenshots, screenshots);
+      animateValue(elements.lastClean.recordings, recordings);
+    },
 
-    updateWithAnimation(elements.lastClean.images, data.lastClean.images);
-    updateWithAnimation(elements.lastClean.videos, data.lastClean.videos);
+    mostCapturedApp: app => {
+      if (elements.topApp.name.textContent !== app.name) {
+        elements.topApp.name.textContent = app.name;
+      }
+      animateValue(elements.topApp.count, app.count.toLocaleString());
 
-    // App name doesn't need highlight usually, but count does
-    if (
-      elements.mostCapturedApp.name.textContent !== data.mostCapturedApp.name
-    ) {
-      elements.mostCapturedApp.name.textContent = data.mostCapturedApp.name;
+      const newIconSrc = ENV.resolveIconPath(app.pkg);
+      if (elements.topApp.icon.getAttribute("src") !== newIconSrc) {
+        elements.topApp.icon.src = newIconSrc;
+      }
+    },
+
+    automations: (autoOrganizer, autoCleaner) => {
+      const { automations } = elements;
+
+      const setAutomation = (
+        statusEl,
+        badgeEl,
+        active,
+        activeText,
+        inactiveText
+      ) => {
+        statusEl.textContent = active ? activeText : inactiveText;
+        badgeEl.textContent = active ? "Ativa" : "Inativa";
+        badgeEl
+          .closest(".dashboard-automation-card")
+          ?.classList.toggle("active", active);
+      };
+
+      setAutomation(
+        automations.organizerStatus,
+        automations.organizerBadge,
+        autoOrganizer,
+        "Novas capturas e gravações de tela serão organizadas periodicamente",
+        "Novas capturas e gravações de tela não serão organizadas periodicamente"
+      );
+      setAutomation(
+        automations.cleanerStatus,
+        automations.cleanerBadge,
+        autoCleaner,
+        "Capturas e gravações de tela serão removidas periodicamente após o prazo configurado",
+        "Capturas e gravações de tela não serão removidas periodicamente"
+      );
+    },
+
+    all: data => {
+      if (!data) return;
+      update.summary(data.organizedFiles, data.removedFiles);
+      update.toOrganize(
+        data.toOrganize?.screenshots,
+        data.toOrganize?.recordings
+      );
+      update.foldersCreated(
+        data.foldersCreated?.screenshots,
+        data.foldersCreated?.recordings
+      );
+      update.lastOrganization(
+        data.lastOrganization.screenshots,
+        data.lastOrganization.recordings
+      );
+      update.lastClean(data.lastClean.screenshots, data.lastClean.recordings);
+      update.mostCapturedApp(data.mostCapturedApp);
+      if (data.settings) {
+        update.automations(
+          data.settings.autoOrganizer,
+          data.settings.autoCleaner
+        );
+      }
     }
+  };
 
-    updateWithAnimation(
-      elements.mostCapturedApp.count,
-      data.mostCapturedApp.count.toLocaleString()
-    );
-
-    const newIconSrc = ENV.resolveIconPath(data.mostCapturedApp.pkg);
-    if (elements.mostCapturedApp.icon.getAttribute("src") !== newIconSrc) {
-      elements.mostCapturedApp.icon.src = newIconSrc;
-    }
+  function init() {
+    queryElements();
   }
 
   return {
     init,
+    getElements,
     update
   };
 })();

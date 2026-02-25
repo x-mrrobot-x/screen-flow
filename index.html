@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no"
     />
-    <title>ScreenFlow — Organizer Automático</title>
+    <title>ScreenFlow — Organizador Automático de Mídia</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -15,7 +15,15 @@
       rel="stylesheet"
     />
 
-    <link rel="stylesheet" href="src/assets/styles/main.css" />
+    <!-- Styles -->
+    <link rel="stylesheet" href="src/assets/styles/base/reset.css" />
+    <link rel="stylesheet" href="src/assets/styles/base/variables.css" />
+    <link rel="stylesheet" href="src/assets/styles/base/typography.css" />
+    <link rel="stylesheet" href="src/assets/styles/base/globals.css" />
+    <link rel="stylesheet" href="src/assets/styles/base/info-card.css" />
+    <link rel="stylesheet" href="src/assets/styles/base/buttons.css" />
+    <link rel="stylesheet" href="src/assets/styles/base/dialog.css" />
+    <link rel="stylesheet" href="src/assets/styles/base/toast.css" />
     <link rel="stylesheet" href="src/assets/styles/animations.css" />
     <link rel="stylesheet" href="src/assets/styles/navigation.css" />
 
@@ -26,8 +34,8 @@
     <link rel="stylesheet" href="src/features/cleaner/cleaner.css" />
     <link rel="stylesheet" href="src/features/organizer/organizer.css" />
     <link rel="stylesheet" href="src/features/settings/settings.css" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
     <script>
       eruda.init();
@@ -35,675 +43,1059 @@
   </head>
   <body>
     <div id="app">
-      <!--  DASHBOARD TAB  -->
-      <main
-        id="tab-dashboard"
-        class="tab-content active page-container page-enter animate-fade-in"
-      >
-        <header class="page-header animate-fade-in-down">
-          <div class="header-row">
-            <img
-              src="src/assets/brand/logo.png"
-              alt="ScreenFlow Logo"
-              class="logo-img"
-            />
-            <div class="header-text">
-              <h1 class="page-title">ScreenFlow</h1>
-              <p class="page-subtitle">Tudo organizado automaticamente</p>
-            </div>
-          </div>
-        </header>
-
-        <section class="dashboard-grid">
-          <div
-            class="summary-card animate-fade-in-up"
-            style="animation-delay: 0.1s"
-          >
-            <div class="summary-header">
-              <i data-icon="layer-group"></i>
-            </div>
-
-            <div class="summary-body">
-              <div class="summary-item">
-                <span id="summary-organized-files" class="summary-value"
-                  >...</span
-                >
-                <span class="summary-label">Arquivos Organizados</span>
-              </div>
-              <div class="summary-item">
-                <span id="summary-removed-files" class="summary-value"
-                  >...</span
-                >
-                <span class="summary-label">Arquivos Removidos</span>
+      <main class="app-main">
+        <!-- PAINEL PRINCIPAL -->
+        <article
+          id="tab-dashboard"
+          class="tab-content active page-container animate-fade-in"
+          role="tabpanel"
+          aria-label="Painel principal"
+        >
+          <header class="page-header animate-fade-in-down">
+            <div class="header-row">
+              <img
+                src="src/assets/brand/logo.png"
+                alt="Logotipo do ScreenFlow"
+                class="logo-img"
+              />
+              <div class="header-text">
+                <h1 class="page-title">ScreenFlow</h1>
+                <p class="page-subtitle">Tudo organizado automaticamente</p>
               </div>
             </div>
-          </div>
+          </header>
 
-          <div class="info-grid">
+          <section class="dashboard-grid" aria-label="Resumo geral">
             <div
-              class="info-card animate-fade-in-up"
-              style="animation-delay: 0.2s"
+              class="dashboard-summary-card animate-fade-in-up"
+              style="animation-delay: 0.1s"
             >
-              <div class="info-header">
-                <div class="info-icon icon-blue">
-                  <i data-icon="file-circle-question"></i>
-                </div>
-                <span class="info-title">Para Organizar</span>
+              <div class="dashboard-summary-header">
+                <i data-icon="layer-group" aria-hidden="true"></i>
               </div>
-              <div class="info-body">
-                <div class="info-item">
-                  <span id="to-organize-images" class="info-value">...</span>
-                  <span class="info-label">Imagens</span>
-                </div>
-                <div class="info-item">
-                  <span id="to-organize-videos" class="info-value">...</span>
-                  <span class="info-label">Vídeos</span>
-                </div>
-              </div>
-            </div>
-
-            <div
-              class="info-card animate-fade-in-up"
-              style="animation-delay: 0.3s"
-            >
-              <div class="info-header">
-                <div class="info-icon icon-blue">
-                  <i data-icon="folder-tree"></i>
-                </div>
-                <span class="info-title">Pastas Criadas</span>
-              </div>
-              <div class="info-body">
-                <div class="info-item">
-                  <span id="folders-created-images" class="info-value"
+              <div class="dashboard-summary-body">
+                <div class="dashboard-summary-item">
+                  <span
+                    id="dashboard-summary-organized-files"
+                    class="dashboard-summary-value"
                     >...</span
                   >
-                  <span class="info-label">Imagens</span>
+                  <span class="dashboard-summary-label"
+                    >Arquivos Organizados</span
+                  >
                 </div>
-                <div class="info-item">
-                  <span id="folders-created-videos" class="info-value"
+                <div class="dashboard-summary-item">
+                  <span
+                    id="dashboard-summary-removed-files"
+                    class="dashboard-summary-value"
                     >...</span
                   >
-                  <span class="info-label">Vídeos</span>
+                  <span class="dashboard-summary-label"
+                    >Arquivos Removidos</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="dashboard-info-grid">
+              <div
+                class="dashboard-info-card card animate-fade-in-up"
+                style="animation-delay: 0.2s"
+              >
+                <div class="dashboard-info-header">
+                  <div class="dashboard-info-icon icon-blue" aria-hidden="true">
+                    <i data-icon="file-circle-question"></i>
+                  </div>
+                  <span class="dashboard-info-title"
+                    >Aguardando Organização</span
+                  >
+                </div>
+                <div class="dashboard-info-body">
+                  <div class="dashboard-info-item">
+                    <span
+                      id="to-organize-screenshots"
+                      class="dashboard-info-value"
+                      >...</span
+                    >
+                    <span class="dashboard-info-label">Capturas</span>
+                  </div>
+                  <div class="dashboard-info-item">
+                    <span
+                      id="to-organize-recordings"
+                      class="dashboard-info-value"
+                      >...</span
+                    >
+                    <span class="dashboard-info-label">Gravações</span>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="dashboard-info-card card animate-fade-in-up"
+                style="animation-delay: 0.2s"
+              >
+                <div class="dashboard-info-header">
+                  <div class="dashboard-info-icon icon-blue" aria-hidden="true">
+                    <i data-icon="folder-tree"></i>
+                  </div>
+                  <span class="dashboard-info-title">Pastas Criadas</span>
+                </div>
+                <div class="dashboard-info-body">
+                  <div class="dashboard-info-item">
+                    <span
+                      id="folders-created-screenshots"
+                      class="dashboard-info-value"
+                      >...</span
+                    >
+                    <span class="dashboard-info-label">Capturas</span>
+                  </div>
+                  <div class="dashboard-info-item">
+                    <span
+                      id="folders-created-recordings"
+                      class="dashboard-info-value"
+                      >...</span
+                    >
+                    <span class="dashboard-info-label">Gravações</span>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="dashboard-info-card card animate-fade-in-up"
+                style="animation-delay: 0.3s"
+              >
+                <div class="dashboard-info-header">
+                  <div
+                    class="dashboard-info-icon icon-green"
+                    aria-hidden="true"
+                  >
+                    <i data-icon="folder-open"></i>
+                  </div>
+                  <span class="dashboard-info-title">Última Organização</span>
+                </div>
+                <div class="dashboard-info-body">
+                  <div class="dashboard-info-item">
+                    <span
+                      id="last-organization-screenshots"
+                      class="dashboard-info-value"
+                      >...</span
+                    >
+                    <span class="dashboard-info-label">Capturas</span>
+                  </div>
+                  <div class="dashboard-info-item">
+                    <span
+                      id="last-organization-recordings"
+                      class="dashboard-info-value"
+                      >...</span
+                    >
+                    <span class="dashboard-info-label">Gravações</span>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="dashboard-info-card card animate-fade-in-up"
+                style="animation-delay: 0.3s"
+              >
+                <div class="dashboard-info-header">
+                  <div
+                    class="dashboard-info-icon icon-purple"
+                    aria-hidden="true"
+                  >
+                    <i data-icon="broom"></i>
+                  </div>
+                  <span class="dashboard-info-title">Última Limpeza</span>
+                </div>
+                <div class="dashboard-info-body">
+                  <div class="dashboard-info-item">
+                    <span
+                      id="last-cleanup-screenshots"
+                      class="dashboard-info-value"
+                      >...</span
+                    >
+                    <span class="dashboard-info-label">Capturas</span>
+                  </div>
+                  <div class="dashboard-info-item">
+                    <span
+                      id="last-cleanup-recordings"
+                      class="dashboard-info-value"
+                      >...</span
+                    >
+                    <span class="dashboard-info-label">Gravações</span>
+                  </div>
                 </div>
               </div>
             </div>
 
             <div
-              class="info-card animate-fade-in-up"
+              class="dashboard-top-app-card card animate-fade-in-up"
               style="animation-delay: 0.4s"
             >
-              <div class="info-header">
-                <div class="info-icon icon-green">
+              <div class="dashboard-app-info">
+                <img
+                  id="top-app-icon"
+                  src="src/assets/icons/default.png"
+                  alt="Ícone do app com mais mídias organizadas"
+                  class="app-icon"
+                />
+                <div class="dashboard-app-text">
+                  <span id="top-app-name" class="dashboard-app-name">...</span>
+                  <span class="dashboard-app-description"
+                    >App com mais mídias organizadas</span
+                  >
+                </div>
+              </div>
+              <span id="top-app-count" class="dashboard-app-count">...</span>
+            </div>
+          </section>
+
+          <section aria-label="Ações rápidas">
+            <h2
+              class="section-title animate-fade-in-up"
+              style="animation-delay: 0.5s"
+            >
+              Ações Rápidas
+            </h2>
+            <div class="dashboard-action-list">
+              <button
+                class="dashboard-action-card card animate-fade-in-up"
+                style="animation-delay: 0.5s"
+                data-process-type="organize_screenshots"
+              >
+                <div class="dashboard-action-icon icon-blue" aria-hidden="true">
+                  <i data-icon="image"></i>
+                </div>
+                <div class="dashboard-action-label">
+                  <span>Organizar</span>
+                  <span>Imagens</span>
+                </div>
+              </button>
+
+              <button
+                class="dashboard-action-card card animate-fade-in-up"
+                style="animation-delay: 0.5s"
+                data-process-type="organize_recordings"
+              >
+                <div
+                  class="dashboard-action-icon icon-green"
+                  aria-hidden="true"
+                >
+                  <i data-icon="video"></i>
+                </div>
+                <div class="dashboard-action-label">
+                  <span>Organizar</span>
+                  <span>Vídeos</span>
+                </div>
+              </button>
+
+              <button
+                class="dashboard-action-card card animate-fade-in-up"
+                style="animation-delay: 0.5s"
+                data-process-type="cleanup_old_files"
+              >
+                <div
+                  class="dashboard-action-icon icon-purple"
+                  aria-hidden="true"
+                >
+                  <i data-icon="broom"></i>
+                </div>
+                <div class="dashboard-action-label">
+                  <span>Executar</span>
+                  <span>Limpeza</span>
+                </div>
+              </button>
+            </div>
+          </section>
+
+          <section
+            id="automations"
+            class="dashboard-automations-section animate-fade-in-up"
+            style="animation-delay: 0.6s"
+            aria-label="Automações"
+            aria-live="polite"
+          >
+            <h2 class="section-title">Automações</h2>
+            <div class="dashboard-automations-grid">
+              <div
+                class="dashboard-automation-card card"
+                id="automation-organizer"
+                data-navigate="organizer"
+              >
+                <div class="dashboard-automation-icon" aria-hidden="true">
                   <i data-icon="folder-open"></i>
                 </div>
-                <span class="info-title">Última Organização</span>
+                <div class="dashboard-automation-text">
+                  <span class="dashboard-automation-name"
+                    >Organização Automática</span
+                  >
+                  <span
+                    class="dashboard-automation-status"
+                    id="automation-organizer-status"
+                    >Verificando...</span
+                  >
+                </div>
+                <span
+                  class="dashboard-automation-badge"
+                  id="automation-organizer-badge"
+                ></span>
               </div>
-              <div class="info-body">
-                <div class="info-item">
-                  <span id="last-organization-images" class="info-value"
-                    >...</span
-                  >
-                  <span class="info-label">Imagens</span>
+
+              <div
+                class="dashboard-automation-card card"
+                id="automation-cleaner"
+                data-navigate="cleaner"
+              >
+                <div class="dashboard-automation-icon" aria-hidden="true">
+                  <i data-icon="broom"></i>
                 </div>
-                <div class="info-item">
-                  <span id="last-organization-videos" class="info-value"
-                    >...</span
+                <div class="dashboard-automation-text">
+                  <span class="dashboard-automation-name"
+                    >Limpeza Automática</span
                   >
-                  <span class="info-label">Vídeos</span>
+                  <span
+                    class="dashboard-automation-status"
+                    id="automation-cleaner-status"
+                    >Verificando...</span
+                  >
                 </div>
+                <span
+                  class="dashboard-automation-badge"
+                  id="automation-cleaner-badge"
+                ></span>
+              </div>
+            </div>
+          </section>
+        </article>
+
+        <!-- ORGANIZAÇÃO -->
+        <article
+          id="tab-organizer"
+          class="tab-content page-container page-enter animate-fade-in"
+          role="tabpanel"
+          aria-label="Organização de mídias"
+        >
+          <header class="page-header animate-fade-in-down">
+            <div class="header-row">
+              <div class="page-header-icon" aria-hidden="true">
+                <i data-icon="folder-open"></i>
+              </div>
+              <div class="header-text">
+                <h2 class="page-title">Organização</h2>
+                <p class="page-subtitle">
+                  Visualize e gerencie suas mídias por pasta
+                </p>
               </div>
             </div>
 
             <div
-              class="info-card animate-fade-in-up"
-              style="animation-delay: 0.5s"
+              class="organizer-search-container animate-fade-in-up"
+              style="animation-delay: 0.1s"
+              role="search"
             >
-              <div class="info-header">
-                <div class="info-icon icon-purple">
-                  <i data-icon="broom"></i>
-                </div>
-                <span class="info-title">Última Limpeza</span>
+              <div class="organizer-search-icon" aria-hidden="true">
+                <i data-icon="search"></i>
               </div>
-              <div class="info-body">
-                <div class="info-item">
-                  <span id="last-clean-images" class="info-value">...</span>
-                  <span class="info-label">Imagens</span>
-                </div>
-                <div class="info-item">
-                  <span id="last-clean-videos" class="info-value">...</span>
-                  <span class="info-label">Vídeos</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div
-            class="app-card animate-fade-in-up"
-            style="animation-delay: 0.6s"
-          >
-            <div class="app-info">
-              <img
-                id="most-captured-app-icon"
-                src="src/assets/icons/default.png"
-                class="app-icon"
+              <input
+                type="search"
+                class="organizer-search-input"
+                placeholder="Buscar pasta..."
+                aria-label="Buscar pasta"
               />
-              <div class="app-text">
-                <span id="most-captured-app-name" class="app-name">...</span>
-                <span class="app-desc">App com mais capturas</span>
-              </div>
             </div>
-            <span id="most-captured-app-count" class="app-count">...</span>
-          </div>
-        </section>
 
-        <section>
-          <h2 class="section-title animate-fade-in-up" style="animation-delay: 0.7s">
-            Ações Rápidas
-          </h2>
-          <div class="quick-actions">
-            <button
-              class="btn-card animate-fade-in-up"
-              style="animation-delay: 0.8s"
-              data-process-type="organize_screenshots"
+            <nav
+              class="organizer-filters-row animate-fade-in-up"
+              style="animation-delay: 0.2s"
+              aria-label="Filtrar por tipo de mídia"
             >
-              <div class="icon-wrapper icon-blue">
-                <i data-icon="image"></i>
-              </div>
-              <div class="btn-label">
-                <span>Organizar</span>
-                <span>Imagens</span>
-              </div>
-            </button>
+              <button
+                id="filter-all"
+                class="organizer-filter-button active card tap-scale"
+                data-filter="all"
+                aria-pressed="true"
+              >
+                Todas
+              </button>
+              <button
+                id="filter-screenshots"
+                class="organizer-filter-button card tap-scale"
+                data-filter="screenshots"
+                aria-pressed="false"
+              >
+                <i data-icon="image" aria-hidden="true"></i>
+                Capturas
+              </button>
+              <button
+                id="filter-recordings"
+                class="organizer-filter-button card tap-scale"
+                data-filter="recordings"
+                aria-pressed="false"
+              >
+                <i data-icon="video" aria-hidden="true"></i>
+                Gravações
+              </button>
 
-            <button
-              class="btn-card animate-fade-in-up"
-              style="animation-delay: 0.9s"
-              data-process-type="organize_recordings"
-            >
-              <div class="icon-wrapper icon-green">
-                <i data-icon="video"></i>
-              </div>
-              <div class="btn-label">
-                <span>Organizar</span>
-                <span>Vídeos</span>
-              </div>
-            </button>
+              <div
+                class="organizer-media-counter"
+                id="media-counter"
+                aria-live="polite"
+              ></div>
+            </nav>
+          </header>
 
-            <button
-              class="btn-card animate-fade-in-up"
-              style="animation-delay: 1.0s"
-              data-process-type="cleanup_old_files"
-            >
-              <div class="icon-wrapper icon-purple">
-                <i data-icon="broom"></i>
-              </div>
-              <div class="btn-label">
-                <span>Executar</span>
-                <span>limpeza</span>
-              </div>
-            </button>
-          </div>
-        </section>
-      </main>
-
-      <!--  ORGANIZER TAB  -->
-      <main
-        id="tab-organizer"
-        class="tab-content page-container page-enter animate-fade-in"
-      >
-        <header class="page-header animate-fade-in-down">
-          <div class="header-row">
-            <div class="page-header-icon">
-              <i data-icon="folder-open"></i>
-            </div>
-            <div class="header-text">
-              <h2 class="page-title">Organização</h2>
-              <p class="page-subtitle">Visualize e gerencie suas mídias</p>
-            </div>
-          </div>
-
-          <div class="search-container animate-fade-in-up" style="animation-delay: 0.1s">
-            <div class="search-icon-wrapper">
-              <i class="search-icon" data-icon="search"></i>
-            </div>
-            <input
-              type="search"
-              class="search-input"
-              placeholder="Buscar por pasta..."
-            />
-          </div>
-
-          <div class="filters-row animate-fade-in-up" style="animation-delay: 0.2s">
-            <button
-              id="filter-all"
-              class="filter-button active tap-scale"
-              data-filter="all"
-            >
-              Todas
-            </button>
-            <button
-              id="filter-screenshots"
-              class="filter-button tap-scale"
-              data-filter="screenshots"
-            >
-              <i data-icon="image"></i>
-              Screenshots
-            </button>
-            <button
-              id="filter-recordings"
-              class="filter-button tap-scale"
-              data-filter="recordings"
-            >
-              <i data-icon="video"></i>
-              Gravações
-            </button>
-
-            <div class="media-counter" id="media-counter"></div>
-          </div>
-        </header>
-
-        <section
-          id="folders-grid"
-          class="folders-grid animate-fade-in"
-          style="animation-delay: 0.3s"
-        ></section>
-      </main>
-
-      <!--  CLEANER TAB  -->
-      <main
-        id="tab-cleaner"
-        class="tab-content page-container page-enter animate-fade-in"
-      >
-        <header class="page-header animate-fade-in-down">
-          <div class="header-row">
-            <div class="page-header-icon">
-              <i data-icon="broom"></i>
-            </div>
-            <div class="header-text">
-              <h2 class="page-title">Limpeza</h2>
-              <p class="page-subtitle" id="cleaner-count-text">
-                Limpe pastas automaticamente
-              </p>
-            </div>
-          </div>
-        </header>
-
-        <section class="cleaner-card animate-fade-in-up" style="animation-delay: 0.1s">
-          <div class="cleaner-row">
-            <div class="cleaner-content">
-              <div class="cleaner-icon icon-purple">
-                <i data-icon="broom"></i>
-              </div>
-              <div class="cleaner-text">
-                <h4>Limpeza Automática</h4>
-              </div>
-            </div>
-            <button
-              class="switch active"
-              id="switch-autoCleaner"
-              data-action="toggleAutoCleaner"
-            ></button>
-          </div>
-          <aside class="cleaner-info">
-            Ao habilitar nas pastas, screenshots e gravações que ultrapassarem o
-            dia limite serão automaticamente apagados.
-          </aside>
-        </section>
-
-        <section
-          id="folder-clean-list"
-          class="folder-clean-list animate-fade-in"
-          style="animation-delay: 0.2s"
-        ></section>
-      </main>
-
-      <!--  STATS TAB  -->
-      <main
-        id="tab-stats"
-        class="tab-content page-container page-enter animate-fade-in"
-      >
-        <header class="page-header animate-fade-in-down">
-          <div class="header-row">
-            <div class="page-header-icon">
-              <i data-icon="chart-column"></i>
-            </div>
-            <div class="header-text">
-              <h2 class="page-title">Estatísticas</h2>
-              <p class="page-subtitle">Acompanhe seu uso e economia</p>
-            </div>
-          </div>
-        </header>
-
-        <nav
-          id="media-type-selector"
-          class="media-type-selector animate-fade-in-up"
-          style="animation-delay: 0.1s"
-        >
-          <button
-            class="media-type-button active tap-scale"
-            data-media-type="screenshots"
-            data-action="setMediaType"
+          <section
+            class="automation-section animate-fade-in-up"
+            style="animation-delay: 0.25s"
+            aria-label="Configuração de organização automática"
           >
-            <i data-icon="image"></i>
-            Screenshots
-          </button>
-          <button
-            class="media-type-button tap-scale"
-            data-media-type="recordings"
-            data-action="setMediaType"
-          >
-            <i data-icon="video"></i>
-            Gravações
-          </button>
-        </nav>
-
-        <article class="chart-card animate-fade-in-up" style="animation-delay: 0.2s">
-          <header class="chart-header">
-            <i data-icon="trending-up"></i>
-            <h3 id="weekly-chart-title" class="chart-title">
-              Capturas por Dia
-            </h3>
-          </header>
-          <div class="chart-container">
-            <canvas id="weeklyChart"></canvas>
-          </div>
-        </article>
-
-        <article class="chart-card animate-fade-in-up" style="animation-delay: 0.3s">
-          <header class="chart-header">
-            <i data-icon="pie-chart"></i>
-            <h3 class="chart-title">Por Pasta</h3>
-          </header>
-          <div class="chart-container">
-            <canvas id="organizerChart"></canvas>
-          </div>
-        </article>
-
-        <article class="activity-card animate-fade-in-up" style="animation-delay: 0.4s">
-          <!-- Cabeçalho -->
-          <header class="card-header">
-            <div class="header-icon">
-              <i data-icon="calendar"></i>
-            </div>
-            <h2 class="card-title">Atividade Recente</h2>
-          </header>
-
-          <ul class="activity-list"></ul>
-        </article>
-      </main>
-
-      <!--  SETTINGS TAB  -->
-      <main
-        id="tab-settings"
-        class="tab-content page-container page-enter animate-fade-in"
-      >
-        <header class="page-header animate-fade-in-down">
-          <div class="header-row">
-            <div class="page-header-icon">
-              <i data-icon="settings"></i>
-            </div>
-            <div class="header-text">
-              <h2 class="page-title">Configurações</h2>
-              <p class="page-subtitle">Personalize sua experiência</p>
-            </div>
-          </div>
-        </header>
-
-        <section class="settings-section animate-fade-in-up" style="animation-delay: 0.1s">
-          <h2 class="section-title">TEMA</h2>
-          <article class="settings-card">
-            <div class="theme-grid">
-              <button
-                class="theme-button tap-scale"
-                data-theme="light"
-                id="theme-light"
-              >
-                <i data-icon="sun"></i>
-                <span>Claro</span>
-              </button>
-              <button
-                class="theme-button tap-scale"
-                data-theme="dark"
-                id="theme-dark"
-              >
-                <i data-icon="moon"></i>
-                <span>Escuro</span>
-              </button>
-              <button
-                class="theme-button tap-scale"
-                data-theme="system"
-                id="theme-system"
-              >
-                <i data-icon="monitor"></i>
-                <span>Sistema</span>
-              </button>
-            </div>
-          </article>
-        </section>
-
-        <section class="settings-section animate-fade-in-up" style="animation-delay: 0.2s">
-          <h2 class="section-title">AUTOMAÇÃO</h2>
-          <article class="settings-card">
-            <div class="setting-row">
-              <div class="setting-info">
-                <div class="setting-icon icon-green">
+            <div class="automation-card card">
+              <div class="automation-info">
+                <div class="automation-icon icon-green" aria-hidden="true">
                   <i data-icon="folder-open"></i>
                 </div>
-                <div class="setting-text">
-                  <h4>Organização Automática</h4>
-                  <p>Organizar arquivos automaticamente</p>
+                <div class="automation-text">
+                  <h3>Organização Automática</h3>
+                  <p>
+                    Verifica periodicamente novas capturas e gravações de tela e
+                    as organiza automaticamente em pastas por aplicativo
+                  </p>
                 </div>
               </div>
               <button
-                class="switch active"
-                id="switch-autoOrganizer"
+                class="switch-md active"
+                id="switch-auto-organizer"
                 data-setting-key="autoOrganizer"
+                role="switch"
+                aria-checked="true"
+                aria-label="Ativar organização automática"
               ></button>
             </div>
-          </article>
-        </section>
+          </section>
 
-        <section class="settings-section animate-fade-in-up" style="animation-delay: 0.3s">
-          <h2 class="section-title">OUTROS</h2>
-          <article class="settings-card">
-            <div class="setting-row">
-              <div class="setting-info">
-                <div class="setting-icon icon-blue">
-                  <i data-icon="wand-magic-sparkles"></i>
-                </div>
-                <div class="setting-text">
-                  <h4>Animações</h4>
-                  <p>Efeitos visuais e transições</p>
-                </div>
-              </div>
-              <button
-                class="switch active"
-                id="switch-animationsEnabled"
-                data-setting-key="animationsEnabled"
-              ></button>
-            </div>
-          </article>
-        </section>
+          <section
+            id="folders-grid"
+            class="organizer-folders-grid animate-fade-in"
+            style="animation-delay: 0.3s"
+            aria-label="Pastas organizadas"
+          ></section>
+        </article>
 
-        <section class="settings-section animate-fade-in-up" style="animation-delay: 0.4s">
-          <h2 class="section-title">NOTIFICAÇÕES</h2>
-          <article class="settings-card">
-            <div class="setting-row">
-              <div class="setting-info">
-                <div class="setting-icon icon-gray">
-                  <i data-icon="bell"></i>
-                </div>
-                <div class="setting-text">
-                  <h4>Notificações</h4>
-                  <p>Receber alertas de limpeza</p>
-                </div>
-              </div>
-              <button
-                class="switch active"
-                id="switch-notifications"
-                data-setting-key="notifications"
-              ></button>
-            </div>
-          </article>
-        </section>
-
-        <div
-          class="settings-section glass-panel danger-zone animate-fade-in-up"
-          style="animation-delay: 0.5s"
+        <!-- LIMPEZA -->
+        <article
+          id="tab-cleaner"
+          class="tab-content page-container page-enter animate-fade-in"
+          role="tabpanel"
+          aria-label="Limpeza de mídias"
         >
-          <div class="settings-section-header">
-            <div class="setting-icon icon-red">
-              <i data-icon="danger"></i>
+          <header class="page-header animate-fade-in-down">
+            <div class="header-row">
+              <div class="page-header-icon" aria-hidden="true">
+                <i data-icon="broom"></i>
+              </div>
+              <div class="header-text">
+                <h2 class="page-title">Limpeza</h2>
+                <p class="page-subtitle" id="cleaner-subtitle">
+                  Remova arquivos antigos
+                </p>
+              </div>
             </div>
-            <h3 class="settings-title" data-i18n="settings.danger_zone">
-              Zona de Perigo
-            </h3>
-          </div>
+          </header>
 
-          <div class="danger-actions">
-            <div class="danger-action">
-              <div class="danger-action-info">
-                <h4 data-i18n="settings.reset_settings">
-                  Resetar Configurações
-                </h4>
-                <p data-i18n="settings.reset_desc">
-                  Restaura todas as configurações para os valores padrão.
-                </p>
+          <section
+            class="automation-section animate-fade-in-up"
+            style="animation-delay: 0.1s"
+            aria-label="Configuração de limpeza automática"
+          >
+            <div class="automation-card card">
+              <div class="automation-info">
+                <div class="automation-icon icon-purple" aria-hidden="true">
+                  <i data-icon="broom"></i>
+                </div>
+                <div class="automation-text">
+                  <h3>Limpeza Automática</h3>
+                  <p>
+                    Verifica periodicamente as pastas configuradas e remove
+                    capturas ou gravações de tela que ultrapassam o limite de
+                    dias definido
+                  </p>
+                </div>
               </div>
               <button
-                type="button"
-                class="btn btn-outline-danger"
-                id="resetSettingsBtn"
-                data-i18n="common.reset"
-              >
-                Resetar
-              </button>
+                class="switch-md active"
+                id="switch-auto-cleaner"
+                data-action="toggleAutoCleaner"
+                data-setting-key="autoCleaner"
+                role="switch"
+                aria-checked="true"
+                aria-label="Ativar limpeza automática"
+              ></button>
             </div>
-            <div class="danger-action">
-              <div class="danger-action-info">
-                <h4 data-i18n="settings.delete_all">Apagar Todos os Dados</h4>
-                <p data-i18n="settings.delete_all_desc">
-                  Remove permanentemente todos os dados do aplicativo.
+          </section>
+
+          <section
+            id="cleaner-folder-list"
+            class="cleaner-folder-list animate-fade-in"
+            style="animation-delay: 0.2s"
+            aria-label="Pastas configuradas para limpeza"
+          ></section>
+        </article>
+
+        <!-- ESTATÍSTICAS -->
+        <article
+          id="tab-stats"
+          class="tab-content page-container page-enter animate-fade-in"
+          role="tabpanel"
+          aria-label="Estatísticas de uso"
+        >
+          <header class="page-header animate-fade-in-down">
+            <div class="header-row">
+              <div class="page-header-icon" aria-hidden="true">
+                <i data-icon="chart-column"></i>
+              </div>
+              <div class="header-text">
+                <h2 class="page-title">Estatísticas</h2>
+                <p class="page-subtitle">
+                  Acompanhe capturas, gravações e economia de espaço
                 </p>
               </div>
-              <button
-                type="button"
-                class="btn btn-danger"
-                id="deleteAllBtn"
-                data-i18n="settings.delete_all_btn"
-              >
-                Apagar Dados
-              </button>
             </div>
-          </div>
-        </div>
+          </header>
+
+          <nav
+            id="media-type-selector"
+            class="stats-media-type-selector animate-fade-in-up"
+            style="animation-delay: 0.1s"
+            aria-label="Selecionar tipo de mídia"
+          >
+            <button
+              class="stats-media-type-button card active tap-scale"
+              data-media-type="screenshots"
+              data-action="setMediaType"
+              aria-pressed="true"
+            >
+              <i data-icon="image" aria-hidden="true"></i>
+              Capturas
+            </button>
+            <button
+              class="stats-media-type-button card tap-scale"
+              data-media-type="recordings"
+              data-action="setMediaType"
+              aria-pressed="false"
+            >
+              <i data-icon="video" aria-hidden="true"></i>
+              Gravações
+            </button>
+          </nav>
+
+          <article
+            class="stats-chart-card card animate-fade-in-up"
+            style="animation-delay: 0.2s"
+          >
+            <header class="stats-chart-header">
+              <i data-icon="trending-up" aria-hidden="true"></i>
+              <h3 id="weekly-chart-title" class="stats-chart-title">
+                Capturas por Dia
+              </h3>
+            </header>
+            <div class="stats-chart-container">
+              <canvas id="weekly-chart"></canvas>
+            </div>
+          </article>
+
+          <article
+            class="stats-chart-card card animate-fade-in-up"
+            style="animation-delay: 0.3s"
+          >
+            <header class="stats-chart-header">
+              <i data-icon="pie-chart" aria-hidden="true"></i>
+              <h3 class="stats-chart-title">Distribuição por Pasta</h3>
+            </header>
+            <div class="stats-chart-container">
+              <canvas id="folders-chart"></canvas>
+            </div>
+          </article>
+
+          <section
+            class="stats-activity-card card animate-fade-in-up"
+            style="animation-delay: 0.4s"
+          >
+            <header class="stats-activity-header">
+              <i data-icon="calendar"></i>
+              <h2 class="stats-activity-title">Atividade Recente</h2>
+            </header>
+            <ul class="stats-activity-list" aria-live="polite"></ul>
+          </section>
+        </article>
+
+        <!-- CONFIGURAÇÕES -->
+        <article
+          id="tab-settings"
+          class="tab-content page-container page-enter animate-fade-in"
+          role="tabpanel"
+          aria-label="Configurações do aplicativo"
+        >
+          <header class="page-header animate-fade-in-down">
+            <div class="header-row">
+              <div class="page-header-icon" aria-hidden="true">
+                <i data-icon="settings"></i>
+              </div>
+              <div class="header-text">
+                <h2 class="page-title">Configurações</h2>
+                <p class="page-subtitle">
+                  Personalize sua experiência no ScreenFlow
+                </p>
+              </div>
+            </div>
+          </header>
+
+          <section
+            class="settings-section animate-fade-in-up"
+            style="animation-delay: 0.1s"
+          >
+            <h3 class="section-title">Tema</h3>
+            <div class="settings-card card">
+              <div class="settings-theme-grid">
+                <button
+                  class="settings-theme-button tap-scale"
+                  data-theme="light"
+                  id="theme-light"
+                >
+                  <i data-icon="sun" aria-hidden="true"></i>
+                  <span>Claro</span>
+                </button>
+                <button
+                  class="settings-theme-button tap-scale"
+                  data-theme="dark"
+                  id="theme-dark"
+                >
+                  <i data-icon="moon" aria-hidden="true"></i>
+                  <span>Escuro</span>
+                </button>
+                <button
+                  class="settings-theme-button tap-scale"
+                  data-theme="system"
+                  id="theme-system"
+                >
+                  <i data-icon="monitor" aria-hidden="true"></i>
+                  <span>Sistema</span>
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <section
+            class="settings-section animate-fade-in-up"
+            style="animation-delay: 0.3s"
+          >
+            <h3 class="section-title">Visual</h3>
+            <div class="settings-card card">
+              <div class="settings-row">
+                <div class="settings-info">
+                  <div class="settings-icon icon-blue" aria-hidden="true">
+                    <i data-icon="wand-magic-sparkles"></i>
+                  </div>
+                  <div class="settings-text">
+                    <h4>Animações</h4>
+                    <p>Efeitos visuais e transições de tela</p>
+                  </div>
+                </div>
+                <button
+                  class="switch-md active"
+                  id="switch-animations-enabled"
+                  data-setting-key="animationsEnabled"
+                  role="switch"
+                  aria-checked="true"
+                  aria-label="Ativar animações"
+                ></button>
+              </div>
+            </div>
+          </section>
+
+          <section
+            class="settings-section animate-fade-in-up"
+            style="animation-delay: 0.4s"
+          >
+            <h3 class="section-title">Notificações</h3>
+            <div class="settings-card card">
+              <div class="settings-row">
+                <div class="settings-info">
+                  <div class="settings-icon icon-green" aria-hidden="true">
+                    <i data-icon="folder-open"></i>
+                  </div>
+                  <div class="settings-text">
+                    <h4>Resultado da Organização</h4>
+                    <p>
+                      Exibe um resumo com o total de arquivos organizados ao
+                      concluir o processo
+                    </p>
+                  </div>
+                </div>
+                <button
+                  class="switch-md active"
+                  id="switch-notify-organization-result"
+                  data-setting-key="notifyOrganizationResult"
+                  role="switch"
+                  aria-checked="true"
+                  aria-label="Notificar resultado da organização"
+                ></button>
+              </div>
+              <div class="settings-row">
+                <div class="settings-info">
+                  <div class="settings-icon icon-purple" aria-hidden="true">
+                    <i data-icon="broom"></i>
+                  </div>
+                  <div class="settings-text">
+                    <h4>Resultado da Limpeza</h4>
+                    <p>
+                      Exibe um resumo com o total de arquivos removidos ao
+                      concluir a limpeza
+                    </p>
+                  </div>
+                </div>
+                <button
+                  class="switch-md active"
+                  id="switch-notify-cleanup-result"
+                  data-setting-key="notifyCleanupResult"
+                  role="switch"
+                  aria-checked="true"
+                  aria-label="Notificar resultado da limpeza"
+                ></button>
+              </div>
+              <div class="settings-row">
+                <div class="settings-info">
+                  <div class="settings-icon icon-blue" aria-hidden="true">
+                    <i data-icon="file-circle-question"></i>
+                  </div>
+                  <div class="settings-text">
+                    <h4>Arquivos Pendentes</h4>
+                    <p>
+                      Notifica periodicamente quando há capturas ou gravações de
+                      tela aguardando organização
+                    </p>
+                  </div>
+                </div>
+                <button
+                  class="switch-md"
+                  id="switch-notify-pending-files"
+                  data-setting-key="notifyPendingFiles"
+                  role="switch"
+                  aria-checked="false"
+                  aria-label="Notificar arquivos pendentes de organização"
+                ></button>
+              </div>
+            </div>
+          </section>
+
+          <section
+            class="settings-section animate-fade-in-up"
+            style="animation-delay: 0.5s"
+          >
+            <h3 class="section-title">Arquivos</h3>
+            <div class="settings-card card">
+              <div
+                class="settings-row settings-row--action"
+                id="setting-custom-destination"
+                role="button"
+                tabindex="0"
+                aria-label="Configurar pasta de destino"
+              >
+                <div class="settings-info">
+                  <div class="settings-icon icon-blue" aria-hidden="true">
+                    <i data-icon="folder-open"></i>
+                  </div>
+                  <div class="settings-text">
+                    <h4>Pasta de Destino</h4>
+                    <p id="custom-destination-path">
+                      Usando diretório padrão do sistema
+                    </p>
+                  </div>
+                </div>
+                <div class="settings-chevron" aria-hidden="true">
+                  <i data-icon="chevron-right"></i>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section
+            class="settings-section animate-fade-in-up"
+            style="animation-delay: 0.6s"
+          >
+            <h3 class="section-title">Agendamento</h3>
+            <div class="settings-card card">
+              <div
+                class="settings-row settings-row--action"
+                id="setting-schedule-time"
+                role="button"
+                tabindex="0"
+                aria-label="Configurar horário de execução"
+              >
+                <div class="settings-info">
+                  <div class="settings-icon icon-yellow" aria-hidden="true">
+                    <i data-icon="clock"></i>
+                  </div>
+                  <div class="settings-text">
+                    <h4>Horário de Execução</h4>
+                    <p id="schedule-time-value">Monitoramento em tempo real</p>
+                  </div>
+                </div>
+                <div class="settings-chevron" aria-hidden="true">
+                  <i data-icon="chevron-right"></i>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section
+            class="settings-section animate-fade-in-up"
+            style="animation-delay: 0.7s"
+          >
+            <h3 class="section-title">Idioma</h3>
+            <div class="settings-card card">
+              <div
+                class="settings-row settings-row--action"
+                id="setting-language"
+                role="button"
+                tabindex="0"
+                aria-label="Selecionar idioma"
+              >
+                <div class="settings-info">
+                  <div class="settings-icon icon-blue" aria-hidden="true">
+                    <i data-icon="language"></i>
+                  </div>
+                  <div class="settings-text">
+                    <h4>Idioma do Aplicativo</h4>
+                    <p id="current-language-label">Português (Brasil)</p>
+                  </div>
+                </div>
+                <div class="settings-chevron" aria-hidden="true">
+                  <i data-icon="chevron-right"></i>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section
+            class="settings-section animate-fade-in-up"
+            style="animation-delay: 0.8s"
+          >
+            <h3 class="section-title">Dados</h3>
+            <div class="settings-card card">
+              <div
+                class="settings-row settings-row--action"
+                id="setting-export-data"
+                role="button"
+                tabindex="0"
+                aria-label="Exportar dados do aplicativo"
+              >
+                <div class="settings-info">
+                  <div class="settings-icon icon-green" aria-hidden="true">
+                    <i data-icon="download"></i>
+                  </div>
+                  <div class="settings-text">
+                    <h4>Exportar Dados</h4>
+                    <p>
+                      Salva configurações e histórico de atividades em um
+                      arquivo JSON
+                    </p>
+                  </div>
+                </div>
+                <div class="settings-chevron" aria-hidden="true">
+                  <i data-icon="chevron-right"></i>
+                </div>
+              </div>
+              <div
+                class="settings-row settings-row--action"
+                id="setting-import-data"
+                role="button"
+                tabindex="0"
+                aria-label="Importar dados do aplicativo"
+              >
+                <div class="settings-info">
+                  <div class="settings-icon icon-blue" aria-hidden="true">
+                    <i data-icon="upload"></i>
+                  </div>
+                  <div class="settings-text">
+                    <h4>Importar Dados</h4>
+                    <p>
+                      Restaura configurações e histórico a partir de um arquivo
+                      exportado
+                    </p>
+                  </div>
+                </div>
+                <div class="settings-chevron" aria-hidden="true">
+                  <i data-icon="chevron-right"></i>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section
+            class="settings-section settings-critical animate-fade-in-up"
+            style="animation-delay: 0.9s"
+            aria-labelledby="critical-actions-title"
+          >
+            <h3 id="critical-actions-title" class="section-title">
+              Ações Irreversíveis
+            </h3>
+            <div class="settings-card card">
+              <div class="settings-critical-action">
+                <div class="settings-info">
+                  <div class="settings-icon icon-yellow" aria-hidden="true">
+                    <i data-icon="rotate-ccw"></i>
+                  </div>
+                  <div class="settings-text">
+                    <h4>Restaurar Configurações</h4>
+                    <p>
+                      Reverte todas as preferências para os valores padrão de
+                      fábrica. Seus dados e histórico de atividades não serão
+                      afetados.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  class="btn-outline-danger"
+                  id="reset-settings-btn"
+                >
+                  Restaurar
+                </button>
+              </div>
+
+              <div class="settings-critical-action">
+                <div class="settings-info">
+                  <div class="settings-icon icon-red" aria-hidden="true">
+                    <i data-icon="trash"></i>
+                  </div>
+                  <div class="settings-text">
+                    <h4>Apagar Todos os Dados</h4>
+                    <p>
+                      Remove permanentemente configurações, histórico de
+                      atividades e estatísticas. Os arquivos de mídia no
+                      dispositivo não serão afetados.
+                    </p>
+                  </div>
+                </div>
+                <button type="button" class="btn-danger" id="delete-all-btn">
+                  Apagar
+                </button>
+              </div>
+            </div>
+          </section>
+        </article>
       </main>
+
+      <!-- NAVEGAÇÃO INFERIOR -->
+      <footer class="app-footer">
+        <nav
+          class="nav-container animate-fade-in-up"
+          aria-label="Navegação principal"
+        >
+          <button
+            id="nav-dashboard"
+            class="nav-button active"
+            data-tab="dashboard"
+          >
+            <i class="nav-icon" data-icon="home" aria-hidden="true"></i>
+            <span class="nav-label">Início</span>
+          </button>
+          <button id="nav-organizer" class="nav-button" data-tab="organizer">
+            <i class="nav-icon" data-icon="folder-open" aria-hidden="true"></i>
+            <span class="nav-label">Organização</span>
+          </button>
+          <button id="nav-cleaner" class="nav-button" data-tab="cleaner">
+            <i class="nav-icon" data-icon="broom" aria-hidden="true"></i>
+            <span class="nav-label">Limpeza</span>
+          </button>
+          <button id="nav-stats" class="nav-button" data-tab="stats">
+            <i class="nav-icon" data-icon="chart-column" aria-hidden="true"></i>
+            <span class="nav-label">Estatísticas</span>
+          </button>
+          <button id="nav-settings" class="nav-button" data-tab="settings">
+            <i class="nav-icon" data-icon="settings" aria-hidden="true"></i>
+            <span class="nav-label">Configurações</span>
+          </button>
+        </nav>
+      </footer>
     </div>
 
-    <!--  BOTTOM NAV  -->
-    <nav class="bottom-nav animate-fade-in-up">
-      <div class="nav-container">
+    <!-- DIALOGS -->
+    <dialog
+      id="process-dialog"
+      class="dialog"
+      aria-labelledby="process-dialog-title"
+    >
+      <header class="dialog-header">
+        <h2 class="dialog-title" id="process-dialog-title">Processando</h2>
         <button
-          id="nav-dashboard"
-          class="nav-button active tap-scale"
-          data-tab="dashboard"
+          type="button"
+          id="process-dialog-close"
+          class="dialog-close"
+          aria-label="Fechar"
         >
-          <i class="nav-icon" data-icon="home"></i>
-          <span class="nav-label">Início</span>
-        </button>
-
-        <button
-          id="nav-organizer"
-          class="nav-button tap-scale"
-          data-tab="organizer"
-        >
-          <i class="nav-icon" data-icon="folder-open"></i>
-          <span class="nav-label">Organização</span>
-        </button>
-
-        <button
-          id="nav-cleaner"
-          class="nav-button tap-scale"
-          data-tab="cleaner"
-        >
-          <i class="nav-icon" data-icon="broom"></i>
-          <span class="nav-label">Limpeza</span>
-        </button>
-
-        <button id="nav-stats" class="nav-button tap-scale" data-tab="stats">
-          <i class="nav-icon" data-icon="chart-column"></i>
-          <span class="nav-label">Estatísticas</span>
-        </button>
-
-        <button
-          id="nav-settings"
-          class="nav-button tap-scale"
-          data-tab="settings"
-        >
-          <i class="nav-icon" data-icon="settings"></i>
-          <span class="nav-label">Configurações</span>
-        </button>
-      </div>
-    </nav>
-
-    <!--  MODAL  -->
-    <dialog id="process-modal" class="modal">
-      <header class="modal-header">
-        <h2 class="modal-title" id="modal-title">Processando</h2>
-        <button type="button" id="process-modal-close" class="modal-close">
-          <i data-icon="x"></i>
+          <i data-icon="x" aria-hidden="true"></i>
         </button>
       </header>
 
-      <div class="modal-body">
-        <div class="progress-bar-container">
+      <div class="dialog-body">
+        <div class="process-progress-bar-container">
           <div
-            id="modal-progress-bar"
-            class="progress-bar"
+            id="process-dialog-bar"
+            class="process-progress-bar"
             style="width: 0%"
           ></div>
         </div>
-        <div class="progress-info">
-          <span id="modal-step-label">Iniciando...</span>
-          <span id="modal-percent">0%</span>
+
+        <div class="process-progress-info">
+          <span id="process-dialog-step-label">Iniciando processo...</span>
+          <span id="process-dialog-percent">0%</span>
         </div>
-        <div id="modal-steps-container" class="process-steps-container"></div>
-        <div id="modal-completion" class="process-completion">
-          <div class="completion-icon">
+
+        <div id="process-dialog-steps" class="process-dialog-steps"></div>
+
+        <div id="process-dialog-completion" class="process-completion">
+          <div class="process-completion-icon" aria-hidden="true">
             <i data-icon="check"></i>
           </div>
-          <p class="completion-title">Processo Finalizado!</p>
-          <p id="modal-result-text" class="completion-text"></p>
+          <p class="process-completion-title">Processo Concluído!</p>
+          <p id="process-dialog-result" class="process-completion-text"></p>
         </div>
       </div>
     </dialog>
 
-    <!-- Confirmation Modal -->
-    <dialog id="confirmation-modal" class="modal">
-      <header class="modal-header">
-        <h2 class="modal-title" id="confirmation-modal-title">Confirmação</h2>
-
-        <button type="button" id="confirmation-modal-close" class="modal-close">
-          <i data-icon="x"></i>
+    <dialog
+      id="confirmation-dialog"
+      class="dialog"
+      aria-labelledby="confirmation-dialog-title"
+    >
+      <header class="dialog-header">
+        <h2 class="dialog-title" id="confirmation-dialog-title">Confirmação</h2>
+        <button
+          type="button"
+          id="confirmation-dialog-close"
+          class="dialog-close"
+          aria-label="Fechar"
+        >
+          <i data-icon="x" aria-hidden="true"></i>
         </button>
       </header>
 
-      <div class="modal-body">
-        <p id="confirmation-modal-message">
-          Tem certeza de que deseja continuar?
+      <div class="dialog-body">
+        <p id="confirmation-dialog-message">
+          Tem certeza de que deseja continuar? Esta ação não pode ser desfeita.
         </p>
       </div>
 
-      <footer class="modal-actions">
+      <footer class="dialog-actions">
         <button
-          id="confirmation-modal-cancel"
-          class="btn btn-outline-secondary"
+          id="confirmation-dialog-cancel"
+          class="btn btn-outline"
           type="button"
         >
           Cancelar
         </button>
         <button
-          id="confirmation-modal-confirm"
+          id="confirmation-dialog-confirm"
           class="btn btn-danger"
           type="button"
         >
@@ -712,25 +1104,22 @@
       </footer>
     </dialog>
 
-    <!-- 1. Utilitários (sem dependências) -->
-    <script src="src/lib/constants.js"></script>
+    <!-- 1. Utilitários -->
     <script src="src/lib/defaults.js"></script>
     <script src="src/lib/utils.js"></script>
     <script src="src/lib/dom.js"></script>
-    <script src="src/lib/validators.js"></script>
     <script src="src/lib/activity-helper.js"></script>
-    <script src="src/lib/modal.js"></script>
     <script src="src/lib/toast.js"></script>
-    <script src="src/lib/confirmation-modal.js"></script>
+    <script src="src/lib/confirmation-dialog.js"></script>
     <script src="src/lib/icons-library.js"></script>
-
-    <!-- Mock data for web environment -->
+    <script src="src/core/logger.js"></script>
     <script src="src/data/mock-env.js"></script>
 
-    <!-- 2. Core (podem depender de lib) -->
+    <!-- 2. Core -->
+    <script src="src/core/dialog-stack.js"></script>
+    <script src="src/core/scroll-manager.js"></script>
     <script src="src/core/icons.js"></script>
     <script src="src/core/env.js"></script>
-    <script src="src/core/logger.js"></script>
     <script src="src/core/event-bus.js"></script>
     <script src="src/core/task-queue.js"></script>
     <script src="src/core/app-state.js"></script>
@@ -738,44 +1127,28 @@
     <script src="src/core/navigation.js"></script>
     <script src="src/core/subfolder-monitor.js"></script>
 
-    <!-- 3. Features (dependem de core e lib) -->
-    <!-- Dashboard -->
-    <script src="src/features/dashboard/dashboard.config.js"></script>
+    <!-- 3. Features -->
     <script src="src/features/dashboard/dashboard.model.js"></script>
     <script src="src/features/dashboard/dashboard.view.js"></script>
     <script src="src/features/dashboard/dashboard.controller.js"></script>
-
-    <!-- Dashboard/Process -->
     <script src="src/features/dashboard/process/process.config.js"></script>
     <script src="src/features/dashboard/process/process.model.js"></script>
     <script src="src/features/dashboard/process/process.view.js"></script>
     <script src="src/features/dashboard/process/process.controller.js"></script>
-
-    <!-- Stats -->
-    <script src="src/features/stats/stats.config.js"></script>
     <script src="src/features/stats/stats.model.js"></script>
     <script src="src/features/stats/stats.view.js"></script>
     <script src="src/features/stats/stats.controller.js"></script>
-
-    <!-- Cleaner -->
-    <script src="src/features/cleaner/cleaner.config.js"></script>
     <script src="src/features/cleaner/cleaner.model.js"></script>
     <script src="src/features/cleaner/cleaner.view.js"></script>
     <script src="src/features/cleaner/cleaner.controller.js"></script>
-
-    <!-- Organizer -->
-    <script src="src/features/organizer/organizer.config.js"></script>
     <script src="src/features/organizer/organizer.model.js"></script>
     <script src="src/features/organizer/organizer.view.js"></script>
     <script src="src/features/organizer/organizer.controller.js"></script>
-
-    <!-- Settings -->
-    <script src="src/features/settings/settings.config.js"></script>
     <script src="src/features/settings/settings.model.js"></script>
     <script src="src/features/settings/settings.view.js"></script>
     <script src="src/features/settings/settings.controller.js"></script>
 
-    <!-- 4. App (depende de tudo) -->
+    <!-- 4. App -->
     <script src="src/app.js"></script>
   </body>
 </html>

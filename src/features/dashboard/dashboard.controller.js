@@ -5,16 +5,36 @@ const DashboardController = (function () {
 
   function updateUI() {
     const data = DashboardModel.getState();
-    DashboardView.update(data);
+    DashboardView.update.all(data);
   }
 
   const debouncedUpdateUI = Utils.debounce(updateUI, 100);
 
-  function refresh(data) {
-    const keysToRefresh = ["stats", "folders"];
-    if (keysToRefresh.includes(data.key)) {
-      debouncedUpdateUI();
+  const handlers = {
+    onStateChange: data => {
+      if (["stats", "folders", "settings"].includes(data.key)) {
+        debouncedUpdateUI();
+      }
+    },
+
+    onAutomationsClick: e => {
+      const card = e.target.closest("[data-navigate]");
+      if (!card) return;
+      Navigation.navigateTo(card.dataset.navigate);
     }
+  };
+
+  function attachEvents() {
+    const { automations } = DashboardView.getElements();
+
+    const events = [
+      [automations.section, "click", handlers.onAutomationsClick]
+    ];
+    events.forEach(([el, event, handler]) =>
+      el.addEventListener(event, handler)
+    );
+
+    EventBus.on("appstate:changed", handlers.onStateChange);
   }
 
   async function loadStats() {
@@ -23,7 +43,6 @@ const DashboardController = (function () {
         DashboardModel.getToOrganizeFileCounts(),
         DashboardModel.getOrganizedFolderCounts()
       ]);
-
       AppState.setStats({
         toOrganize,
         foldersCreated
@@ -33,26 +52,17 @@ const DashboardController = (function () {
     }
   }
 
-  function attachEventListeners() {
-    EventBus.on("appstate:changed", refresh);
-  }
-
   async function init() {
-    if (isInitialized) {
-      Logger.warn("Dashboard already initialized");
-      return;
-    }
-
+    if (isInitialized) return;
     DashboardView.init();
     updateUI();
     loadStats();
-    attachEventListeners();
+    attachEvents();
     isInitialized = true;
   }
 
   return {
     init,
-    loadStats,
-    refresh
+    loadStats
   };
 })();

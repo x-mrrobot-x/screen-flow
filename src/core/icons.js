@@ -1,101 +1,84 @@
 const Icons = (function () {
-  const elements = {
-    app: DOM.qs("#app"),
-    toReplace: DOM.qsa("[data-icon]")
-  };
+  "use strict";
 
   const SPRITE_CONTAINER_ID = "icon-sprites";
   const ICON_PREFIX = "icon-";
 
-  const buildAttrString = attrs =>
-    Object.entries(attrs)
-      .map(([key, value]) => `${key}="${value}"`)
+  function buildAttrString(attrs) {
+    return Object.entries(attrs)
+      .map(([k, v]) => `${k}="${v}"`)
       .join(" ");
+  }
 
-  const createSymbol = (name, content) => {
-    const isFontAwesome = ICON_FONTAWESOME_LIST.has(name);
-    const viewBox = isFontAwesome
+  function createSymbol(name, content) {
+    const isFa = ICON_FONTAWESOME_LIST.has(name);
+    const viewBox = isFa
       ? ICON_FONTAWESOME_ATTRS.viewBox
       : ICON_DEFAULT_ATTRS.viewBox;
-
     return `<symbol id="${ICON_PREFIX}${name}" viewBox="${viewBox}">${content}</symbol>`;
-  };
+  }
 
-  const injectSprites = () => {
+  function injectSprites() {
     const symbols = Object.entries(ICON_SVGS)
       .map(([name, content]) => createSymbol(name, content))
       .join("");
 
-    const spriteContainer = document.createElement("div");
-    spriteContainer.id = SPRITE_CONTAINER_ID;
-    spriteContainer.style.display = "none";
-    spriteContainer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg">${symbols}</svg>`;
+    const container = document.createElement("div");
+    container.id = SPRITE_CONTAINER_ID;
+    container.style.display = "none";
+    container.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg">${symbols}</svg>`;
+    document.body.prepend(container);
+  }
 
-    document.body.prepend(spriteContainer);
-  };
-
-  const getSvg = (name, attrs = {}) => {
+  function getSvg(name, attrs = {}) {
     if (!ICON_SVGS[name]) {
-      Logger.warn(`[Icons]: Icon "${name}" not found`);
+      Logger.warn(`[Icons] Icon "${name}" not found.`);
       return "";
     }
-
-    const isFontAwesome = ICON_FONTAWESOME_LIST.has(name);
-    const baseAttrs = isFontAwesome
-      ? ICON_FONTAWESOME_ATTRS
-      : ICON_DEFAULT_ATTRS;
-
-    const mergedAttrs = { ...baseAttrs, ...attrs };
-    const attrString = buildAttrString(mergedAttrs);
-
+    const isFa = ICON_FONTAWESOME_LIST.has(name);
+    const baseAttrs = isFa ? ICON_FONTAWESOME_ATTRS : ICON_DEFAULT_ATTRS;
+    const attrString = buildAttrString({ ...baseAttrs, ...attrs });
     return `<svg ${attrString}><use href="#${ICON_PREFIX}${name}"/></svg>`;
-  };
+  }
 
-  const getAppIcon = (item, attrs = {}) => {
+  function getAppIcon(item, attrs = {}) {
     const className = attrs.class ? ` ${attrs.class}` : "";
     const iconPath = ENV.resolveIconPath(item.pkg);
+    return `<img src="${iconPath}" alt="${item.name}" class="app-icon${className}" loading="lazy" decoding="async" />`;
+  }
 
-    return `<img src="${iconPath}" alt="${item.name}" class="folder-icon${className}" loading="lazy" decoding="async" />`;
-  };
-
-  const replace = () => {
-    const nodes = DOM.qsa("[data-icon]");
-
-    nodes.forEach(el => {
+  function replace() {
+    DOM.qsa("[data-icon]").forEach(el => {
       const name = el.getAttribute("data-icon");
       if (!name) return;
-
       const icon = getSvg(name, { class: el.className });
       if (icon) el.outerHTML = icon;
     });
-  };
+  }
 
-  const handleError = event => {
+  function handleIconError(event) {
     const { target } = event;
     const isIconImage =
-      target.tagName === "IMG" &&
-      (target.classList.contains("folder-icon") ||
-        target.classList.contains("app-icon"));
+      target.tagName === "IMG" && target.classList.contains("app-icon");
 
     if (!isIconImage) return;
 
-    const defaultIconPath = `${ENV.WORK_DIR}${DEFAULT_ICON_PATH}`;
-
+    const defaultPath = `${ENV.WORK_DIR}${DEFAULT_ICON_PATH}`;
     if (target.src.includes(DEFAULT_ICON_PATH)) return;
 
-    target.src = defaultIconPath;
-  };
+    target.src = defaultPath;
+  }
 
-  const attachErrorHandler = () => {
-    window.addEventListener("error", handleError, true);
-  };
+  function attachEvents() {
+    const app = DOM.qs("#app");
+    app.addEventListener("error", handleIconError, true);
+  }
 
-  const init = () => {
+  function init() {
     injectSprites();
     replace();
-    attachErrorHandler();
-    elements.app.classList.remove("loading");
-  };
+    attachEvents();
+  }
 
   return {
     getSvg,

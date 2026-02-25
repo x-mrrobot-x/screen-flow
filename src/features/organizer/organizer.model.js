@@ -1,24 +1,20 @@
 const OrganizerModel = (function () {
   "use strict";
 
-  let state = {
-    folders: [],
+  const state = {
     activeFilter: "all",
     searchTerm: ""
   };
 
   function getFolders() {
-    state.folders = AppState.getFolders();
-
-    let filteredFolders = state.folders;
+    let folders = AppState.getFolders();
 
     if (state.searchTerm) {
-      filteredFolders = filteredFolders.filter(folder =>
-        folder.name.toLowerCase().includes(state.searchTerm.toLowerCase())
-      );
+      const term = state.searchTerm.toLowerCase();
+      folders = folders.filter(f => f.name.toLowerCase().includes(term));
     }
 
-    return filteredFolders;
+    return folders;
   }
 
   function setFilter(filter) {
@@ -30,30 +26,25 @@ const OrganizerModel = (function () {
   }
 
   function deleteFolder(id) {
-    const folders = AppState.getFolders();
-    const updatedFolders = folders.filter(f => f.id !== id);
-    AppState.setFolders(updatedFolders);
+    const folders = AppState.getFolders().filter(f => f.id !== id);
+    AppState.setFolders(folders);
   }
 
   async function clearMedia(folder, mediaType, basePath) {
     const mediaFolderPath = `${basePath}/${folder.name}`;
-
     const result = await TaskQueue.add(
       "delete_folder_contents",
       [mediaFolderPath],
       "shell"
     );
 
-    let removedCount = 0;
-    if (result && result.deleted > 0) {
+    if (result?.deleted > 0) {
       folder[mediaType].count = 0;
-      if (result.mtime) {
-        folder[mediaType].mtime = result.mtime;
-      }
-      removedCount = result.deleted;
+      if (result.mtime) folder[mediaType].mtime = result.mtime;
+      return result.deleted;
     }
 
-    return removedCount;
+    return 0;
   }
 
   async function clearFolderContents(folderId, type) {
@@ -65,31 +56,29 @@ const OrganizerModel = (function () {
       return 0;
     }
 
-    const folder = folders[folderIndex];
+    const folder = { ...folders[folderIndex] };
+    if (folder.ss) folder.ss = { ...folder.ss };
+    if (folder.sr) folder.sr = { ...folder.sr };
 
     try {
       const clearPromises = [];
 
-      const canClearSs = (type === "ss" || type === "both") && folder.ss;
-      if (canClearSs) {
+      if ((type === "ss" || type === "both") && folder.ss) {
         clearPromises.push(
           clearMedia(folder, "ss", ENV.ORGANIZED_SCREENSHOTS_PATH)
         );
       }
-
-      const canClearSr = (type === "sr" || type === "both") && folder.sr;
-      if (canClearSr) {
+      if ((type === "sr" || type === "both") && folder.sr) {
         clearPromises.push(
           clearMedia(folder, "sr", ENV.ORGANIZED_RECORDINGS_PATH)
         );
       }
 
       const removedCounts = await Promise.all(clearPromises);
-      const totalRemoved = removedCounts.reduce((sum, count) => sum + count, 0);
+      const totalRemoved = removedCounts.reduce((sum, n) => sum + n, 0);
 
-      if (totalRemoved > 0) {
-        AppState.setFolders(folders);
-      }
+      folders[folderIndex] = folder;
+      AppState.setFolders(folders);
 
       return totalRemoved;
     } catch (error) {
@@ -98,12 +87,28 @@ const OrganizerModel = (function () {
     }
   }
 
+  function getAutoOrganizerSetting() {
+    return AppState.getSetting("autoOrganizer");
+  }
+
+  function toggleAutoOrganizer() {
+    const newValue = AppState.toggleSetting("autoOrganizer");
+    AppState.addActivity({
+      type: "feature-toggle",
+      feature: "auto-organizer",
+      enabled: newValue
+    });
+    return newValue;
+  }
+
   return {
     getFolders,
     setFilter,
     setSearchTerm,
     deleteFolder,
     clearFolderContents,
+    getAutoOrganizerSetting,
+    toggleAutoOrganizer,
     getState: () => ({ ...state })
   };
 })();

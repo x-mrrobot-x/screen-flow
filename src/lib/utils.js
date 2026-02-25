@@ -6,67 +6,72 @@ const Utils = (function () {
 
     const now = Date.now();
     const diffMs = now - timestamp;
-    const diffSecs = Math.floor(diffMs / 1000);
-    const diffMins = Math.floor(diffSecs / 60);
-    const diffHours = Math.floor(diffMins / 60);
-    const diffDays = Math.floor(diffHours / 24);
+    const diffMins = Math.floor(diffMs / 60_000);
+    const diffHrs = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHrs / 24);
 
-    if (diffHours < 1) {
-      if (diffMins < 1) return "Agora";
-      return `${diffMins} min`;
-    } else if (diffDays < 1) {
-      return `${diffHours}h`;
-    } else if (diffDays < 7) {
-      return `${diffDays} dia${diffDays > 1 ? "s" : ""}`;
-    } else {
-      const date = new Date(timestamp);
-      const today = new Date();
+    if (diffMins < 1) return "Agora";
+    if (diffHrs < 1) return `${diffMins} min`;
+    if (diffDays < 1) return `${diffHrs}h`;
+    if (diffDays < 7) return `${diffDays} dia${diffDays > 1 ? "s" : ""}`;
 
-      if (
-        date.getDate() === today.getDate() &&
-        date.getMonth() === today.getMonth() &&
-        date.getFullYear() === today.getFullYear()
-      ) {
-        return `Hoje, ${date.getHours()}:${date
-          .getMinutes()
-          .toString()
-          .padStart(2, "0")}`;
-      } else if (date.getDate() === today.getDate() - 1) {
-        return `Ontem, ${date.getHours()}:${date
-          .getMinutes()
-          .toString()
-          .padStart(2, "0")}`;
-      } else {
-        return `${date.getDate()} ${date.toLocaleString("pt-BR", {
-          month: "short"
-        })}`;
-      }
-    }
+    const date = new Date(timestamp);
+    const today = new Date();
+    const hhmm = `${date.getHours()}:${String(date.getMinutes()).padStart(
+      2,
+      "0"
+    )}`;
+
+    const dateDay = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate()
+    );
+    const todayDay = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate()
+    );
+    const diffCalendarDays = Math.round((todayDay - dateDay) / 86_400_000);
+
+    if (diffCalendarDays === 0) return `Hoje, ${hhmm}`;
+    if (diffCalendarDays === 1) return `Ontem, ${hhmm}`;
+
+    return `${date.getDate()} ${date.toLocaleString("pt-BR", {
+      month: "short"
+    })}`;
   }
+
+  const UNSAFE_FOLDER_CHARS = /[:"$`\\]/g;
 
   function sanitizeFolderName(name) {
     if (typeof name !== "string") return "";
     return name
       .trim()
-      .replace(/:/g, "-")
-      .replace(/"/g, "")
-      .replace(/\$/g, "")
-      .replace(/`/g, "")
-      .replace(/\\/g, "-");
+      .replace(UNSAFE_FOLDER_CHARS, match =>
+        match === ":" || match === "\\" ? "-" : ""
+      );
+  }
+
+  function pluralize(n, word, returnCount = true) {
+    if (returnCount) {
+      return `${n} ${word}${n === 1 ? "" : "s"}`;
+    }
+    return `${word}${n === 1 ? "" : "s"}`;
   }
 
   function debounce(func, wait) {
     let timeout;
     return function (...args) {
-      const context = this;
       clearTimeout(timeout);
-      timeout = setTimeout(() => func.apply(context, args), wait);
+      timeout = setTimeout(() => func.apply(this, args), wait);
     };
   }
 
   return {
     formatTimestamp,
     sanitizeFolderName,
+    pluralize,
     debounce
   };
 })();

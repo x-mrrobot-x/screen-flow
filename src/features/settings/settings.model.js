@@ -1,6 +1,6 @@
-const SettingsModel = (function() {
-  'use strict';
-  
+const SettingsModel = (function () {
+  "use strict";
+
   function getSettings() {
     return AppState.getSettings();
   }
@@ -11,26 +11,10 @@ const SettingsModel = (function() {
 
   function setSetting(key, value) {
     AppState.setSetting(key, value);
-    if (key === 'theme') {
-      localStorage.setItem("screenflow-theme", value);
-    }
-    logSettingChange(key, value);
   }
 
   function toggleSetting(key) {
-    const newValue = AppState.toggleSetting(key);
-    logSettingChange(key, newValue);
-    return newValue;
-  }
-
-  function logSettingChange(key, value) {
-    if (key === "autoOrganizer") {
-      AppState.addActivity({
-        type: "feature-toggle",
-        feature: "auto-organizer",
-        enabled: value
-      });
-    }
+    return AppState.toggleSetting(key);
   }
 
   function resetAllSettings() {
@@ -43,7 +27,6 @@ const SettingsModel = (function() {
 
   return {
     getSettings,
-
     getSetting,
     setSetting,
     toggleSetting,

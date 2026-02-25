@@ -1,63 +1,67 @@
-const SettingsView = (function() {
-  'use strict';
+const SettingsView = (function () {
+  "use strict";
 
-  let container = null;
-  const elements = {};
+  let elements = null;
+
+  function queryElements() {
+    elements = {
+      tabContent: DOM.qs("#tab-settings"),
+      themeBtns: DOM.qsa(".settings-theme-button"),
+      resetBtn: DOM.qs("#reset-settings-btn"),
+      deleteBtn: DOM.qs("#delete-all-btn")
+    };
+  }
+
+  function getElements() {
+    return elements;
+  }
 
   const render = {
-    theme: (theme) => {
+    theme: (theme, themes) => {
       const root = document.documentElement;
-      root.classList.remove(...SettingsConfig.THEMES);
-      let themeToApply = theme;
-      if (theme === "system") {
-        const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        themeToApply = systemPrefersDark ? "dark" : "light";
-      }
+      root.classList.remove(...themes);
+      const themeToApply =
+        theme === "system"
+          ? window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light"
+          : theme;
       root.classList.add(themeToApply);
-      if (typeof StatsController !== 'undefined') {
-        StatsController.refresh();
-      }
+      if (typeof StatsController !== "undefined") StatsController.refresh();
     },
-    themeSelector: (theme) => {
-      elements.themeButtons.forEach(btn => btn.classList.remove("active", "glow"));
-      const activeBtn = DOM.qs(`#theme-${theme}`);
-      if (activeBtn) activeBtn.classList.add("active", "glow");
-    },
-    setting: (key, value) => {
-      const switchElement = elements[`${key}Switch`] || DOM.qs(`#switch-${key}`);
-      if (switchElement) {
-        switchElement.classList.toggle("active", value);
-      }
-      if(key === 'animationsEnabled') {
-        document.documentElement.classList.toggle("no-animations", !value);
-      }
-    },
-    allSettings: (settings) => {
-      SettingsConfig.SETTINGS_KEYS.forEach(key => {
-        render.setting(key, settings[key]);
-      });
-      render.theme(settings.theme);
-      render.themeSelector(settings.theme);
+
+    all: (settings, themes, settingsKeys) => {
+      settingsKeys.forEach(key => update.setting(key, settings[key]));
+      render.theme(settings.theme, themes);
+      update.themeSelector(settings.theme);
     }
   };
 
-  function init(containerSelector) {
-    container = DOM.qs(containerSelector);
-    if (!container) throw new Error(`Container ${containerSelector} not found`);
+  const update = {
+    themeSelector: theme => {
+      elements.themeBtns.forEach(btn => btn.classList.remove("active"));
+      DOM.qs(`#theme-${theme}`)?.classList.add("active");
+    },
 
-    for (const key in SettingsConfig.SELECTORS) {
-      if (key !== "CONTAINER") {
-        elements[key] = DOM.qsa(SettingsConfig.SELECTORS[key]);
-        if(key !== 'themeButtons') {
-          if (elements[key].length === 1) elements[key] = elements[key][0];
-        }
+    setting: (key, value) => {
+      const switchEl = DOM.qs(
+        `#switch-${key.replace(/([A-Z])/g, "-$1").toLowerCase()}`
+      );
+      switchEl?.classList.toggle("active", value);
+      if (key === "animationsEnabled") {
+        document.documentElement.classList.toggle("no-animations", !value);
       }
     }
-    return container;
+  };
+
+  function init() {
+    queryElements();
   }
 
   return {
     init,
-    render
+    getElements,
+    render,
+    update
   };
 })();

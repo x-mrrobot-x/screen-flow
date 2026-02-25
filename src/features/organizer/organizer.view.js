@@ -1,234 +1,215 @@
 const OrganizerView = (function () {
   "use strict";
 
-  let container = null;
-  const elements = {};
+  let elements = null;
+
+  function queryElements() {
+    elements = {
+      tabContent: DOM.qs("#tab-organizer"),
+      grid: DOM.qs("#folders-grid"),
+      counter: DOM.qs("#media-counter"),
+      filterContainer: DOM.qs(".organizer-filters-row"),
+      filterBtns: DOM.qsa(".organizer-filter-button"),
+      search: DOM.qs(".organizer-search-input"),
+      autoSwitch: DOM.qs("#switch-auto-organizer")
+    };
+  }
+
+  function getElements() {
+    return elements;
+  }
 
   const templates = {
-    organizerBadges: (item, activeFilter) => {
-      const ssCount = item.ss ? item.ss.count : 0;
-      const srCount = item.sr ? item.sr.count : 0;
+    badges: (folder, activeFilter) => {
+      const ssCount = folder.ss?.count ?? 0;
+      const srCount = folder.sr?.count ?? 0;
 
       if (activeFilter === "all") {
         return `
-          <div class="folder-badge">
-            ${Icons.getSvg("image")} ${ssCount}
-          </div>
-          <div class="folder-badge">
-            ${Icons.getSvg("video")} ${srCount}
-          </div>
-        `;
+          <div class="organizer-folder-badge">${Icons.getSvg(
+            "image"
+          )} ${ssCount}</div>
+          <div class="organizer-folder-badge">${Icons.getSvg(
+            "video"
+          )} ${srCount}</div>`;
       }
-      const mediaCount = activeFilter === "recordings" ? srCount : ssCount;
-      const mediaIcon = Icons.getSvg(
-        activeFilter === "recordings" ? "video" : "image"
-      );
-      const mediaType =
-        activeFilter === "recordings" ? "Gravações" : "Screenshots";
-      return `
-        <div class="folder-badge">
-          ${mediaIcon} ${mediaCount} ${mediaType}
-        </div>
-      `;
+
+      const isRecordings = activeFilter === "recordings";
+      const count = isRecordings ? srCount : ssCount;
+      const icon = Icons.getSvg(isRecordings ? "video" : "image");
+      const label = isRecordings ? "Gravações de tela" : "Capturas de tela";
+      return `<div class="organizer-folder-badge">${icon} <span>${count}</span> <span>${label}</span></div>`;
     },
+
     folderCard: (folder, index, activeFilter) => `
-      <div class="folder-card animate-scale-in" style="animation-delay: ${
-        0.3 + index * 0.05
-      }s" data-folder-id="${folder.id}">
-        <div class="folder-top">
-          <div class="folder-badges">
-            ${templates.organizerBadges(folder, activeFilter)}
+      <div class="organizer-folder-card card animate-scale-in"
+           style="animation-delay: ${0.3 + index * 0.05}s"
+           data-folder-id="${folder.id}">
+        <div class="organizer-folder-top">
+          <div class="organizer-folder-badges">
+            ${templates.badges(folder, activeFilter)}
           </div>
-          <div class="folder-app-icon">
+          <div class="organizer-folder-app-icon">
             ${Icons.getAppIcon(folder)}
           </div>
         </div>
-        <div class="folder-bottom">
-          <div class="folder-info-row">
-            <span class="folder-name truncate-text">${folder.name}</span>
-            <span class="folder-menu-dots">
-              <svg viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path></svg>
+        <div class="organizer-folder-bottom">
+          <div class="organizer-folder-info-row">
+            <span class="organizer-folder-name truncate-text">
+              ${folder.name}
             </span>
+            <div class="organizer-folder-menu-dots">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+              </svg>
+            </div>
           </div>
         </div>
       </div>`,
-    emptyState: activeFilter => {
-      let title, subtitle;
 
-      switch (activeFilter) {
-        case "screenshots":
-          title = "Nenhuma pasta de capturas";
-          subtitle = "Não há pastas com capturas de tela para exibir.";
-          break;
-        case "recordings":
-          title = "Nenhuma pasta de gravações";
-          subtitle = "Não há pastas com gravações de tela para exibir.";
-          break;
-        case "all":
-        default:
-          title = "Nenhuma pasta organizada";
-          subtitle =
-            "Não há pastas organizadas para exibir. Os arquivos serão organizados automaticamente por aplicativo.";
-          break;
-      }
+    emptyState: activeFilter => {
+      const copy = {
+        screenshots: {
+          title: "Nenhuma pasta com capturas de tela",
+          subtitle: "Nenhuma pasta com capturas de tela foi encontrada."
+        },
+        recordings: {
+          title: "Nenhuma pasta com gravações de tela",
+          subtitle: "Nenhuma pasta com gravações de tela foi encontrada."
+        },
+        all: {
+          title: "Nenhuma pasta organizada",
+          subtitle:
+            "Seus arquivos serão organizados automaticamente em pastas por aplicativo."
+        }
+      };
+      const { title, subtitle } = copy[activeFilter] ?? copy.all;
 
       return `
-        <div class="empty-state animate-fade-in" style="animation-delay: 0.3s">
-            <div class="empty-icon-wrapper">${Icons.getSvg("folder")}</div>
-            <p class="empty-title">${title}</p>
-            <p class="empty-subtitle">${subtitle}</p>
+        <div class="organizer-empty-state animate-fade-in" style="animation-delay: 0.3s">
+          <div class="organizer-empty-icon-wrapper">${Icons.getSvg(
+            "folder-open"
+          )}</div>
+          <p class="organizer-empty-title">${title}</p>
+          <p class="organizer-empty-subtitle">${subtitle}</p>
         </div>`;
     },
+
     actionsMenu: folderId => `
-      <div class="folder-actions-popup" data-folder-id="${folderId}">
-        <div class="folder-action-item" data-action="clear">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2">
-            <polyline points="3 6,5 6,21 6"></polyline>
-            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-          </svg>
+      <div class="organizer-folder-actions-popup" data-folder-id="${folderId}">
+        <div class="organizer-folder-action-item" data-action="clear">
+          ${Icons.getSvg("trash")}
           <span>Limpar pasta</span>
         </div>
-      </div>
-    `
+      </div>`
   };
-
-  function getFilteredFolders(folders, activeFilter) {
-    if (activeFilter === "all") {
-      return folders.filter(folder => folder.ss || folder.sr);
-    } else if (activeFilter === "screenshots") {
-      return folders.filter(folder => folder.ss);
-    } else if (activeFilter === "recordings") {
-      return folders.filter(folder => folder.sr);
-    } else {
-      return folders; // fallback to all folders
-    }
-  }
 
   const render = {
+    getFiltered: (folders, activeFilter) => {
+      if (activeFilter === "screenshots") return folders.filter(f => f.ss);
+      if (activeFilter === "recordings") return folders.filter(f => f.sr);
+      return folders.filter(f => f.ss || f.sr);
+    },
+
     folders: (folders, activeFilter) => {
-      const filteredFolders = getFilteredFolders(folders, activeFilter);
-
-      if (filteredFolders.length > 0) {
-        elements.foldersGrid.innerHTML = filteredFolders
-          .map((f, i) => templates.folderCard(f, i, activeFilter))
-          .join("");
-      } else {
-        elements.foldersGrid.innerHTML = templates.emptyState(activeFilter);
-      }
+      const filtered = render.getFiltered(folders, activeFilter);
+      elements.grid.innerHTML =
+        filtered.length > 0
+          ? filtered
+              .map((f, i) => templates.folderCard(f, i, activeFilter))
+              .join("")
+          : templates.emptyState(activeFilter);
     },
+
     mediaCounter: (folders, activeFilter) => {
-      const filteredFolders = getFilteredFolders(folders, activeFilter);
+      const filtered = render.getFiltered(folders, activeFilter);
 
-      let totalMedia = 0;
-      let mediaIcon = "";
       if (activeFilter === "all") {
-        const totalScreenshots = filteredFolders.reduce(
-          (sum, f) => sum + (f.ss ? f.ss.count : 0),
-          0
-        );
-        const totalRecordings = filteredFolders.reduce(
-          (sum, f) => sum + (f.sr ? f.sr.count : 0),
-          0
-        );
-        elements.mediaCounter.innerHTML = `
-          <span>${Icons.getSvg("folder")} ${filteredFolders.length}</span>
-          <span>${Icons.getSvg("file")} ${
-            totalScreenshots + totalRecordings
-          }</span>
-        `;
+        const totalSs = filtered.reduce((s, f) => s + (f.ss?.count ?? 0), 0);
+        const totalSr = filtered.reduce((s, f) => s + (f.sr?.count ?? 0), 0);
+        elements.counter.innerHTML = `
+          <span>${Icons.getSvg("folder")} ${filtered.length}</span>
+          <span>${Icons.getSvg("file")} ${totalSs + totalSr}</span>`;
       } else {
-        if (activeFilter === "recordings") {
-          totalMedia = filteredFolders.reduce(
-            (sum, f) => sum + (f.sr ? f.sr.count : 0),
-            0
-          );
-          mediaIcon = Icons.getSvg("video");
-        } else {
-          totalMedia = filteredFolders.reduce(
-            (sum, f) => sum + (f.ss ? f.ss.count : 0),
-            0
-          );
-          mediaIcon = Icons.getSvg("image");
-        }
-        elements.mediaCounter.innerHTML = `
-          <span>${Icons.getSvg("folder")} ${filteredFolders.length}</span>
-          <span>${mediaIcon} ${totalMedia}</span>
-        `;
+        const isRec = activeFilter === "recordings";
+        const total = filtered.reduce(
+          (s, f) => s + ((isRec ? f.sr : f.ss)?.count ?? 0),
+          0
+        );
+        elements.counter.innerHTML = `
+          <span>${Icons.getSvg("folder")} ${filtered.length}</span>
+          <span>${Icons.getSvg(isRec ? "video" : "image")} ${total}</span>`;
       }
     },
+
     filters: activeFilter => {
-      elements.filterButtons.forEach(btn =>
-        btn.classList.remove("active", "glow")
-      );
-      DOM.qs(`#filter-${activeFilter}`).classList.add("active", "glow");
+      elements.filterBtns.forEach(btn => btn.classList.remove("active"));
+      DOM.qs(`#filter-${activeFilter}`)?.classList.add("active");
     }
   };
 
-  function updateCard(folder, activeFilter) {
-    if (!folder) return;
-    const card = DOM.qs(
-      `.folder-card[data-folder-id="${folder.id}"]`,
-      elements.foldersGrid
-    );
-    if (card) {
-      const badgesContainer = DOM.qs(".folder-badges", card);
+  const update = {
+    autoOrganizer: value => {
+      elements.autoSwitch.classList.toggle("active", !!value);
+      elements.autoSwitch.setAttribute(
+        "aria-checked",
+        value ? "true" : "false"
+      );
+    },
+
+    card: (folder, activeFilter) => {
+      const card = DOM.qs(
+        `.organizer-folder-card[data-folder-id="${folder.id}"]`,
+        elements.grid
+      );
+      if (!card) return;
+      const badgesContainer = DOM.qs(".organizer-folder-badges", card);
       if (badgesContainer) {
-        badgesContainer.innerHTML = templates.organizerBadges(
-          folder,
-          activeFilter
-        );
+        badgesContainer.innerHTML = templates.badges(folder, activeFilter);
       }
-    }
-  }
+    },
 
-  function showActionsMenu(folderId, folderCard) {
-    const existingMenu = DOM.qs(
-      `.folder-actions-popup[data-folder-id="${folderId}"]`
-    );
-    if (existingMenu) {
-      existingMenu.remove();
-      return;
-    }
+    actionsMenu: (folderId, folderCard) => {
+      const existingMenu = DOM.qs(
+        `.organizer-folder-actions-popup[data-folder-id="${folderId}"]`
+      );
+      if (existingMenu) {
+        existingMenu.remove();
+        return null;
+      }
 
-    const menu = document.createElement("div");
-    menu.innerHTML = templates.actionsMenu(folderId).trim();
-    const popupElement = menu.firstChild;
+      const wrapper = document.createElement("div");
+      wrapper.innerHTML = templates.actionsMenu(folderId).trim();
+      const popup = wrapper.firstChild;
 
-    const menuDots = DOM.qs(".folder-menu-dots", folderCard);
-    if (menuDots) {
+      const menuDots = DOM.qs(".organizer-folder-menu-dots", folderCard);
+      if (!menuDots) return null;
+
       if (getComputedStyle(folderCard).position === "static") {
         folderCard.style.position = "relative";
       }
-      folderCard.appendChild(popupElement);
+      folderCard.appendChild(popup);
+
       const dotsRect = menuDots.getBoundingClientRect();
       const cardRect = folderCard.getBoundingClientRect();
-      const topPos =
-        dotsRect.top - cardRect.top - popupElement.offsetHeight - 5;
-      popupElement.style.top = `${topPos}px`;
-      popupElement.style.display = "block";
+      popup.style.top = `${
+        dotsRect.top - cardRect.top - popup.offsetHeight - 20
+      }px`;
+      popup.style.display = "block";
+
+      return popup;
     }
-    return popupElement;
-  }
+  };
 
-  function queryElements() {
-    const S = OrganizerConfig.SELECTORS;
-    elements.foldersGrid = DOM.qs(S.foldersGrid);
-    elements.mediaCounter = DOM.qs(S.mediaCounter);
-    elements.filterButtons = DOM.qsa(S.filterButtons);
-  }
-
-  function init(containerSelector) {
-    container = DOM.qs(containerSelector);
-    if (!container) throw new Error(`Container ${containerSelector} not found`);
-
+  function init() {
     queryElements();
-    return container;
   }
 
   return {
     init,
+    getElements,
+    templates,
     render,
-    updateCard,
-    showActionsMenu
+    update
   };
 })();

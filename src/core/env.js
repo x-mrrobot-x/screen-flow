@@ -1,10 +1,14 @@
 const ENV = (() => {
+  "use strict";
+
+  const isWeb = typeof tk === "undefined";
+
   const STORAGE_CONFIG = {
     FOLDERS: {
       web: {
         type: "localStorage",
         key: "folders",
-        default: DEFAULT_FOLDERS
+        default: []
       },
       tasker: {
         type: "file",
@@ -40,7 +44,7 @@ const ENV = (() => {
       web: {
         type: "localStorage",
         key: "activities",
-        default: DEFAULT_ACTIVITIES
+        default: []
       },
       tasker: {
         type: "file",
@@ -64,7 +68,7 @@ const ENV = (() => {
       web: {
         type: "localStorage",
         key: "apps",
-        default: DEFAULT_APPS
+        default: []
       },
       tasker: {
         type: "file",
@@ -74,58 +78,34 @@ const ENV = (() => {
     }
   };
 
-  const isWeb = typeof tk === "undefined";
-
   function resolvePath(pathTemplate, params = {}) {
-    return pathTemplate.replace(/\{(\w+)\}/g, (_, key) => params[key] || _);
+    return pathTemplate.replace(/\{(\w+)\}/g, (_, key) => params[key] ?? _);
   }
 
   function getDefault(key) {
-    const isWeb = typeof tk === "undefined";
-    const config = STORAGE_CONFIG[key];
-    const envConfig = isWeb ? config.web : config.tasker;
-    return JSON.parse(JSON.stringify(envConfig.default));
+    const cfg = STORAGE_CONFIG[key];
+    const envCfg = isWeb ? cfg.web : cfg.tasker;
+    return JSON.parse(JSON.stringify(envCfg.default));
   }
 
-  // ===== WEB ENVIRONMENT =====
   function WebEnvironment() {
     const STORAGE_PREFIX = "@screenflow:";
-    const SOURCE_SCREENSHOTS_PATH = "/storage/emulated/0/DCIM/Screenshots";
-    const SOURCE_RECORDINGS_PATH = "/storage/emulated/0/DCIM/ScreenRecorder";
-    const ORGANIZED_SCREENSHOTS_PATH =
-      "/storage/emulated/0/OrganizedMedia/Screenshots";
-    const ORGANIZED_RECORDINGS_PATH =
-      "/storage/emulated/0/OrganizedMedia/ScreenRecordings";
-    const WORK_DIR = "";
 
-    const WEB_MOCK_DATA = {
-      get_subfolders: () => [
-        "Test Folder 1,1675280000",
-        "Test Folder 2,1675281000"
-      ],
-      get_item_count: () => Math.floor(Math.random() * 100),
-      scan_media_app_packages: args => {
-        if (args[0] === "jpg") {
-          return ["com.spotify.music", "com.whatsapp"];
-        } else {
-          return ["com.netflix.mediaclient"];
-        }
-      },
-      create_app_media_folders: args => {
-        try {
-          const apps = JSON.parse(args[0]);
-          return { created: apps.length };
-        } catch (e) {
-          return { created: 0 };
-        }
-      },
-      run_batch_command: () => ({ moved: 5 }),
-      delete_files_batch: () => null,
-      find_expired_files: () => []
+    const PATHS = {
+      SOURCE_SCREENSHOTS_PATH: "/storage/emulated/0/DCIM/Screenshots",
+      SOURCE_RECORDINGS_PATH: "/storage/emulated/0/DCIM/ScreenRecorder",
+      ORGANIZED_SCREENSHOTS_PATH:
+        "/storage/emulated/0/OrganizedMedia/Screenshots",
+      ORGANIZED_RECORDINGS_PATH:
+        "/storage/emulated/0/OrganizedMedia/ScreenRecordings"
     };
 
     function resolveIconPath(pkg) {
       return `src/assets/icons/${pkg}.png`;
+    }
+
+    function getFilePath() {
+      return "";
     }
 
     async function getData(key, params = {}) {
@@ -133,8 +113,8 @@ const ENV = (() => {
         const cfg = STORAGE_CONFIG[key].web;
 
         if (cfg.type === "localStorage") {
-          const content = localStorage.getItem(STORAGE_PREFIX + cfg.key);
-          return content ? JSON.parse(content) : getDefault(key);
+          const raw = localStorage.getItem(STORAGE_PREFIX + cfg.key);
+          return raw ? JSON.parse(raw) : getDefault(key);
         }
 
         if (cfg.type === "fetch") {
@@ -152,10 +132,8 @@ const ENV = (() => {
     function setData(key, data) {
       try {
         const cfg = STORAGE_CONFIG[key].web;
-        if (cfg.type === "fetch") {
+        if (cfg.type === "fetch")
           throw new Error(`Cannot write to ${key} (fetch type)`);
-        }
-
         localStorage.setItem(STORAGE_PREFIX + cfg.key, JSON.stringify(data));
         return true;
       } catch (e) {
@@ -164,71 +142,83 @@ const ENV = (() => {
       }
     }
 
-    async function execute({ command, args = [] }) {
-      // Logger.debug(`[WEB MOCK] ENV.execute: ${command}`, args);
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      if (typeof WEB_MOCK_DATA[command] === "function") {
-        return WEB_MOCK_DATA[command](args);
-      }
-
-      Logger.warn(`[WEB MOCK] No mock data for command: ${command}`);
-      return null;
-    }
-
-    function cancelProcess() {
-      // No process to cancel in web mock, but keep the function for API consistency
-    }
-
     async function runTask(taskName, priority, ...params) {
-      Logger.debug(`[WEB MOCK] ENV.runTask: ${taskName}`, { priority, params });
+      if (taskName === "SO - FILE QUEUE WORKER") {
+        let taskerParams;
+        try {
+          taskerParams = JSON.parse(params[0]);
+        } catch (e) {
+          Logger.error("[WEB ENV] Failed to parse taskerParams:", e);
+          return;
+        }
 
-      if (taskName === "SO - HANDLE ACTIONS" && params[0] === "load_apps") {
-        setTimeout(() => {
-          Logger.debug(
-            "[WEB MOCK][LOAD APPS] Simulating app data callback with default apps."
-          );
-          App.updateAppsData(JSON.stringify(DEFAULT_APPS));
-        }, 500);
+        const {
+          id,
+          commandName,
+          action,
+          params: taskParams,
+          type
+        } = taskerParams;
+        const realCommand = commandName || action;
+
+        (async () => {
+          try {
+            const payload = await MockEnv.processTask(
+              realCommand,
+              taskParams,
+              type
+            );
+            App.handleTaskResult(
+              JSON.stringify({
+                id,
+                status: "success",
+                payload
+              })
+            );
+          } catch (error) {
+            Logger.error(
+              `[WEB ENV] Error processing task "${realCommand}":`,
+              error
+            );
+            App.handleTaskResult(
+              JSON.stringify({
+                id,
+                status: "error",
+                payload: String(error)
+              })
+            );
+          }
+        })();
       }
     }
 
-    function isTaskRunning(taskName) {
-      Logger.debug(`[WEB MOCK] ENV.isTaskRunning check for: ${taskName}`);
+    function isTaskRunning() {
       return true;
     }
 
-    function getFilePath() {
-      return "";
-    }
-
     return {
-      WORK_DIR,
+      WORK_DIR: "",
       isWeb: true,
       resolveIconPath,
       getData,
       getDefault,
       setData,
-      execute,
       runTask,
-      cancelProcess,
       isTaskRunning,
       getFilePath,
-      SOURCE_SCREENSHOTS_PATH,
-      SOURCE_RECORDINGS_PATH,
-      ORGANIZED_SCREENSHOTS_PATH,
-      ORGANIZED_RECORDINGS_PATH
+      ...PATHS
     };
   }
 
-  // ===== TASKER ENVIRONMENT CONFIG =====
   function TaskerEnvironment() {
-    const SOURCE_SCREENSHOTS_PATH = "/storage/emulated/0/DCIM/Screenshots";
-    const SOURCE_RECORDINGS_PATH = "/storage/emulated/0/DCIM/ScreenRecorder";
-    const ORGANIZED_SCREENSHOTS_PATH =
-      "/storage/emulated/0/OrganizedMedia/Screenshots";
-    const ORGANIZED_RECORDINGS_PATH =
-      "/storage/emulated/0/OrganizedMedia/ScreenRecordings";
+    const PATHS = {
+      SOURCE_SCREENSHOTS_PATH: "/storage/emulated/0/DCIM/Screenshots",
+      SOURCE_RECORDINGS_PATH: "/storage/emulated/0/DCIM/ScreenRecorder",
+      ORGANIZED_SCREENSHOTS_PATH:
+        "/storage/emulated/0/OrganizedMedia/Screenshots",
+      ORGANIZED_RECORDINGS_PATH:
+        "/storage/emulated/0/OrganizedMedia/ScreenRecordings"
+    };
 
     const WORK_DIR = `${tk.local("%work_dir")}/`;
 
@@ -244,15 +234,47 @@ const ENV = (() => {
       return `${WORK_DIR}${relative}`;
     }
 
+    async function execute({ command, args = [] }) {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          const scriptPath = `${WORK_DIR}src/features/dashboard/process/script.sh`;
+          const quotedArgs = args
+            .map(arg => {
+              const str =
+                typeof arg === "object" && arg !== null
+                  ? JSON.stringify(arg)
+                  : String(arg);
+              return "'" + str.replace(/'/g, "'\\''") + "'";
+            })
+            .join(" ");
+
+          try {
+            const result = tk.shell(
+              `sh "${scriptPath}" ${command} ${quotedArgs}`,
+              false,
+              5000
+            );
+            if (!result?.trim())
+              throw new Error("Shell returned empty result.");
+            const parsed = JSON.parse(result);
+            if (parsed.success) resolve(parsed.data);
+            else throw new Error(parsed.error || "Unknown shell error.");
+          } catch (e) {
+            Logger.error(`Error executing '${command}':`, e);
+            reject(new Error(`Failed to execute '${command}': ${e.message}`));
+          }
+        }, 0);
+      });
+    }
+
     async function getData(key, params = {}) {
       try {
-        const result = await execute({
+        return await execute({
           command: "read_file",
           args: [getFilePath(key, params), JSON.stringify(getDefault(key))]
         });
-        return result;
       } catch (e) {
-        Logger.error(`Error getting async ${key}:`, e);
+        Logger.error(`Error getting ${key}:`, e);
         return getDefault(key);
       }
     }
@@ -268,46 +290,6 @@ const ENV = (() => {
         Logger.error(`Error saving ${key}:`, e);
         return false;
       }
-    }
-
-    async function execute({ command, args = [] }) {
-      return new Promise((resolve, reject) => {
-        setTimeout(() => {
-          const scriptPath = `${WORK_DIR}src/features/dashboard/process/script.sh`;
-
-          const quotedArgs = args
-            .map(arg => {
-              const argStr =
-                typeof arg === "object" && arg !== null
-                  ? JSON.stringify(arg)
-                  : String(arg);
-              return "'" + argStr.replace(/'/g, "'\\''") + "'";
-            })
-            .join(" ");
-
-          const fullCommand = `sh "${scriptPath}" ${command} ${quotedArgs}`;
-
-          try {
-            // Logger.debug(`[FULL COMMAND] ${fullCommand}`);
-            const result = tk.shell(fullCommand, false, 5000);
-            // Logger.debug(`[RESULT] ${result}`);
-
-            if (!result || result.trim() === "") {
-              throw new Error("Shell command returned empty result.");
-            }
-
-            const parsed = JSON.parse(result);
-            if (parsed.success) {
-              resolve(parsed.data);
-            } else {
-              throw new Error(parsed.error || "Unknown shell script error.");
-            }
-          } catch (e) {
-            Logger.error(`Error executing process command: ${command}`, e);
-            reject(new Error(`Failed to execute '${command}': ${e.message}`));
-          }
-        }, 0);
-      });
     }
 
     async function runTask(taskName, priority, ...params) {
@@ -326,10 +308,8 @@ const ENV = (() => {
           );
           resolve();
         } catch (e) {
-          Logger.error(`Error executing task '${taskName}':`, e);
-          reject(
-            new Error(`Failed to execute task '${taskName}': ${e.message}`)
-          );
+          Logger.error(`Error running task '${taskName}':`, e);
+          reject(new Error(`Failed: '${taskName}': ${e.message}`));
         }
       });
     }
@@ -337,8 +317,6 @@ const ENV = (() => {
     function isTaskRunning(taskName) {
       return tk.taskRunning(taskName);
     }
-
-    function cancelProcess() {}
 
     return {
       WORK_DIR,
@@ -350,12 +328,8 @@ const ENV = (() => {
       execute,
       runTask,
       isTaskRunning,
-      cancelProcess,
       getFilePath,
-      SOURCE_SCREENSHOTS_PATH,
-      SOURCE_RECORDINGS_PATH,
-      ORGANIZED_SCREENSHOTS_PATH,
-      ORGANIZED_RECORDINGS_PATH
+      ...PATHS
     };
   }
 

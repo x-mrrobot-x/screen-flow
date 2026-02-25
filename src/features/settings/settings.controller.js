@@ -1,84 +1,88 @@
 const SettingsController = (function () {
+  "use strict";
+
   let isInitialized = false;
 
-  function render() {
+  const THEMES = ["light", "dark", "system"];
+  const SETTINGS_KEYS = [
+    "animationsEnabled",
+    "notifyOrganizationResult",
+    "notifyCleanupResult",
+    "notifyPendingFiles"
+  ];
+
+  function renderAll() {
     const settings = SettingsModel.getSettings();
-    SettingsView.render.allSettings(settings);
+    SettingsView.render.all(settings, THEMES, SETTINGS_KEYS);
   }
 
   const handlers = {
-    onThemeChange: e => {
-      const theme = e.target.closest("[data-theme]").dataset.theme;
+    onThemeClick: e => {
+      const theme = e.target.closest("[data-theme]")?.dataset.theme;
+      if (!theme) return;
       SettingsModel.setSetting("theme", theme);
-      SettingsView.render.theme(theme);
-      SettingsView.render.themeSelector(theme);
+      SettingsView.render.theme(theme, THEMES);
+      SettingsView.update.themeSelector(theme);
     },
-    onSettingToggle: e => {
-      const toggle = e.target.closest("[data-setting-key]");
-      const key = e.target.dataset.settingKey;
-      const newValue = SettingsModel.toggleSetting(key);
-      SettingsView.render.setting(key, newValue);
+
+    onSwitchClick: e => {
+      const switchEl = e.target.closest("[data-setting-key]");
+      if (!switchEl) return;
+      const newValue = SettingsModel.toggleSetting(switchEl.dataset.settingKey);
+      SettingsView.update.setting(switchEl.dataset.settingKey, newValue);
     },
+
     onReset: () => {
       SettingsModel.resetAllSettings();
       Toast.success("Configurações restauradas com sucesso!");
     },
+
     onDelete: () => {
-      ConfirmationModal.open(
+      ConfirmationDialog.open(
         {
           title: "Apagar Todos os Dados",
           message:
             "Tem certeza de que deseja apagar todos os dados do aplicativo? Esta ação não pode ser desfeita."
         },
         () => {
-          const success = SettingsModel.deleteAllData();
-          if (success) {
-            Toast.success("Dados apagados com sucesso!");
-          } else {
-            Toast.error("Ocorreu um erro ao apagar os dados.");
-          }
+          const ok = SettingsModel.deleteAllData();
+          Toast[ok ? "success" : "error"](
+            ok
+              ? "Dados apagados com sucesso!"
+              : "Ocorreu um erro ao apagar os dados."
+          );
         }
       );
     },
+
     onStateChange: data => {
-      if (data && data.key === "settings") {
-        render();
-      }
+      if (data?.key === "settings") renderAll();
     }
   };
 
-  function attachEventListeners() {
-    const themeButtons = DOM.qsa(SettingsConfig.SELECTORS.themeButtons);
-    themeButtons.forEach(btn =>
-      btn.addEventListener("click", handlers.onThemeChange)
+  function attachEvents() {
+    const { tabContent, resetBtn, deleteBtn } = SettingsView.getElements();
+
+    const events = [
+      [tabContent, "click", handlers.onThemeClick],
+      [tabContent, "click", handlers.onSwitchClick],
+      [resetBtn, "click", handlers.onReset],
+      [deleteBtn, "click", handlers.onDelete]
+    ];
+    events.forEach(([el, event, handler]) =>
+      el.addEventListener(event, handler)
     );
 
-    SettingsConfig.SETTINGS_KEYS.forEach(key => {
-      const switchElement = DOM.qs(`#switch-${key}`);
-      if (switchElement) {
-        switchElement.addEventListener("click", handlers.onSettingToggle);
-      }
-    });
-
-    const resetButton = DOM.qs(SettingsConfig.SELECTORS.resetButton);
-    if (resetButton) resetButton.addEventListener("click", handlers.onReset);
-
-    const deleteAllButton = DOM.qs(SettingsConfig.SELECTORS.deleteAllButton);
-    if (deleteAllButton)
-      deleteAllButton.addEventListener("click", handlers.onDelete);
-    
     EventBus.on("appstate:changed", handlers.onStateChange);
   }
 
   function init() {
     if (isInitialized) return;
-    SettingsView.init(SettingsConfig.SELECTORS.CONTAINER);
-    render();
-    attachEventListeners();
+    SettingsView.init();
+    renderAll();
+    attachEvents();
     isInitialized = true;
   }
 
-  return {
-    init
-  };
+  return { init };
 })();

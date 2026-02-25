@@ -1,26 +1,46 @@
-/* Animation styles */
 .no-animations *,
 .no-animations *::before,
 .no-animations *::after {
   animation-duration: 0s !important;
-  transition-duration: 0s !important;
   animation-delay: 0s !important;
 }
 
-/* Smooth transitions for UI elements */
-.switch-container {
-  transition: all 0.3s ease;
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s var(--transition-spring) both;
 }
 
-.switch-container.active {
-  transition: all 0.3s ease;
+.animate-fade-in-down {
+  animation: fadeInDown 0.6s var(--transition-spring) both;
 }
 
-/* Keyframe animations from globals.css */
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out both;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.5s var(--transition-spring) both;
+}
+
+.animate-pulse-highlight {
+  animation: pulseHighlight 0.4s var(--transition-spring);
+}
+
+.tap-scale {
+  transition: transform 0.15s ease;
+}
+
+.tap-scale:active {
+  transform: scale(0.98);
+}
+
+.page-enter {
+  animation: pageEnter 0.35s var(--transition-spring) both;
+}
+
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(3rem);
   }
   to {
     opacity: 1;
@@ -31,33 +51,11 @@
 @keyframes fadeInDown {
   from {
     opacity: 0;
-    transform: translateY(-20px);
+    transform: translateY(-3rem);
   }
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-@keyframes fadeInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes fadeInRight {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
   }
 }
 
@@ -73,7 +71,7 @@
 @keyframes scaleIn {
   from {
     opacity: 0;
-    transform: scale(0.8);
+    transform: scale(0.95);
   }
   to {
     opacity: 1;
@@ -86,7 +84,7 @@
     transform: scale(1);
   }
   50% {
-    transform: scale(1.1);
+    transform: scale(1.05);
     color: hsl(var(--primary));
   }
   100% {
@@ -94,65 +92,13 @@
   }
 }
 
-.animate-fade-in-up {
-  animation: fadeInUp 0.5s ease-out both;
-}
-
-.animate-fade-in-down {
-  animation: fadeInDown 0.5s ease-out both;
-}
-
-.animate-fade-in-left {
-  animation: fadeInLeft 0.5s ease-out both;
-}
-
-.animate-fade-in-right {
-  animation: fadeInRight 0.5s ease-out both;
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.5s ease-out both;
-}
-
-.animate-scale-in {
-  animation: scaleIn 0.4s ease-out both;
-}
-
-.animate-pulse-highlight {
-  animation: pulseHighlight 0.4s ease-out;
-}
-
-/* Delay classes */
-.delay-0 {
-  animation-delay: 0ms;
-}
-.delay-1 {
-  animation-delay: 50ms;
-}
-.delay-2 {
-  animation-delay: 100ms;
-}
-.delay-3 {
-  animation-delay: 150ms;
-}
-.delay-4 {
-  animation-delay: 200ms;
-}
-.delay-5 {
-  animation-delay: 250ms;
-}
-.delay-6 {
-  animation-delay: 300ms;
-}
-.delay-7 {
-  animation-delay: 350ms;
-}
-.delay-8 {
-  animation-delay: 400ms;
-}
-.delay-9 {
-  animation-delay: 450ms;
-}
-.delay-10 {
-  animation-delay: 500ms;
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(1.6rem) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }

@@ -1,9 +1,25 @@
 const StatsView = (function () {
   "use strict";
 
-  let container = null;
-  const elements = {};
+  let elements = null;
+
   const charts = {};
+
+  function queryElements() {
+    elements = {
+      tabContent: DOM.qs("#tab-stats"),
+      mediaTypeBtns: DOM.qsa(".stats-media-type-button"),
+      mediaTypeContainer: DOM.qs("#media-type-selector"),
+      weeklyChart: DOM.qs("#weekly-chart"),
+      foldersChart: DOM.qs("#folders-chart"),
+      chartTitle: DOM.qs("#weekly-chart-title"),
+      activityList: DOM.qs(".stats-activity-list")
+    };
+  }
+
+  function getElements() {
+    return elements;
+  }
 
   function getThemeColors() {
     const isDark = document.documentElement.classList.contains("dark");
@@ -14,68 +30,40 @@ const StatsView = (function () {
     };
   }
 
-  function formatTimeAgo(timestamp) {
-    const now = Date.now();
-    const diffMs = now - timestamp;
-    const diffSecs = Math.floor(diffMs / 1000);
-    const diffMins = Math.floor(diffSecs / 60);
-    const diffHours = Math.floor(diffMins / 60);
-    const diffDays = Math.floor(diffHours / 24);
-
-    if (diffDays > 0)
-      return `${diffDays} ${diffDays === 1 ? "dia" : "dias"} atrás`;
-    if (diffHours > 0)
-      return `${diffHours} ${diffHours === 1 ? "hora" : "horas"} atrás`;
-    if (diffMins > 0)
-      return `${diffMins} ${diffMins === 1 ? "minuto" : "minutos"} atrás`;
-    return "Agora mesmo";
-  }
-
   const templates = {
     activityItem: (activity, index) => `
-      <li class="activity-item animate-fade-in-up" style="animation-delay: ${
+      <li class="stats-activity-item animate-fade-in-up" style="animation-delay: ${
         0.4 + index * 0.05
       }s">
-        <div class="icon-box ${activity.class}">
+        <div class="stats-activity-icon-box ${activity.class}">
           ${Icons.getSvg(activity.icon)}
-          <span>${activity.execution ? activity.execution : ""}</span>
+          <span>${activity.execution ?? ""}</span>
         </div>
-          
-        <div class="item-content">
-          <div class="item-header">
+        <div class="stats-activity-content">
+          <div class="stats-activity-content-header">
             <h3>${activity.title}</h3>
-            <span class="item-time">${formatTimeAgo(activity.timestamp)}</span>
+            <span class="stats-activity-time">${Utils.formatTimestamp(
+              activity.timestamp
+            )}</span>
           </div>
           <p>${activity.description}</p>
         </div>
       </li>`,
+
     activityList: activities =>
       activities
         .slice(0, 5)
         .map((a, i) => templates.activityItem(a, i))
-        .join(""),
-    activityCard: activities => `
-      <article class="activity-card animate-fade-in-up" style="animation-delay: 0.4s">
-        <div class="card-header">
-          <div class="header-icon">${Icons.getSvg("calendar")}</div>
-          <h2 class="card-title">Atividade Recente</h2>
-        </div>
-        <ul class="activity-list">${templates.activityList(activities)}</ul>
-      </article>`
+        .join("")
   };
 
   const render = {
-    activityCard: activities => {
-      const card = DOM.qs(StatsConfig.SELECTORS.activityCard);
-      if (card) {
-        const list = DOM.qs(StatsConfig.SELECTORS.activityList, card);
-        if (list) list.innerHTML = templates.activityList(activities);
-      }
+    activityList: activities => {
+      elements.activityList.innerHTML = templates.activityList(activities);
     },
-    weeklyChart: data => {
-      if (charts.weekly) {
-        charts.weekly.destroy();
-      }
+
+    weeklyChart: (data, config) => {
+      charts.weekly?.destroy();
       const colors = getThemeColors();
       charts.weekly = new Chart(elements.weeklyChart, {
         type: "bar",
@@ -83,9 +71,9 @@ const StatsView = (function () {
           labels: data.weeklyData.map(d => d.day),
           datasets: [
             {
-              label: StatsConfig.CHART_LABEL[data.activeMediaType],
+              label: config.LABEL[data.activeMediaType],
               data: data.weeklyData.map(d => d.value),
-              backgroundColor: StatsConfig.CHART_COLOR[data.activeMediaType],
+              backgroundColor: config.COLOR[data.activeMediaType],
               borderRadius: 8
             }
           ]
@@ -95,11 +83,7 @@ const StatsView = (function () {
           maintainAspectRatio: false,
           animations: {
             x: { duration: 0 },
-            y: {
-              duration: 1000,
-              easing: "easeOutQuart",
-              from: 0
-            }
+            y: { duration: 1000, easing: "easeOutQuart", from: 0 }
           },
           plugins: {
             legend: {
@@ -122,17 +106,16 @@ const StatsView = (function () {
         }
       });
     },
-    foldersChart: data => {
-      if (charts.folders) {
-        charts.folders.destroy();
-      }
+
+    foldersChart: (data, config) => {
+      charts.folders?.destroy();
       const colors = getThemeColors();
       const topFolders = data.topFolders.map(({ name, count }, index) => ({
         name,
         count,
-        color:
-          StatsConfig.COLOR_PALETTE[index % StatsConfig.COLOR_PALETTE.length]
+        color: config.COLOR_PALETTE[index % config.COLOR_PALETTE.length]
       }));
+
       charts.folders = new Chart(elements.foldersChart, {
         type: "bar",
         data: {
@@ -155,16 +138,10 @@ const StatsView = (function () {
           responsive: true,
           maintainAspectRatio: false,
           animations: {
-            x: {
-              duration: 1500,
-              easing: "easeOutQuart",
-              from: 0
-            },
+            x: { duration: 1500, easing: "easeOutQuart", from: 0 },
             y: { duration: 0 }
           },
-          plugins: {
-            legend: { display: false }
-          },
+          plugins: { legend: { display: false } },
           scales: {
             x: {
               beginAtZero: true,
@@ -179,56 +156,41 @@ const StatsView = (function () {
         }
       });
     },
-    mediaTypeUI: mediaType => {
-      elements.mediaTypeButtons.forEach(btn => btn.classList.remove("active"));
-      const activeButton = Array.from(elements.mediaTypeButtons).find(
-        btn => btn.dataset.mediaType === mediaType
-      );
-      if (activeButton) activeButton.classList.add("active");
-      const title = DOM.qs(StatsConfig.SELECTORS.weeklyChartTitle);
-      if (title)
-        title.textContent =
-          mediaType === "screenshots"
-            ? "Capturas por Dia"
-            : "Gravações por Dia";
-    },
-    complete: data => {
-      render.mediaTypeUI(data.activeMediaType);
-      render.weeklyChart(data);
-      render.foldersChart(data);
-      const activities = AppState.getActivities();
-      render.activityCard(activities);
+
+    all: (data, config) => {
+      update.mediaTypeButtons(data.activeMediaType);
+      render.weeklyChart(data, config);
+      render.foldersChart(data, config);
+      render.activityList(AppState.getActivities());
     }
   };
 
-  function init(containerSelector) {
-    container = DOM.qs(containerSelector);
-    if (!container) throw new Error(`Container ${containerSelector} not found`);
+  const update = {
+    mediaTypeButtons: mediaType => {
+      elements.mediaTypeBtns.forEach(btn => btn.classList.remove("active"));
+      Array.from(elements.mediaTypeBtns)
+        .find(btn => btn.dataset.mediaType === mediaType)
+        ?.classList.add("active");
 
-    for (const key in StatsConfig.SELECTORS) {
-      if (key !== "CONTAINER") {
-        elements[key] = DOM.qsa(StatsConfig.SELECTORS[key]);
-        if (elements[key].length === 1) elements[key] = elements[key][0];
-      }
+      elements.chartTitle.textContent =
+        mediaType === "screenshots" ? "Capturas por Dia" : "Gravações por Dia";
     }
-    return container;
+  };
+
+  function init() {
+    queryElements();
   }
 
-  function update(section, data) {
-    if (render[section]) render[section](data);
-  }
-
-  function clear() {
-    for (const chart in charts) {
-      charts[chart].destroy();
-    }
-    if (container) container.innerHTML = "";
+  function destroyCharts() {
+    Object.values(charts).forEach(chart => chart?.destroy());
   }
 
   return {
     init,
+    getElements,
+    templates,
     render,
     update,
-    clear
+    destroyCharts
   };
 })();

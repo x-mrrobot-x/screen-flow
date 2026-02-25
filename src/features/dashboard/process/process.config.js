@@ -1,16 +1,4 @@
 const ProcessConfig = {
-  SELECTORS: {
-    modal: "#process-modal",
-    title: "#modal-title",
-    progressBar: "#modal-progress-bar",
-    stepLabel: "#modal-step-label",
-    percent: "#modal-percent",
-    stepsContainer: "#modal-steps-container",
-    completion: "#modal-completion",
-    resultText: "#modal-result-text",
-    closeBtn: "#process-modal-close"
-  },
-
   PROCESS_TYPES: {
     organize_screenshots: {
       title: "Organizar Capturas de Tela",
@@ -43,7 +31,7 @@ const ProcessConfig = {
           id: "prepare_file_moves",
           label: "Preparando arquivos para organização",
           type: "js",
-          func: "prepareScreenshotOrganization",
+          func: "prepareMediaOrganization",
           params: ctx => [
             ctx.resolve_app_names,
             ENV.SOURCE_SCREENSHOTS_PATH,
@@ -108,7 +96,7 @@ const ProcessConfig = {
           id: "prepare_file_moves",
           label: "Preparando arquivos para organização",
           type: "js",
-          func: "prepareRecordingOrganization",
+          func: "prepareMediaOrganization",
           params: ctx => [
             ctx.resolve_app_names,
             ENV.SOURCE_RECORDINGS_PATH,

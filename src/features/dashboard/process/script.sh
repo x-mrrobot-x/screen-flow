@@ -107,29 +107,23 @@ run_batch_command() {
     local remaining
     local moved_count
 
-    # 1. Contar os arquivos antes de mover
     count=$(eval "$count_command" 2>/dev/null)
     count=$(echo "$count" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
     count=${count:-0}
 
-    # Se não houver arquivos, retorna sucesso
     if [ "$count" -eq 0 ]; then
         json_response "true" "{\"moved\": 0, \"total\": 0}" "null"
         return 0
     fi
     
-    # 2. Executar comandos de movimentação (todos serão executados com ;)
     eval "$move_command" 2>/dev/null
     
-    # 3. Recontar arquivos restantes para saber quantos foram movidos
     remaining=$(eval "$count_command" 2>/dev/null)
     remaining=$(echo "$remaining" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
     remaining=${remaining:-0}
     
-    # 4. Calcular quantos foram movidos com sucesso
     moved_count=$((count - remaining))
     
-    # 5. Retornar resultado
     if [ $moved_count -eq $count ]; then
         json_response "true" "{\"moved\": $moved_count, \"total\": $count}" "null"
     else
@@ -173,13 +167,11 @@ EOF
 delete_files_batch() {
     files_json="$1"
     
-    # Remove colchetes e aspas para processar a lista
     file_list=$(echo "$files_json" | tr -d '[]"' | tr ',' '\n')
     
     deleted_count=0
     
     while IFS= read -r file_path; do
-        # Remove espaços em branco e escapes
         clean_path=$(echo "$file_path" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//;s/\\\\/\\/g')
         
         if [ -n "$clean_path" ] && [ -f "$clean_path" ]; then
@@ -327,11 +319,9 @@ get_item_counts_batch() {
   json_array=""
   first=true
   
-  # Usa { } em vez de ( ) - NÃO cria subshell
   {
     cd "$base_path" || return 1
     while IFS= read -r folder_name; do
-      # Remove espaços em branco do início/fim
       folder_name=$(echo "$folder_name" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
       
       if [ -n "$folder_name" ] && [ -d "$folder_name" ]; then
@@ -359,19 +349,14 @@ rename_folder() {
   old_name="$2"
   new_name="$3"
 
-  # Caminhos completos
   old_path="$base_path/$old_name"
   new_path="$base_path/$new_name"
 
-  # Verifica se a pasta antiga existe e o nome é diferente
   if [ -d "$old_path" ] && [ "$old_name" != "$new_name" ]; then
     
-    # Se a nova pasta já existe, mescla o conteúdo
     if [ -d "$new_path" ]; then
-      # Move o conteúdo e depois remove a pasta antiga vazia
       mv "$old_path"/* "$new_path"/ 2>/dev/null && rmdir "$old_path"
     else
-      # Senão, apenas renomeia
       mv "$old_path" "$new_path"
     fi
 
@@ -382,7 +367,6 @@ rename_folder() {
       json_response "false" "null" "\"Falha ao renomear/mesclar $old_name\""
     fi
   else
-    # Nada a fazer
     json_response "true" "{\"renamed\": false, \"timestamp\": null}" "null"
   fi
 }

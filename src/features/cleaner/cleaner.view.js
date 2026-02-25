@@ -1,209 +1,227 @@
 const CleanerView = (function () {
   "use strict";
 
-  let container = null;
-  const elements = {};
+  const DAY_OPTIONS = [1, 7, 15, 30, 60];
 
-  function createDayButton(mediaType, days, isActive) {
-    const activeClass = isActive ? "active" : "";
-    return `<button class="clean-day-button tap-scale ${activeClass}" data-action="setFolderDays" data-media-type="${mediaType}" data-days="${days}">${days} dias</button>`;
+  let elements = null;
+
+  function queryElements() {
+    elements = {
+      tabContent: DOM.qs("#tab-cleaner"),
+      autoSwitch: DOM.qs("#switch-auto-cleaner"),
+      list: DOM.qs("#cleaner-folder-list"),
+      countText: DOM.qs("#cleaner-subtitle")
+    };
   }
 
-  function createCleanGroup(folder, mediaType, key, label) {
-    if (!folder[key]?.cleaner?.on) {
-      return "";
-    }
-
-    const optionId = `option-group-${folder.id}-${mediaType}`;
-    const currentDays = folder[key].cleaner.days;
-
-    const optionsHtml = CleanerConfig.DAY_OPTIONS.map(days =>
-      createDayButton(mediaType, days, currentDays === days)
-    ).join("");
-
-    return `
-      <div class="folder-clean-group" id="${optionId}">
-        <p>${label} - Remover após:</p>
-        <div class="clean-days-options">${optionsHtml}</div>
-      </div>
-    `;
-  }
-
-  function createSwitchContainer(folder, mediaType, key, label) {
-    if (!folder[key]) return "";
-
-    const cleanerOn = folder[key]?.cleaner?.on;
-    return `
-      <div class="clean-switch-container" data-action="toggleDayConfigVisibility" data-media-type="${mediaType}">
-        <span class="switch-label">${label}</span>
-        <button class="switch ${
-          cleanerOn ? "active" : ""
-        }" data-action="toggleFolderClean" data-media-type="${mediaType}"></button>
-      </div>
-    `;
+  function getElements() {
+    return elements;
   }
 
   const templates = {
-    folderOptions: (folder, mediaType) => {
-      const key = mediaType === "screenshots" ? "ss" : "sr";
-      const label = mediaType === "screenshots" ? "Capturas" : "Gravações";
-      return createCleanGroup(folder, mediaType, key, label);
+    dayButton: (mediaType, days, isActive) => `
+      <button class="cleaner-day-button tap-scale ${isActive ? "active" : ""}"
+        data-action="setFolderDays"
+        data-media-type="${mediaType}"
+        data-days="${days}"
+      >
+        ${Utils.pluralize(days, "dia")}
+      </button>`,
+
+    cleanerGroup: (folder, mediaType, key, label) => {
+      if (!folder[key]?.cleaner?.on) return "";
+      const currentDays = folder[key].cleaner.days;
+      const optionsHtml = DAY_OPTIONS.map(d =>
+        templates.dayButton(mediaType, d, currentDays === d)
+      ).join("");
+      return `
+        <div class="cleaner-group" id="cleaner-group-${folder.id}-${mediaType}">
+          <p>${label} - Apagar após:</p>
+          <div class="cleaner-day-options">${optionsHtml}</div>
+        </div>`;
     },
+
+    switchContainer: (folder, mediaType, key, label) => {
+      if (!folder[key]) return "";
+      const cleanerOn = folder[key]?.cleaner?.on;
+      return `
+        <div class="cleaner-switch-container" data-media-type="${mediaType}">
+          <span class="cleaner-switch-label">${label}</span>
+          <button class="switch-md ${cleanerOn ? "active" : ""}"
+                  data-action="toggleFolderClean"
+                  data-media-type="${mediaType}"></button>
+        </div>`;
+    },
+
+    buildSwitches: folder => ({
+      screenshots: templates.switchContainer(
+        folder,
+        "screenshots",
+        "ss",
+        "Capturas de tela"
+      ),
+      recordings: templates.switchContainer(
+        folder,
+        "screenrecordings",
+        "sr",
+        "Gravações de tela"
+      )
+    }),
 
     folderCard: (folder, index) => {
       if (!folder.ss && !folder.sr) return "";
 
-      const screenshotsSwitch = createSwitchContainer(
-        folder,
-        "screenshots",
-        "ss",
-        "Capturas"
-      );
-      const recordingsSwitch = createSwitchContainer(
-        folder,
-        "screenrecordings",
-        "sr",
-        "Gravações"
-      );
+      const { screenshots, recordings } = templates.buildSwitches(folder);
+      if (!screenshots && !recordings) return "";
 
-      if (!screenshotsSwitch && !recordingsSwitch) return "";
+      const isEnabled = folder.ss?.cleaner?.on || folder.sr?.cleaner?.on;
 
-      const ssCleanerOn = folder.ss?.cleaner?.on;
-      const srCleanerOn = folder.sr?.cleaner?.on;
-      const isEnabled = ssCleanerOn || srCleanerOn;
+      const optionsHtml = isEnabled
+        ? `
+        <div class="cleaner-folder-options">
+          ${templates.cleanerGroup(
+            folder,
+            "screenshots",
+            "ss",
+            "Capturas de tela"
+          )}
+          ${templates.cleanerGroup(
+            folder,
+            "screenrecordings",
+            "sr",
+            "Gravações de tela"
+          )}
+        </div>`
+        : "";
 
       return `
-        <div class="folder-clean-card ${
+        <div class="cleaner-folder-card card ${
           isEnabled ? "enabled" : ""
-        } animate-fade-in-up" style="animation-delay: ${
-          0.2 + index * 0.05
-        }s" data-folder-id="${folder.id}">
-          <div class="folder-clean-header">
+        } animate-fade-in-up"
+             style="animation-delay: ${0.2 + index * 0.05}s"
+             data-folder-id="${folder.id}">
+          <div class="cleaner-folder-header">
             ${Icons.getAppIcon(folder)}
-            <span class="folder-clean-name truncate-text">${folder.name}</span>
-            <div class="folder-clean-switches">
-              ${screenshotsSwitch}
-              ${recordingsSwitch}
+            <span class="cleaner-folder-name truncate-text">${
+              folder.name
+            }</span>
+            <div class="cleaner-folder-switches">
+              ${screenshots}
+              ${recordings}
             </div>
           </div>
-          ${
-            isEnabled
-              ? `
-            <div class="folder-clean-options">
-              ${createCleanGroup(folder, "screenshots", "ss", "Capturas")}
-              ${createCleanGroup(folder, "screenrecordings", "sr", "Gravações")}
-            </div>
-          `
-              : ""
-          }
-        </div>
-      `;
+          ${optionsHtml}
+        </div>`;
     }
   };
 
   const render = {
-    counts: (folders, autoCleaner) => {
-      const screenshotsCount = folders.filter(f => f.ss?.cleaner?.on).length;
-      const recordingsCount = folders.filter(f => f.sr?.cleaner?.on).length;
+    buildCountsHtml: (ssCount, srCount) => `
+        <div class="cleaner-subtitle-item">
+          <span class="dot dot-screenshot"></span>
+          <span>${Utils.pluralize(
+            ssCount,
+            "pasta"
+          )} com limpeza de capturas de tela</span>
+        </div>
+        <div class="cleaner-subtitle-item">
+          <span class="dot dot-recording"></span>
+          <span>${Utils.pluralize(
+            srCount,
+            "pasta"
+          )} com limpeza de gravações de tela</span>
+        </div>`,
 
-      if (autoCleaner) {
-        elements.cleanerCountText.innerHTML = `<div class="subtitle-item">
-            <span class="dot dot-screenshot"></span>
-            <span>${screenshotsCount} pastas com limpeza de capturas</span>
-          </div>
-            
-          <div class="subtitle-item">
-            <span class="dot dot-recording"></span>
-            <span>${recordingsCount} com limpeza de gravações</span>
-          </div>`;
+    counts: folders => {
+      const ssCount = folders.filter(f => f.ss?.cleaner?.on).length;
+      const srCount = folders.filter(f => f.sr?.cleaner?.on).length;
+      const hasActive = ssCount > 0 || srCount > 0;
+
+      if (hasActive) {
+        elements.countText.innerHTML = render.buildCountsHtml(ssCount, srCount);
       } else {
-        elements.cleanerCountText.textContent = "Limpe pastas automaticamente";
+        elements.countText.textContent = "Nenhuma pasta com limpeza ativa";
       }
     },
 
     folderList: folders => {
-      elements.folderCleanList.innerHTML = folders
+      elements.list.innerHTML = folders
         .map((folder, index) => templates.folderCard(folder, index))
         .join("");
     },
 
-    cleaner: (folders, autoCleaner) => {
-      render.counts(folders, autoCleaner);
+    cleaner: folders => {
+      render.counts(folders);
       render.folderList(folders);
-      elements.autoCleanerSwitch.classList.toggle("active", autoCleaner);
-      elements.folderCleanList.style.display = autoCleaner ? "flex" : "none";
     }
   };
 
-  function updateCard(folder) {
-    if (!folder) return;
-    const card = DOM.qs(
-      `.folder-clean-card[data-folder-id="${folder.id}"]`,
-      elements.folderCleanList
-    );
-    if (!card) return;
-
-    const ssCleanerOn = folder.ss?.cleaner?.on;
-    const srCleanerOn = folder.sr?.cleaner?.on;
-    const isEnabled = ssCleanerOn || srCleanerOn;
-
-    card.classList.toggle("enabled", isEnabled);
-
-    const ssSwitch = DOM.qs('button[data-media-type="screenshots"]', card);
-    if (ssSwitch) {
-      ssSwitch.classList.toggle("active", !!ssCleanerOn);
-    }
-    const srSwitch = DOM.qs('button[data-media-type="screenrecordings"]', card);
-    if (srSwitch) {
-      srSwitch.classList.toggle("active", !!srCleanerOn);
-    }
-
-    let optionsDiv = DOM.qs(".folder-clean-options", card);
-    if (isEnabled) {
-      if (!optionsDiv) {
-        optionsDiv = document.createElement("div");
-        optionsDiv.className = "folder-clean-options";
-        card.appendChild(optionsDiv);
-      }
-      const ssOptions = createCleanGroup(
-        folder,
-        "screenshots",
-        "ss",
-        "Capturas"
+  const update = {
+    switchButtons: (card, folder) => {
+      DOM.qs('button[data-media-type="screenshots"]', card)?.classList.toggle(
+        "active",
+        !!folder.ss?.cleaner?.on
       );
-      const srOptions = createCleanGroup(
-        folder,
-        "screenrecordings",
-        "sr",
-        "Gravações"
-      );
-      optionsDiv.innerHTML = ssOptions + srOptions;
-    } else {
-      if (optionsDiv) {
-        optionsDiv.remove();
-      }
-    }
-  }
+      DOM.qs(
+        'button[data-media-type="screenrecordings"]',
+        card
+      )?.classList.toggle("active", !!folder.sr?.cleaner?.on);
+    },
 
-  function init(containerSelector) {
-    container = DOM.qs(containerSelector);
-    if (!container) throw new Error(`Container ${containerSelector} not found`);
-
-    for (const key in CleanerConfig.SELECTORS) {
-      if (key !== "CONTAINER") {
-        if (key === "folderCleanList") {
-          elements.folderCleanList = DOM.qs(CleanerConfig.SELECTORS[key]);
-        } else {
-          elements[key] = DOM.qs(CleanerConfig.SELECTORS[key]);
+    optionsDiv: (card, folder, isEnabled) => {
+      let optionsDiv = DOM.qs(".cleaner-folder-options", card);
+      if (isEnabled) {
+        if (!optionsDiv) {
+          optionsDiv = document.createElement("div");
+          optionsDiv.className = "cleaner-folder-options";
+          card.appendChild(optionsDiv);
         }
+        optionsDiv.innerHTML =
+          templates.cleanerGroup(
+            folder,
+            "screenshots",
+            "ss",
+            "Capturas de tela"
+          ) +
+          templates.cleanerGroup(
+            folder,
+            "screenrecordings",
+            "sr",
+            "Gravações de tela"
+          );
+      } else {
+        optionsDiv?.remove();
       }
+    },
+
+    autoCleaner: active => {
+      elements.autoSwitch.classList.toggle("active", active);
+    },
+
+    card: folder => {
+      if (!folder) return;
+      const card = DOM.qs(
+        `.cleaner-folder-card[data-folder-id="${folder.id}"]`,
+        elements.list
+      );
+      if (!card) return;
+
+      const isEnabled = folder.ss?.cleaner?.on || folder.sr?.cleaner?.on;
+      card.classList.toggle("enabled", isEnabled);
+      update.switchButtons(card, folder);
+      update.optionsDiv(card, folder, isEnabled);
     }
-    return container;
+  };
+
+  function init() {
+    queryElements();
   }
 
   return {
     init,
+    getElements,
+    templates,
     render,
-    updateCard
+    update
   };
 })();

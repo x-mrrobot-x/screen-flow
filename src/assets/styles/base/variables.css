@@ -1,16 +1,16 @@
 :root {
-  --icon-xs: 1.2rem;
-  --icon-sm: 1.4rem;
-  --icon-md: 1.6rem;
-  --icon-lg: 2rem;
-  --icon-xl: 2.4rem;
-  --icon-2xl: 3.2rem;
+  --icon-xs: 1.4rem;
+  --icon-sm: 1.6rem;
+  --icon-md: 2rem;
+  --icon-lg: 2.4rem;
+  --icon-xl: 2.8rem;
+  --icon-2xl: 3.6rem;
 
-  --radius-xs: 0.6rem;
-  --radius-sm: 0.8rem;
-  --radius-md: 1.2rem;
-  --radius-lg: 1.4rem;
-  --radius-xl: 1.8rem;
+  --radius-xs: 0.8rem;
+  --radius-sm: 1.2rem;
+  --radius-md: 1.4rem;
+  --radius-lg: 2rem;
+  --radius-xl: 2.4rem;
   --radius-full: 9999px;
 
   --space-xxs: 0.4rem;
@@ -29,15 +29,15 @@
   --font-xl: 2rem;
   --font-2xl: 2.2rem;
 
-  /* Common color variables */
   --primary: 213 94% 68%;
   --primary-foreground: 0 0% 100%;
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
   --ring: 213 94% 68%;
   --radius: 1.6rem;
-  --gradient-start: 217 91% 60%;
-  --gradient-end: 258 90% 66%;
+
+  --gradient-start: 217 91% 65%;
+  --gradient-end: 258 90% 70%;
   --accent-gradient: linear-gradient(
     135deg,
     hsl(var(--gradient-start)) 0%,
@@ -48,8 +48,10 @@
   --warning: 38 92% 50%;
   --accent: 255 92% 76%;
   --accent-foreground: 0 0% 100%;
-  
-  /* Default dark theme colors */
+
+  --transition-spring: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* Dark mode */
   --background: 222 47% 5%;
   --foreground: 210 40% 98%;
   --card: 222 47% 8%;
@@ -71,14 +73,10 @@
   --card-foreground: 222 47% 11%;
   --popover: 0 0% 100%;
   --popover-foreground: 222 47% 11%;
-  --secondary: 210 40% 96%;
+  --secondary: 214 32% 94%;
   --secondary-foreground: 222 47% 11%;
-  --muted: 210 40% 96%;
-  --muted-foreground: 215 16% 47%;
-  --border: 214 32% 91%;
-  --input: 214 32% 91%;
-}
-
-.dark {
-  /* Dark theme has no unique variables since all are defined in :root */
+  --muted: 214 32% 94%;
+  --muted-foreground: 215 16% 40%;
+  --border: 214 32% 90%;
+  --input: 214 32% 90%;
 }

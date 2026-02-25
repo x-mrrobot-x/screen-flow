@@ -1,103 +1,127 @@
-/* Shared styles for info cards used in both setting and cleaner */
-
-.cleaner-info,
-.setting-info {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-}
-
-.cleaner-info svg,
-.setting-info svg {
-  width: var(--icon-lg);
-  height: var(--icon-lg);
-  flex-shrink: 0;
-  margin-top: 0.2rem;
-}
-
-.cleaner-info h4,
-.setting-info h4 {
-  font-size: var(--font-sm);
-  font-weight: 500;
-  color: hsl(var(--foreground));
-  margin-bottom: var(--space-xxs);
-}
-
-.cleaner-info p,
-.setting-info p {
-  font-size: var(--font-xs);
-  color: hsl(var(--muted-foreground));
-}
-
-/* Shared styles for setting rows */
-.cleaner-row,
-.setting-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--space-md);
-  border-bottom: 1px solid hsl(var(--border));
-}
-
-.cleaner-row:last-child,
-.setting-row:last-child {
-  border-bottom: none;
-}
-
-.cleaner-content,
-.setting-content {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-}
-
-.cleaner-icon,
-.setting-icon {
-  padding: var(--space-xs);
-  border-radius: var(--radius-md);
-}
-
-.cleaner-text h4,
-.setting-text h4 {
-  font-weight: 500;
-  color: hsl(var(--foreground));
-}
-
-.cleaner-text p,
-.setting-text p {
-  font-size: var(--font-sm);
-  color: hsl(var(--muted-foreground));
-}
-
-/* Shared switch styles */
-.switch {
+.switch-sm,
+.switch-md,
+.switch-lg {
   position: relative;
-  width: 4.4rem;
-  height: 2.4rem;
   background: hsl(var(--muted));
   border-radius: var(--radius-full);
-  border: none;
-  cursor: pointer;
   transition: background 0.2s ease;
+  flex-shrink: 0;
 }
 
-.switch.active {
-  background: rgba(59, 130, 246, 0.4);
+.switch-sm.active,
+.switch-md.active,
+.switch-lg.active {
+  background: hsl(var(--primary) / 0.4);
 }
 
-.switch::after {
+.switch-sm::after,
+.switch-md::after,
+.switch-lg::after {
   content: "";
   position: absolute;
+  background: hsl(var(--primary) / 0.3);
+  border-radius: var(--radius-full);
+  transition:
+    transform 0.3s var(--transition-spring),
+    background 0.3s var(--transition-spring);
+}
+
+.switch-sm.active::after,
+.switch-md.active::after,
+.switch-lg.active::after {
+  background: hsl(var(--primary) / 0.8);
+}
+
+.switch-sm {
+  width: 2.8rem;
+  height: 1.6rem;
+}
+
+.switch-sm::after {
+  top: 0.2rem;
+  left: 0.2rem;
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.switch-sm.active::after {
+  transform: translateX(1.2rem);
+}
+
+.switch-md {
+  width: 3.6rem;
+  height: 2rem;
+}
+
+.switch-md::after {
+  top: 0.2rem;
+  left: 0.2rem;
+  width: 1.6rem;
+  height: 1.6rem;
+}
+
+.switch-md.active::after {
+  transform: translateX(1.6rem);
+}
+
+.switch-lg {
+  width: 4.4rem;
+  height: 2.4rem;
+}
+
+.switch-lg::after {
   top: 0.2rem;
   left: 0.2rem;
   width: 2rem;
   height: 2rem;
-  background: rgba(59, 130, 246, 0.3);
-  border-radius: var(--radius-full);
-  transition: transform 0.2s ease;
 }
 
-.switch.active::after {
+.switch-lg.active::after {
   transform: translateX(2rem);
-  background: rgba(59, 130, 246, 0.8);
+}
+
+.automation-section {
+  margin-bottom: var(--space-lg);
+}
+
+.automation-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.automation-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex: 1;
+  min-width: 0;
+}
+
+.automation-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xs);
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+.automation-icon svg {
+  width: var(--icon-lg);
+  height: var(--icon-lg);
+}
+
+.automation-text h3 {
+  font-size: var(--font-md);
+  font-weight: 600;
+  color: hsl(var(--foreground));
+  margin-bottom: var(--space-xxs);
+}
+
+.automation-text p {
+  font-size: var(--font-xs);
+  color: hsl(var(--muted-foreground));
+  line-height: 1.4;
 }

@@ -3,35 +3,21 @@ const DashboardModel = (function () {
 
   function getTopOrganizerApp() {
     const folders = AppState.getFolders();
-    if (!folders || folders.length === 0) {
-      return null;
-    }
+    if (!folders || folders.length === 0) return null;
 
-    let topApp = null;
-    let maxCount = -1;
+    const topApp = folders.reduce((best, folder) => {
+      const count = (folder.ss?.count || 0) + (folder.sr?.count || 0);
+      return count > (best?.count || 0) ? { ...folder, count } : best;
+    }, null);
 
-    for (const folder of folders) {
-      const totalFiles = (folder.ss?.count || 0) + (folder.sr?.count || 0);
-      if (totalFiles > maxCount) {
-        maxCount = totalFiles;
-        topApp = folder;
-      }
-    }
+    if (!topApp || topApp.count <= 0) return null;
 
-    if (!topApp || maxCount <= 0) {
-      return null;
-    }
-
-    return {
-      name: topApp.name,
-      count: maxCount,
-      pkg: topApp.pkg
-    };
+    return { name: topApp.name, count: topApp.count, pkg: topApp.pkg };
   }
 
   async function getToOrganizeFileCounts() {
     try {
-      const [imagesResult, videosResult] = await Promise.all([
+      const [screenshotsResult, recordingsResult] = await Promise.all([
         TaskQueue.add(
           "count_media_items",
           ["jpg", ENV.SOURCE_SCREENSHOTS_PATH],
@@ -44,21 +30,13 @@ const DashboardModel = (function () {
         )
       ]);
 
-      const imagesCount = Number(imagesResult) || 0;
-      const videosCount = Number(videosResult) || 0;
-
-      const toOrganize = {
-        images: imagesCount,
-        videos: videosCount
+      return {
+        screenshots: Number(screenshotsResult) || 0,
+        recordings: Number(recordingsResult) || 0
       };
-
-      return toOrganize;
     } catch (error) {
       Logger.error("Failed to update pending files count:", error);
-      return {
-        images: 0,
-        videos: 0
-      };
+      return { screenshots: 0, recordings: 0 };
     }
   }
 
@@ -79,21 +57,13 @@ const DashboardModel = (function () {
         ]
       );
 
-      const screenshotsCount = Number(screenshotsFolderCount) || 0;
-      const recordingsCount = Number(recordingsFolderCount) || 0;
-
-      const foldersCreated = {
-        images: screenshotsCount,
-        videos: recordingsCount
+      return {
+        screenshots: Number(screenshotsFolderCount) || 0,
+        recordings: Number(recordingsFolderCount) || 0
       };
-
-      return foldersCreated;
     } catch (error) {
       Logger.error("Failed to update folders created count:", error);
-      return {
-        images: 0,
-        videos: 0
-      };
+      return { screenshots: 0, recordings: 0 };
     }
   }
 
@@ -105,31 +75,29 @@ const DashboardModel = (function () {
       pkg: "default.png"
     };
 
-    const currentState = {
+    return {
       organizedFiles: stats.organizedFiles || 0,
       removedFiles: stats.cleanedFiles || 0,
-      toOrganize: stats.toOrganize,
-      foldersCreated: stats.foldersCreated,
+      toOrganize: stats.toOrganize || { screenshots: 0, recordings: 0 },
+      foldersCreated: stats.foldersCreated || { screenshots: 0, recordings: 0 },
       lastOrganization: {
-        images: Utils.formatTimestamp(stats.lastOrganization?.images),
-        videos: Utils.formatTimestamp(stats.lastOrganization?.videos)
+        screenshots: Utils.formatTimestamp(stats.lastOrganization?.screenshots),
+        recordings: Utils.formatTimestamp(stats.lastOrganization?.recordings)
       },
       lastClean: {
-        images: Utils.formatTimestamp(stats.lastClean?.images),
-        videos: Utils.formatTimestamp(stats.lastClean?.videos)
+        screenshots: Utils.formatTimestamp(stats.lastClean?.screenshots),
+        recordings: Utils.formatTimestamp(stats.lastClean?.recordings)
       },
-      mostCapturedApp: mostCapturedApp
+      mostCapturedApp,
+      settings: {
+        autoOrganizer: AppState.getSetting("autoOrganizer") ?? false,
+        autoCleaner: AppState.getSetting("autoCleaner") ?? false
+      }
     };
-    return currentState;
-  }
-
-  function refresh() {
-    return getState();
   }
 
   return {
     getState,
-    refresh,
     getToOrganizeFileCounts,
     getOrganizedFolderCounts
   };

@@ -7,74 +7,82 @@ const ProcessController = (function () {
     context: {}
   };
 
-  //======= MOTOR DE EXECUÇÃO DE PROCESSOS =======//
-
   const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
+  async function executeStep(step) {
+    const params = step.params(state.context);
+    if (step.type === "shell") return TaskQueue.add(step.func, params, "shell");
+    if (step.type === "js") return ProcessModel[step.func](...params);
+  }
+
+  function activateStep(i, step, steps) {
+    ProcessView.update.stepStatus(i, "running");
+    ProcessView.update.scrollToStep(i);
+    ProcessView.update.stepLabel(step.label);
+    ProcessView.update.progress((i / steps.length) * 100);
+  }
+
+  function checkEmptyResult(step, result) {
+    const messages = {
+      scan_screenshots: "Nenhuma captura de tela encontrada para organizar.",
+      scan_recordings: "Nenhuma gravação de tela encontrada para organizar.",
+      find_all_expired: "Nenhum arquivo antigo encontrado para limpar."
+    };
+
+    const isEmpty =
+      (step.id === "scan_screenshots" && result.length === 0) ||
+      (step.id === "scan_recordings" && result.length === 0) ||
+      (step.id === "find_all_expired" && result.all.length === 0);
+
+    if (!isEmpty) return false;
+
+    state.isRunning = false;
+    Toast.info(messages[step.id]);
+    close();
+    return true;
+  }
+
+  async function advanceToNextStep(i, steps) {
+    if (i >= steps.length - 1 || !state.isRunning) return;
+    activateStep(i + 1, steps[i + 1], steps);
+    await sleep(1000);
+  }
+
+  function handleStepError(error, step, index) {
+    if (error === "Cancelled") {
+      Logger.warn(`Processo '${state.processType}' cancelado pelo usuário.`);
+    } else {
+      Logger.error(`Erro na etapa ${step.id}:`, error);
+      ProcessView.update.stepStatus(index, "failed");
+      ProcessView.update.completion(`Erro em: ${step.label}`, false);
+    }
+    state.isRunning = false;
+  }
+
   async function run() {
-    const processData = ProcessConfig.PROCESS_TYPES[state.processType];
-    const steps = processData.steps;
+    const steps = ProcessConfig.PROCESS_TYPES[state.processType].steps;
 
     for (let i = 0; i < steps.length; i++) {
       if (!state.isRunning) {
-        Logger.user("Processo cancelado.", "info");
+        Toast.info("Processo cancelado.");
         return;
       }
 
       const step = steps[i];
-      const progress = (i / steps.length) * 100;
-
-      ProcessView.updateStepStatus(i, "running");
-      ProcessView.scrollToStep(i);
-      ProcessView.updateStepLabel(step.label);
-      ProcessView.updateProgress(progress);
+      activateStep(i, step, steps);
 
       try {
-        const params = step.params(state.context);
-        let result;
-
-        if (step.type === "shell") {
-          // Adiciona a tarefa pesada à fila e aguarda a conclusão, especificando o tipo 'shell'
-          result = await TaskQueue.add(step.func, params, "shell");
-        } else if (step.type === "js") {
-          // Chama a função JS diretamente do Model
-          result = await ProcessModel[step.func](...params);
-        }
+        const result = await executeStep(step);
 
         Logger.debug("[STEP RESULT]", step.id, result);
         state.context[step.id] = result;
-        ProcessView.updateStepStatus(i, "completed");
 
-        if (step.id === "scan_screenshots" && result.length === 0) {
-          Toast.info("Nenhuma screenshot encontrada para organizar.");
-          stop();
-          return;
-        }
+        if (checkEmptyResult(step, result)) return;
 
-        if (step.id === "scan_recordings" && result.length === 0) {
-          Toast.info("Nenhuma gravação encontrada para organizar.");
-          stop();
-          return;
-        }
-
-        if (step.id === "find_all_expired" && result.all.length === 0) {
-          Toast.info("Nenhum arquivo antigo encontrado para limpar.");
-          stop();
-          return;
-        }
-
-        await sleep(500);
+        ProcessView.update.stepStatus(i, "completed");
+        await advanceToNextStep(i, steps);
       } catch (error) {
-        if (error === "Cancelled") {
-          Logger.warn(
-            `Processo '${state.processType}' cancelado pelo usuário.`
-          );
-        } else {
-          Logger.error(`Erro na etapa ${step.id}:`, error);
-          ProcessView.updateStepStatus(i, "failed");
-          ProcessView.showCompletion(`Erro em: ${step.label}`);
-        }
-        state.isRunning = false;
+        handleStepError(error, step, i);
         return;
       }
     }
@@ -82,47 +90,68 @@ const ProcessController = (function () {
     finishProcess();
   }
 
-  async function finishProcess() {
-    if (!state.isRunning) return;
-
-    ProcessView.updateProgress(100);
-    ProcessView.updateStepLabel("Processo concluído!");
-
-    const finalSummary =
-      state.context.save_summary || state.context.save_cleanup_summary || {};
-    const stats = finalSummary.savedStats || {};
-    let completionText = "Processo finalizado com sucesso!";
-
-    const processResult = { processType: state.processType };
-
+  function buildCompletionText(processType, stats) {
     if (
-      state.processType === "organize_screenshots" ||
-      state.processType === "organize_recordings"
+      processType === "organize_screenshots" ||
+      processType === "organize_recordings"
     ) {
-      const movedCount = stats.moved || 0;
-      completionText = `Organização concluída! ${movedCount} arquivos movidos.`;
-    } else if (state.processType === "cleanup_old_files") {
-      const removedCount = stats.total_removed || 0;
-      completionText = `Limpeza concluída! ${removedCount} arquivos removidos.`;
+      return `Organização concluída! ${Utils.pluralize(
+        stats.moved || 0,
+        "arquivo"
+      )}
+      ${Utils.pluralize(stats.moved, "movido", false)}.`;
     }
+    if (processType === "cleanup_old_files") {
+      return `Limpeza concluída! ${Utils.pluralize(
+        stats.total_removed || 0,
+        "arquivo"
+      )}
+      ${Utils.pluralize(stats.total_removed || 0, "removido", false)}.`;
+    }
+    return "Processo finalizado com sucesso!";
+  }
 
-    ProcessView.showCompletion(completionText);
-    state.isRunning = false;
-
-    // Apenas executa o scan e atualiza estatísticas se houver alterações
-    if (
-      (stats.moved && stats.moved > 0) ||
-      (stats.total_removed && stats.total_removed > 0)
-    ) {
+  function notifyChanges(stats) {
+    if (stats.moved > 0 || stats.total_removed > 0) {
       SubfolderMonitor.runScan();
       DashboardController.loadStats();
     }
   }
 
-  function stop() {
+  function finishProcess() {
+    if (!state.isRunning) return;
+
+    ProcessView.update.progress(100);
+    ProcessView.update.stepLabel("Processo concluído!");
+
+    const finalSummary =
+      state.context.save_summary || state.context.save_cleanup_summary || {};
+    const stats = finalSummary.savedStats || {};
+
+    ProcessView.update.completion(
+      buildCompletionText(state.processType, stats)
+    );
     state.isRunning = false;
-    ProcessView.hide();
+
+    notifyChanges(stats);
+  }
+
+  function cancelCurrentProcess() {
+    if (state.isRunning) {
+      Toast.info("Cancelando processo...");
+      state.isRunning = false;
+      TaskQueue.cancelAll();
+    }
     ProcessView.reset();
+  }
+
+  function open() {
+    const { dialog } = ProcessView.getElements();
+    DialogStack.push(dialog, cancelCurrentProcess);
+  }
+
+  function close() {
+    DialogStack.goBack();
   }
 
   async function start(processType) {
@@ -132,6 +161,7 @@ const ProcessController = (function () {
       const hasConfigs = await ProcessModel.hasCleanerConfigs();
       if (!hasConfigs) {
         Toast.info("Nenhuma pasta configurada para limpeza.");
+        Navigation.navigateTo("cleaner");
         return;
       }
     }
@@ -147,34 +177,46 @@ const ProcessController = (function () {
     state.context = {};
 
     ProcessView.reset();
-    ProcessView.updateTitle(processData.title);
-    ProcessView.renderInitialSteps(processData.steps);
-    ProcessView.show();
+    ProcessView.update.title(processData.title);
+    ProcessView.render(processData.steps);
+    open();
 
-    setTimeout(run, 1000);
+    setTimeout(run, 500);
   }
 
-  function cancelCurrentProcess() {
-    if (state.isRunning) {
-      Logger.user("Cancelando processo...", "warn");
-      state.isRunning = false;
-      TaskQueue.cancelAll();
+  const handlers = {
+    onProcessBtn: e => {
+      const processType = e.target.closest("[data-process-type]")?.dataset
+        .processType;
+      if (processType) start(processType);
+    },
+
+    onClose: () => close(),
+
+    onBackdropClick: e => {
+      if (e.target === ProcessView.getElements().dialog) close();
     }
-    ProcessView.hide();
-    ProcessView.reset();
+  };
+
+  function attachEvents() {
+    const { dialog, closeBtn } = ProcessView.getElements();
+
+    const events = [
+      [document, "click", handlers.onProcessBtn],
+      [closeBtn, "click", handlers.onClose],
+      [dialog, "click", handlers.onBackdropClick]
+    ];
+    events.forEach(([el, event, handler]) =>
+      el.addEventListener(event, handler)
+    );
   }
 
   function init() {
-    ProcessView.init({ onCancel: cancelCurrentProcess });
-    const quickActionButtons = DOM.qsa("[data-process-type]");
-    quickActionButtons.forEach(btn => {
-      const processType = btn.dataset.processType;
-      btn.addEventListener("click", () => start(processType));
-    });
+    ProcessView.init();
+    attachEvents();
   }
 
   return {
-    init,
-    stop
+    init
   };
 })();

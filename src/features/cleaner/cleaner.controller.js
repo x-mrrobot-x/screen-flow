@@ -6,100 +6,75 @@ const CleanerController = (function () {
 
   function renderUI() {
     const folders = CleanerModel.getFolders();
-    const state = CleanerModel.getState();
-    CleanerView.render.cleaner(folders, state.autoCleaner);
+    CleanerView.render.cleaner(folders);
+    CleanerView.update.autoCleaner(CleanerModel.getAutoCleanerSetting());
   }
 
   function updatePartial(folderId) {
     const folders = CleanerModel.getFolders();
-    const state = CleanerModel.getState();
     const folder = folders.find(f => f.id === folderId);
-    if (folder) {
-      CleanerView.updateCard(folder);
-      CleanerView.render.counts(folders, state.autoCleaner);
-    }
+    if (!folder) return;
+    CleanerView.update.card(folder);
+    CleanerView.render.counts(folders);
   }
 
   const debouncedRender = Utils.debounce(renderUI, 100);
 
   const handlers = {
-    handleEvent: e => {
-      const folderCard = e.target.closest(".folder-clean-card");
-      if (!folderCard) return;
-
-      const folderId = folderCard.getAttribute("data-folder-id");
-      if (!folderId) return;
-
-      const actionBtn = e.target.closest("[data-action]");
-      if (!actionBtn) return;
-
+    onListClick: e => {
+      const card = e.target.closest(".cleaner-folder-card");
+      const btn = e.target.closest("[data-action]");
+      if (!card || !btn) return;
       e.stopPropagation();
-      const action = actionBtn.getAttribute("data-action");
-      const mediaType = actionBtn.getAttribute("data-media-type");
+      const { folderId } = card.dataset;
+      const { action, mediaType, days } = btn.dataset;
+      suppressNextRender = true;
 
-      switch (action) {
-        case "toggleFolderClean":
-          suppressNextRender = true;
+      try {
+        if (action === "toggleFolderClean")
           CleanerModel.toggleFolderClean(folderId, mediaType);
-          updatePartial(folderId);
-          suppressNextRender = false;
-          break;
-        case "setFolderDays":
-          suppressNextRender = true;
-          const days = parseInt(actionBtn.getAttribute("data-days"));
-          CleanerModel.setFolderDays(folderId, mediaType, days);
-          updatePartial(folderId);
-          suppressNextRender = false;
-          break;
+        if (action === "setFolderDays")
+          CleanerModel.setFolderDays(folderId, mediaType, parseInt(days, 10));
+        updatePartial(folderId);
+      } finally {
+        suppressNextRender = false;
       }
     },
-    toggleAutoCleaner: () => {
-      CleanerModel.toggleAutoCleaner();
-      renderUI();
+
+    onAutoCleanerToggle: () => {
+      const newValue = CleanerModel.toggleAutoCleaner();
+      CleanerView.update.autoCleaner(newValue);
     },
+
     onStateChange: data => {
-      const relevantKeys = ["settings", "folders"];
-      if (relevantKeys.includes(data.key)) {
-        if (data.key === "folders" && suppressNextRender) {
-          return;
-        }
-        debouncedRender();
+      if (data.key === "settings") {
+        CleanerView.update.autoCleaner(CleanerModel.getAutoCleanerSetting());
       }
+      if (data.key === "folders" && !suppressNextRender) debouncedRender();
     }
   };
 
-  function attachEventListeners() {
-    const autoCleanerSwitch = DOM.qs(CleanerConfig.SELECTORS.autoCleanerSwitch);
-    if (autoCleanerSwitch) {
-      autoCleanerSwitch.addEventListener("click", handlers.toggleAutoCleaner);
-    }
+  function attachEvents() {
+    const { autoSwitch, list } = CleanerView.getElements();
 
-    const organizerItemCleanList = DOM.qs(
-      CleanerConfig.SELECTORS.folderCleanList
+    const events = [
+      [autoSwitch, "click", handlers.onAutoCleanerToggle],
+      [list, "click", handlers.onListClick]
+    ];
+    events.forEach(([el, event, handler]) =>
+      el.addEventListener(event, handler)
     );
-    if (organizerItemCleanList) {
-      organizerItemCleanList.addEventListener("click", handlers.handleEvent);
-    }
 
     EventBus.on("appstate:changed", handlers.onStateChange);
   }
 
   function init() {
     if (isInitialized) return;
-    CleanerView.init(CleanerConfig.SELECTORS.CONTAINER);
+    CleanerView.init();
     renderUI();
-    updateSwitchState();
-    attachEventListeners();
+    attachEvents();
     isInitialized = true;
   }
 
-  function updateSwitchState() {
-    const state = CleanerModel.getState();
-    const autoCleanerSwitch = DOM.qs(CleanerConfig.SELECTORS.autoCleanerSwitch);
-    autoCleanerSwitch.classList.toggle("active", state.autoCleaner);
-  }
-
-  return {
-    init
-  };
+  return { init };
 })();

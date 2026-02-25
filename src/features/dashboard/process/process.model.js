@@ -3,7 +3,6 @@ const ProcessModel = (function () {
 
   async function resolveAppNames(packageNames) {
     const apps = AppState.getApps();
-
     const identifierToAppNameMap = {};
 
     apps.forEach(app => {
@@ -12,30 +11,23 @@ const ProcessModel = (function () {
     });
 
     const resolvedMap = {};
-
     for (const identifier of packageNames) {
       const appName = identifierToAppNameMap[identifier] || identifier;
-      const sanitizedName = Utils.sanitizeFolderName(appName);
-      resolvedMap[identifier] = sanitizedName;
+      resolvedMap[identifier] = Utils.sanitizeFolderName(appName);
     }
 
     return resolvedMap;
   }
 
-  async function buildMoveCommands(
-    resolvedNames,
-    sourcePath,
-    destPath,
-    extension
-  ) {
+  function buildMoveCommands(resolvedNames, sourcePath, destPath, extension) {
     const commands = [`cd "${sourcePath}"`];
     const patterns = [];
 
-    for (const pkgName in resolvedNames) {
-      const appName = resolvedNames[pkgName].trim();
-
+    for (const [pkgName, appName] of Object.entries(resolvedNames)) {
       patterns.push(`*"_${pkgName}.${extension}"`);
-      commands.push(`mv *"_${pkgName}.${extension}" "${destPath}/${appName}/"`);
+      commands.push(
+        `mv *"_${pkgName}.${extension}" "${destPath}/${appName.trim()}/"`
+      );
     }
 
     if (patterns.length === 0) {
@@ -45,26 +37,15 @@ const ProcessModel = (function () {
       };
     }
 
-    const countCommand = `cd "${sourcePath}" && ls -1 ${patterns.join(
-      " "
-    )} 2>/dev/null | wc -l`;
-
     return {
-      countCommand: countCommand,
+      countCommand: `cd "${sourcePath}" && ls -1 ${patterns.join(
+        " "
+      )} 2>/dev/null | wc -l`,
       moveCommand: commands.join(" ; ")
     };
   }
 
-  async function prepareScreenshotOrganization(
-    resolvedNames,
-    sourcePath,
-    destPath,
-    extension
-  ) {
-    return buildMoveCommands(resolvedNames, sourcePath, destPath, extension);
-  }
-
-  async function prepareRecordingOrganization(
+  async function prepareMediaOrganization(
     resolvedNames,
     sourcePath,
     destPath,
@@ -75,39 +56,51 @@ const ProcessModel = (function () {
 
   async function loadCleanupRules() {
     const folders = AppState.getFolders();
-    const rules = {
-      screenshots: [],
-      recordings: []
-    };
+    const rules = { screenshots: [], recordings: [] };
 
     folders.forEach(folder => {
       if (folder.ss?.cleaner?.on) {
         rules.screenshots.push({
           folder: folder.name,
-          days: folder.ss?.cleaner?.days
+          days: folder.ss.cleaner.days
         });
       }
       if (folder.sr?.cleaner?.on) {
         rules.recordings.push({
           folder: folder.name,
-          days: folder.sr?.cleaner?.days
+          days: folder.sr.cleaner.days
         });
       }
     });
+
     return rules;
   }
 
+  async function findExpired(configs, rootDir, extension) {
+    const results = await Promise.allSettled(
+      configs.map(async config => {
+        const folderPath = `${rootDir}/${config.folder}`;
+        const expired = await TaskQueue.add(
+          "find_expired_files",
+          [folderPath, config.days, extension],
+          "shell"
+        );
+        return expired || [];
+      })
+    );
+
+    return results.flatMap(r =>
+      r.status === "fulfilled"
+        ? r.value
+        : (Logger.error("Failed to list expired files:", r.reason), [])
+    );
+  }
+
   async function findAllExpiredMedia(rules, screenshotsPath, recordingsPath) {
-    const expiredScreenshots = await findExpired(
-      rules.screenshots,
-      screenshotsPath,
-      "jpg"
-    );
-    const expiredRecordings = await findExpired(
-      rules.recordings,
-      recordingsPath,
-      "mp4"
-    );
+    const [expiredScreenshots, expiredRecordings] = await Promise.all([
+      findExpired(rules.screenshots, screenshotsPath, "jpg"),
+      findExpired(rules.recordings, recordingsPath, "mp4")
+    ]);
 
     return {
       screenshots: expiredScreenshots,
@@ -116,78 +109,45 @@ const ProcessModel = (function () {
     };
   }
 
-  async function findExpired(configs, rootDir, extension) {
-    let allExpired = [];
-    for (const config of configs) {
-      try {
-        const folderPath = `${rootDir}/${config.folder}`;
-
-        const expiredInFolder = await ENV.execute({
-          command: "find_expired_files",
-          args: [folderPath, config.days, extension]
-        });
-        if (expiredInFolder && expiredInFolder.length > 0) {
-          allExpired = allExpired.concat(expiredInFolder);
-        }
-      } catch (e) {
-        Logger.error(
-          `Falha ao listar arquivos expirados em ${config.folder}:`,
-          e
-        );
-      }
-    }
-    return allExpired;
-  }
-
-  function updateStats(result) {
-    const { processType, organizedCount = 0, cleanedCount = 0 } = result;
-
-    let newStats = AppState.getStats();
+  function updateStats({ processType, organizedCount = 0, cleanedCount = 0 }) {
+    const stats = AppState.getStats();
     const now = Date.now();
 
     if (processType.includes("organize")) {
       const mediaType = processType.includes("screenshots")
-        ? "images"
-        : "videos";
-      newStats.organizedFiles = (newStats.organizedFiles || 0) + organizedCount;
-      newStats.lastOrganization = {
-        ...newStats.lastOrganization,
-        [mediaType]: now
-      };
+        ? "screenshots"
+        : "recordings";
+      AppState.setStats({
+        organizedFiles: (stats.organizedFiles || 0) + organizedCount,
+        lastOrganization: {
+          ...stats.lastOrganization,
+          [mediaType]: now
+        }
+      });
     } else if (processType.includes("cleanup")) {
-      newStats.cleanedFiles = (newStats.cleanedFiles || 0) + cleanedCount;
-
-      newStats.lastClean = {
-        images: now,
-        videos: now
-      };
+      AppState.setStats({
+        cleanedFiles: (stats.cleanedFiles || 0) + cleanedCount,
+        lastClean: {
+          screenshots: now,
+          recordings: now
+        }
+      });
     }
-
-    AppState.setStats(newStats);
   }
 
   async function saveSummary(processType, stats, activityType, mediaType) {
-    // 1. Atualiza as estatísticas globais
-    const statsPayload = {
-      processType: processType,
+    updateStats({
+      processType,
       organizedCount: stats.moved || 0,
       cleanedCount: stats.total_removed || 0
-    };
+    });
 
-    updateStats(statsPayload);
-
-    // 2. Adiciona a atividade correspondente
-    const activityPayload = {
+    AppState.addActivity({
       execution: "manual",
       type: activityType,
-      count: stats.moved || stats.total_removed || 0
-    };
-
-    if (mediaType) {
-      activityPayload.mediaType = mediaType;
-    }
-
-    AppState.addActivity(activityPayload);
+      count: stats.moved || stats.total_removed || 0,
+      ...(mediaType && { mediaType })
+    });
 
     return { success: true, savedStats: stats };
   }
@@ -205,14 +165,14 @@ const ProcessModel = (function () {
   }
 
   async function hasCleanerConfigs() {
-    const folders = AppState.getFolders();
-    return folders.some(folder => folder.ss?.cleaner?.on || folder.sr?.cleaner?.on);
+    return AppState.getFolders().some(
+      folder => folder.ss?.cleaner?.on || folder.sr?.cleaner?.on
+    );
   }
 
   return {
     resolveAppNames,
-    prepareScreenshotOrganization,
-    prepareRecordingOrganization,
+    prepareMediaOrganization,
     loadCleanupRules,
     findAllExpiredMedia,
     saveScreenshotSummary,

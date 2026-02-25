@@ -1,162 +1,37 @@
-/* General Button Styles */
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-xs);
-  border: none;
-  border-radius: var(--radius-md);
+button {
   font-weight: 500;
-  cursor: pointer;
+  font-size: var(--font-xs);
+  border-radius: var(--radius-md);
   transition: all 0.2s ease;
-  text-decoration: none;
-  user-select: none;
-  outline: none;
 }
 
-.btn:focus-visible {
-  box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--ring));
+button:active {
+  transform: scale(0.95);
 }
 
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none !important;
-}
-
-.btn-sm {
-  padding: var(--space-xs) var(--space-sm);
-  font-size: var(--font-sm);
-}
-
-.btn-md {
-  padding: var(--space-sm) var(--space-md);
-  font-size: var(--font-sm);
-}
-
-.btn-lg {
-  padding: var(--space-md) var(--space-lg);
-  font-size: var(--font-md);
-}
-
-/* Primary Button */
-.btn-primary {
-  background: hsl(var(--primary));
-  color: hsl(var(--primary-foreground));
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: hsl(var(--primary) / 0.9);
-  transform: translateY(-1px);
-}
-
-.btn-primary:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-/* Secondary Outline Button */
-.btn-outline-secondary {
-  background: transparent;
+.btn-outline {
   color: hsl(var(--secondary-foreground));
   border: 1px solid hsl(var(--border));
   padding: var(--space-sm) var(--space-md);
-  border-radius: var(--radius-md);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  background-color: transparent;
 }
 
-.btn-outline-secondary:hover {
-  background: hsl(var(--secondary) / 0.5);
-  border-color: hsl(var(--secondary) / 0.7);
+.btn-outline:active {
+  background-color: hsl(var(--secondary) / 0.7);
 }
 
-.btn-outline-secondary:active {
-  background: hsl(var(--secondary) / 0.7);
-  transform: translateY(0);
-}
-
-/* Danger Button */
-.btn-danger {
-  background: hsl(var(--destructive));
+.btn-danger,
+.btn-outline-danger:active {
   color: hsl(var(--destructive-foreground));
-  border: 1px solid hsl(var(--destructive));
   padding: var(--space-sm) var(--space-md);
-  border-radius: var(--radius-md);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  border: 1px solid hsl(var(--destructive));
+  background: hsl(var(--destructive));
 }
 
-.btn-danger:hover:not(:disabled) {
-  background: hsl(var(--destructive) / 0.9);
-  transform: translateY(-1px);
-}
-
-.btn-danger:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-/* Outline Danger Button */
-.btn-outline-danger {
-  background: transparent;
+.btn-outline-danger,
+.btn-danger:active {
   color: hsl(var(--destructive));
+  padding: var(--space-sm) var(--space-md);
   border: 1px solid hsl(var(--destructive));
-  padding: var(--space-sm) var(--space-md);
-  border-radius: var(--radius-md);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-outline-danger:hover {
-  background: hsl(var(--destructive) / 0.1);
-  border-color: hsl(var(--destructive));
-}
-
-/* Success Button */
-.btn-success {
-  background: hsl(var(--success));
-  color: hsl(var(--primary-foreground));
-  border: 1px solid hsl(var(--success));
-  padding: var(--space-sm) var(--space-md);
-  border-radius: var(--radius-md);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-success:hover:not(:disabled) {
-  background: hsl(var(--success) / 0.9);
-  transform: translateY(-1px);
-}
-
-.btn-success:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-/* Accent Button */
-.btn-accent {
-  background: linear-gradient(
-    135deg,
-    hsl(var(--primary)) 0%,
-    hsl(var(--accent)) 100%
-  );
-  color: hsl(var(--primary-foreground));
-  border: 1px solid hsl(var(--accent));
-  padding: var(--space-sm) var(--space-md);
-  border-radius: var(--radius-md);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-accent:hover:not(:disabled) {
-  opacity: 0.9;
-  transform: translateY(-1px);
-}
-
-.btn-accent:active:not(:disabled) {
-  transform: translateY(0);
+  background: transparent;
 }
