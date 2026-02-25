@@ -47,7 +47,7 @@ const SettingsView = (function () {
       const switchEl = DOM.qs(
         `#switch-${key.replace(/([A-Z])/g, "-$1").toLowerCase()}`
       );
-      switchEl?.classList.toggle("active", value);
+      if (switchEl) switchEl.checked = !!value;
       if (key === "animationsEnabled") {
         document.documentElement.classList.toggle("no-animations", !value);
       }

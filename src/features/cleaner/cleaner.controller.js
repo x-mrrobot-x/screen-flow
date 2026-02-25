@@ -31,10 +31,25 @@ const CleanerController = (function () {
       suppressNextRender = true;
 
       try {
-        if (action === "toggleFolderClean")
-          CleanerModel.toggleFolderClean(folderId, mediaType);
         if (action === "setFolderDays")
           CleanerModel.setFolderDays(folderId, mediaType, parseInt(days, 10));
+        updatePartial(folderId);
+      } finally {
+        suppressNextRender = false;
+      }
+    },
+
+    onListChange: e => {
+      const card = e.target.closest(".cleaner-folder-card");
+      const input = e.target.closest("input[data-action]");
+      if (!card || !input) return;
+      const { folderId } = card.dataset;
+      const { action, mediaType } = input.dataset;
+      suppressNextRender = true;
+
+      try {
+        if (action === "toggleFolderClean")
+          CleanerModel.toggleFolderClean(folderId, mediaType);
         updatePartial(folderId);
       } finally {
         suppressNextRender = false;
@@ -58,8 +73,9 @@ const CleanerController = (function () {
     const { autoSwitch, list } = CleanerView.getElements();
 
     const events = [
-      [autoSwitch, "click", handlers.onAutoCleanerToggle],
-      [list, "click", handlers.onListClick]
+      [autoSwitch, "change", handlers.onAutoCleanerToggle],
+      [list, "click", handlers.onListClick],
+      [list, "change", handlers.onListChange]
     ];
     events.forEach(([el, event, handler]) =>
       el.addEventListener(event, handler)

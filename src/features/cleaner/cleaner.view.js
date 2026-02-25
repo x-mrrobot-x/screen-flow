@@ -45,12 +45,12 @@ const CleanerView = (function () {
       if (!folder[key]) return "";
       const cleanerOn = folder[key]?.cleaner?.on;
       return `
-        <div class="cleaner-switch-container" data-media-type="${mediaType}">
+        <label class="cleaner-switch-container" data-media-type="${mediaType}">
           <span class="cleaner-switch-label">${label}</span>
-          <button class="switch-md ${cleanerOn ? "active" : ""}"
-                  data-action="toggleFolderClean"
-                  data-media-type="${mediaType}"></button>
-        </div>`;
+          <input type="checkbox" class="switch-md"
+                 data-action="toggleFolderClean"
+                 data-media-type="${mediaType}"
+                 ${cleanerOn ? "checked" : ""}></label>`;
     },
 
     buildSwitches: folder => ({
@@ -158,14 +158,10 @@ const CleanerView = (function () {
 
   const update = {
     switchButtons: (card, folder) => {
-      DOM.qs('button[data-media-type="screenshots"]', card)?.classList.toggle(
-        "active",
-        !!folder.ss?.cleaner?.on
-      );
-      DOM.qs(
-        'button[data-media-type="screenrecordings"]',
-        card
-      )?.classList.toggle("active", !!folder.sr?.cleaner?.on);
+      const ssInput = DOM.qs('input[data-media-type="screenshots"]', card);
+      const srInput = DOM.qs('input[data-media-type="screenrecordings"]', card);
+      if (ssInput) ssInput.checked = !!folder.ss?.cleaner?.on;
+      if (srInput) srInput.checked = !!folder.sr?.cleaner?.on;
     },
 
     optionsDiv: (card, folder, isEnabled) => {
@@ -195,7 +191,7 @@ const CleanerView = (function () {
     },
 
     autoCleaner: active => {
-      elements.autoSwitch.classList.toggle("active", active);
+      elements.autoSwitch.checked = !!active;
     },
 
     card: folder => {

@@ -1,6 +1,8 @@
 .switch-sm,
 .switch-md,
 .switch-lg {
+  appearance: none;
+  -webkit-appearance: none;
   position: relative;
   background: hsl(var(--muted));
   border-radius: var(--radius-full);
@@ -8,9 +10,9 @@
   flex-shrink: 0;
 }
 
-.switch-sm.active,
-.switch-md.active,
-.switch-lg.active {
+.switch-sm:checked,
+.switch-md:checked,
+.switch-lg:checked {
   background: hsl(var(--primary) / 0.4);
 }
 
@@ -26,9 +28,9 @@
     background 0.3s var(--transition-spring);
 }
 
-.switch-sm.active::after,
-.switch-md.active::after,
-.switch-lg.active::after {
+.switch-sm:checked::after,
+.switch-md:checked::after,
+.switch-lg:checked::after {
   background: hsl(var(--primary) / 0.8);
 }
 
@@ -44,7 +46,7 @@
   height: 1.2rem;
 }
 
-.switch-sm.active::after {
+.switch-sm:checked::after {
   transform: translateX(1.2rem);
 }
 
@@ -60,7 +62,7 @@
   height: 1.6rem;
 }
 
-.switch-md.active::after {
+.switch-md:checked::after {
   transform: translateX(1.6rem);
 }
 
@@ -76,7 +78,7 @@
   height: 2rem;
 }
 
-.switch-lg.active::after {
+.switch-lg:checked::after {
   transform: translateX(2rem);
 }
 

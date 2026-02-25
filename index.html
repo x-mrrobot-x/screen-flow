@@ -448,7 +448,7 @@
             style="animation-delay: 0.25s"
             aria-label="Configuração de organização automática"
           >
-            <div class="automation-card card">
+            <label class="automation-card card">
               <div class="automation-info">
                 <div class="automation-icon icon-green" aria-hidden="true">
                   <i data-icon="folder-open"></i>
@@ -461,15 +461,15 @@
                   </p>
                 </div>
               </div>
-              <button
-                class="switch-md active"
+              <input
+                type="checkbox"
+                class="switch-md"
                 id="switch-auto-organizer"
                 data-setting-key="autoOrganizer"
-                role="switch"
-                aria-checked="true"
                 aria-label="Ativar organização automática"
-              ></button>
-            </div>
+                checked
+              />
+            </label>
           </section>
 
           <section
@@ -506,7 +506,7 @@
             style="animation-delay: 0.1s"
             aria-label="Configuração de limpeza automática"
           >
-            <div class="automation-card card">
+            <label class="automation-card card">
               <div class="automation-info">
                 <div class="automation-icon icon-purple" aria-hidden="true">
                   <i data-icon="broom"></i>
@@ -520,16 +520,15 @@
                   </p>
                 </div>
               </div>
-              <button
-                class="switch-md active"
+              <input
+                type="checkbox"
+                class="switch-md"
                 id="switch-auto-cleaner"
-                data-action="toggleAutoCleaner"
                 data-setting-key="autoCleaner"
-                role="switch"
-                aria-checked="true"
                 aria-label="Ativar limpeza automática"
-              ></button>
-            </div>
+                checked
+              />
+            </label>
           </section>
 
           <section
@@ -689,7 +688,7 @@
           >
             <h3 class="section-title">Visual</h3>
             <div class="settings-card card">
-              <div class="settings-row">
+              <label class="settings-row">
                 <div class="settings-info">
                   <div class="settings-icon icon-blue" aria-hidden="true">
                     <i data-icon="wand-magic-sparkles"></i>
@@ -699,15 +698,15 @@
                     <p>Efeitos visuais e transições de tela</p>
                   </div>
                 </div>
-                <button
-                  class="switch-md active"
+                <input
+                  type="checkbox"
+                  class="switch-md"
                   id="switch-animations-enabled"
                   data-setting-key="animationsEnabled"
-                  role="switch"
-                  aria-checked="true"
                   aria-label="Ativar animações"
-                ></button>
-              </div>
+                  checked
+                />
+              </label>
             </div>
           </section>
 
@@ -717,7 +716,7 @@
           >
             <h3 class="section-title">Notificações</h3>
             <div class="settings-card card">
-              <div class="settings-row">
+              <label class="settings-row">
                 <div class="settings-info">
                   <div class="settings-icon icon-green" aria-hidden="true">
                     <i data-icon="folder-open"></i>
@@ -730,16 +729,16 @@
                     </p>
                   </div>
                 </div>
-                <button
-                  class="switch-md active"
+                <input
+                  type="checkbox"
+                  class="switch-md"
                   id="switch-notify-organization-result"
                   data-setting-key="notifyOrganizationResult"
-                  role="switch"
-                  aria-checked="true"
                   aria-label="Notificar resultado da organização"
-                ></button>
-              </div>
-              <div class="settings-row">
+                  checked
+                />
+              </label>
+              <label class="settings-row">
                 <div class="settings-info">
                   <div class="settings-icon icon-purple" aria-hidden="true">
                     <i data-icon="broom"></i>
@@ -752,16 +751,16 @@
                     </p>
                   </div>
                 </div>
-                <button
-                  class="switch-md active"
+                <input
+                  type="checkbox"
+                  class="switch-md"
                   id="switch-notify-cleanup-result"
                   data-setting-key="notifyCleanupResult"
-                  role="switch"
-                  aria-checked="true"
                   aria-label="Notificar resultado da limpeza"
-                ></button>
-              </div>
-              <div class="settings-row">
+                  checked
+                />
+              </label>
+              <label class="settings-row">
                 <div class="settings-info">
                   <div class="settings-icon icon-blue" aria-hidden="true">
                     <i data-icon="file-circle-question"></i>
@@ -774,15 +773,14 @@
                     </p>
                   </div>
                 </div>
-                <button
+                <input
+                  type="checkbox"
                   class="switch-md"
                   id="switch-notify-pending-files"
                   data-setting-key="notifyPendingFiles"
-                  role="switch"
-                  aria-checked="false"
                   aria-label="Notificar arquivos pendentes de organização"
-                ></button>
-              </div>
+                />
+              </label>
             </div>
           </section>
 

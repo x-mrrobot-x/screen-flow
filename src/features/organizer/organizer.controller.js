@@ -110,7 +110,7 @@ const OrganizerController = (function () {
       renderUI();
     },
 
-    onSwitchClick: e => {
+    onSwitchChange: e => {
       const switchEl = e.target.closest("[data-setting-key]");
       if (!switchEl) return;
       const newValue = OrganizerModel.toggleAutoOrganizer();
@@ -168,7 +168,7 @@ const OrganizerController = (function () {
       [search, "input", handlers.onSearch],
       [grid, "click", handlers.onGridClick],
       [filterContainer, "click", handlers.onFilterClick],
-      [tabContent, "click", handlers.onSwitchClick],
+      [tabContent, "change", handlers.onSwitchChange],
       [document, "click", handlers.onDocumentClick]
     ];
     events.forEach(([el, event, handler]) =>

@@ -150,11 +150,7 @@ const OrganizerView = (function () {
 
   const update = {
     autoOrganizer: value => {
-      elements.autoSwitch.classList.toggle("active", !!value);
-      elements.autoSwitch.setAttribute(
-        "aria-checked",
-        value ? "true" : "false"
-      );
+      elements.autoSwitch.checked = !!value;
     },
 
     card: (folder, activeFilter) => {

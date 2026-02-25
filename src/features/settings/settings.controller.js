@@ -25,7 +25,7 @@ const SettingsController = (function () {
       SettingsView.update.themeSelector(theme);
     },
 
-    onSwitchClick: e => {
+    onSwitchChange: e => {
       const switchEl = e.target.closest("[data-setting-key]");
       if (!switchEl) return;
       const newValue = SettingsModel.toggleSetting(switchEl.dataset.settingKey);
@@ -65,7 +65,7 @@ const SettingsController = (function () {
 
     const events = [
       [tabContent, "click", handlers.onThemeClick],
-      [tabContent, "click", handlers.onSwitchClick],
+      [tabContent, "change", handlers.onSwitchChange],
       [resetBtn, "click", handlers.onReset],
       [deleteBtn, "click", handlers.onDelete]
     ];
