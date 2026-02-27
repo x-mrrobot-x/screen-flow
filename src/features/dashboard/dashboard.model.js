@@ -70,7 +70,7 @@ const DashboardModel = (function () {
   function getState() {
     const stats = AppState.getStats();
     const mostCapturedApp = getTopOrganizerApp() || {
-      name: "Nenhum",
+      name: I18n.t("common.none"),
       count: 0,
       pkg: "default.png"
     };

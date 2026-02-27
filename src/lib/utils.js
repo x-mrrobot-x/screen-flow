@@ -10,10 +10,10 @@ const Utils = (function () {
     const diffHrs = Math.floor(diffMins / 60);
     const diffDays = Math.floor(diffHrs / 24);
 
-    if (diffMins < 1) return "Agora";
-    if (diffHrs < 1) return `${diffMins} min`;
-    if (diffDays < 1) return `${diffHrs}h`;
-    if (diffDays < 7) return `${diffDays} dia${diffDays > 1 ? "s" : ""}`;
+    if (diffMins < 1) return I18n.t("time.now");
+    if (diffHrs < 1) return I18n.t("time.minutes_ago", { n: diffMins });
+    if (diffDays < 1) return I18n.t("time.hours_ago", { n: diffHrs });
+    if (diffDays < 7) return I18n.t("time.days_ago", { n: diffDays });
 
     const date = new Date(timestamp);
     const today = new Date();
@@ -34,10 +34,10 @@ const Utils = (function () {
     );
     const diffCalendarDays = Math.round((todayDay - dateDay) / 86_400_000);
 
-    if (diffCalendarDays === 0) return `Hoje, ${hhmm}`;
-    if (diffCalendarDays === 1) return `Ontem, ${hhmm}`;
+    if (diffCalendarDays === 0) return I18n.t("time.today");
+    if (diffCalendarDays === 1) return I18n.t("time.yesterday", { time: hhmm });
 
-    return `${date.getDate()} ${date.toLocaleString("pt-BR", {
+    return `${date.getDate()} ${date.toLocaleString(I18n.getLocale(), {
       month: "short"
     })}`;
   }
@@ -60,6 +60,10 @@ const Utils = (function () {
     return `${word}${n === 1 ? "" : "s"}`;
   }
 
+  function capitalizeFirstLetter(text) {
+    return text.charAt(0).toUpperCase() + text.slice(1);
+  }
+
   function debounce(func, wait) {
     let timeout;
     return function (...args) {
@@ -72,6 +76,7 @@ const Utils = (function () {
     formatTimestamp,
     sanitizeFolderName,
     pluralize,
+    capitalizeFirstLetter,
     debounce
   };
 })();

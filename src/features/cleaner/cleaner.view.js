@@ -25,7 +25,7 @@ const CleanerView = (function () {
         data-media-type="${mediaType}"
         data-days="${days}"
       >
-        ${Utils.pluralize(days, "dia")}
+        ${days} ${I18n.t("cleaner.day", { n: days })}
       </button>`,
 
     cleanerGroup: (folder, mediaType, key, label) => {
@@ -36,7 +36,7 @@ const CleanerView = (function () {
       ).join("");
       return `
         <div class="cleaner-group" id="cleaner-group-${folder.id}-${mediaType}">
-          <p>${label} - Apagar após:</p>
+          <p>${label} - ${I18n.t("cleaner.delete_after")}</p>
           <div class="cleaner-day-options">${optionsHtml}</div>
         </div>`;
     },
@@ -58,13 +58,13 @@ const CleanerView = (function () {
         folder,
         "screenshots",
         "ss",
-        "Capturas de tela"
+        I18n.t("common.screenshots_short")
       ),
       recordings: templates.switchContainer(
         folder,
         "screenrecordings",
         "sr",
-        "Gravações de tela"
+        I18n.t("common.recordings_short")
       )
     }),
 
@@ -83,13 +83,13 @@ const CleanerView = (function () {
             folder,
             "screenshots",
             "ss",
-            "Capturas de tela"
+            I18n.t("common.screenshots_label")
           )}
           ${templates.cleanerGroup(
             folder,
             "screenrecordings",
             "sr",
-            "Gravações de tela"
+            I18n.t("common.recordings_label")
           )}
         </div>`
         : "";
@@ -119,17 +119,15 @@ const CleanerView = (function () {
     buildCountsHtml: (ssCount, srCount) => `
         <div class="cleaner-subtitle-item">
           <span class="dot dot-screenshot"></span>
-          <span>${Utils.pluralize(
-            ssCount,
-            "pasta"
-          )} com limpeza de capturas de tela</span>
+          <span>${ssCount} ${I18n.t("cleaner.count_screenshots", {
+            n: ssCount
+          })}</span>
         </div>
         <div class="cleaner-subtitle-item">
           <span class="dot dot-recording"></span>
-          <span>${Utils.pluralize(
-            srCount,
-            "pasta"
-          )} com limpeza de gravações de tela</span>
+          <span>${srCount} ${I18n.t("cleaner.count_recordings", {
+            n: srCount
+          })}</span>
         </div>`,
 
     counts: folders => {
@@ -140,7 +138,7 @@ const CleanerView = (function () {
       if (hasActive) {
         elements.countText.innerHTML = render.buildCountsHtml(ssCount, srCount);
       } else {
-        elements.countText.textContent = "Nenhuma pasta com limpeza ativa";
+        elements.countText.textContent = I18n.t("cleaner.no_active_folders");
       }
     },
 
@@ -177,13 +175,13 @@ const CleanerView = (function () {
             folder,
             "screenshots",
             "ss",
-            "Capturas de tela"
+            I18n.t("common.screenshots_label")
           ) +
           templates.cleanerGroup(
             folder,
             "screenrecordings",
             "sr",
-            "Gravações de tela"
+            I18n.t("common.recordings_label")
           );
       } else {
         optionsDiv?.remove();

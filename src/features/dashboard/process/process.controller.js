@@ -18,15 +18,15 @@ const ProcessController = (function () {
   function activateStep(i, step, steps) {
     ProcessView.update.stepStatus(i, "running");
     ProcessView.update.scrollToStep(i);
-    ProcessView.update.stepLabel(step.label);
+    ProcessView.update.stepLabel(I18n.t(step.labelKey));
     ProcessView.update.progress((i / steps.length) * 100);
   }
 
   function checkEmptyResult(step, result) {
-    const messages = {
-      scan_screenshots: "Nenhuma captura de tela encontrada para organizar.",
-      scan_recordings: "Nenhuma gravação de tela encontrada para organizar.",
-      find_all_expired: "Nenhum arquivo antigo encontrado para limpar."
+    const messageKeys = {
+      scan_screenshots: "process.empty_screenshots",
+      scan_recordings: "process.empty_recordings",
+      find_all_expired: "process.empty_expired"
     };
 
     const isEmpty =
@@ -37,7 +37,7 @@ const ProcessController = (function () {
     if (!isEmpty) return false;
 
     state.isRunning = false;
-    Toast.info(messages[step.id]);
+    Toast.info(I18n.t(messageKeys[step.id]));
     close();
     return true;
   }
@@ -54,7 +54,10 @@ const ProcessController = (function () {
     } else {
       Logger.error(`Erro na etapa ${step.id}:`, error);
       ProcessView.update.stepStatus(index, "failed");
-      ProcessView.update.completion(`Erro em: ${step.label}`, false);
+      ProcessView.update.completion(
+        I18n.t("process.step_error", { label: I18n.t(step.labelKey) }),
+        false
+      );
     }
     state.isRunning = false;
   }
@@ -64,7 +67,7 @@ const ProcessController = (function () {
 
     for (let i = 0; i < steps.length; i++) {
       if (!state.isRunning) {
-        Toast.info("Processo cancelado.");
+        Toast.info(I18n.t("process.cancelled"));
         return;
       }
 
@@ -95,20 +98,28 @@ const ProcessController = (function () {
       processType === "organize_screenshots" ||
       processType === "organize_recordings"
     ) {
-      return `Organização concluída! ${Utils.pluralize(
-        stats.moved || 0,
-        "arquivo"
-      )}
-      ${Utils.pluralize(stats.moved, "movido", false)}.`;
+      const count = stats.moved || 0;
+      return I18n.t("process.organize_done", {
+        count,
+        file:
+          count === 1 ? I18n.t("common.files") : I18n.t("common.files_plural"),
+        moved:
+          count === 1 ? I18n.t("common.moved") : I18n.t("common.moved_plural")
+      });
     }
     if (processType === "cleanup_old_files") {
-      return `Limpeza concluída! ${Utils.pluralize(
-        stats.total_removed || 0,
-        "arquivo"
-      )}
-      ${Utils.pluralize(stats.total_removed || 0, "removido", false)}.`;
+      const count = stats.total_removed || 0;
+      return I18n.t("process.cleanup_done", {
+        count,
+        file:
+          count === 1 ? I18n.t("common.files") : I18n.t("common.files_plural"),
+        removed:
+          count === 1
+            ? I18n.t("common.removed")
+            : I18n.t("common.removed_plural")
+      });
     }
-    return "Processo finalizado com sucesso!";
+    return I18n.t("process.finished");
   }
 
   function notifyChanges(stats) {
@@ -122,7 +133,7 @@ const ProcessController = (function () {
     if (!state.isRunning) return;
 
     ProcessView.update.progress(100);
-    ProcessView.update.stepLabel("Processo concluído!");
+    ProcessView.update.stepLabel(I18n.t("process.step_done"));
 
     const finalSummary =
       state.context.save_summary || state.context.save_cleanup_summary || {};
@@ -138,7 +149,7 @@ const ProcessController = (function () {
 
   function cancelCurrentProcess() {
     if (state.isRunning) {
-      Toast.info("Cancelando processo...");
+      Toast.info(I18n.t("process.cancelling"));
       state.isRunning = false;
       TaskQueue.cancelAll();
     }
@@ -160,7 +171,7 @@ const ProcessController = (function () {
     if (processType === "cleanup_old_files") {
       const hasConfigs = await ProcessModel.hasCleanerConfigs();
       if (!hasConfigs) {
-        Toast.info("Nenhuma pasta configurada para limpeza.");
+        Toast.info(I18n.t("process.no_cleaner_folders"));
         Navigation.navigateTo("cleaner");
         return;
       }
@@ -177,7 +188,7 @@ const ProcessController = (function () {
     state.context = {};
 
     ProcessView.reset();
-    ProcessView.update.title(processData.title);
+    ProcessView.update.title(I18n.t(processData.titleKey));
     ProcessView.render(processData.steps);
     open();
 

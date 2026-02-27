@@ -1,25 +1,25 @@
 const ProcessConfig = {
   PROCESS_TYPES: {
     organize_screenshots: {
-      title: "Organizar Capturas de Tela",
+      titleKey: "process.organize_screenshots_title",
       steps: [
         {
           id: "scan_screenshots",
-          label: "Analisando capturas de tela",
+          labelKey: "process.step_scan_screenshots",
           type: "shell",
           func: "scan_media_app_packages",
           params: () => ["jpg", ENV.SOURCE_SCREENSHOTS_PATH]
         },
         {
           id: "resolve_app_names",
-          label: "Identificando aplicativos",
+          labelKey: "process.step_resolve_apps",
           type: "js",
           func: "resolveAppNames",
           params: ctx => [ctx.scan_screenshots]
         },
         {
           id: "create_app_folders",
-          label: "Criando pastas dos aplicativos",
+          labelKey: "process.step_create_folders",
           type: "shell",
           func: "create_app_media_folders",
           params: ctx => [
@@ -29,7 +29,7 @@ const ProcessConfig = {
         },
         {
           id: "prepare_file_moves",
-          label: "Preparando arquivos para organização",
+          labelKey: "process.step_prepare_moves",
           type: "js",
           func: "prepareMediaOrganization",
           params: ctx => [
@@ -41,7 +41,7 @@ const ProcessConfig = {
         },
         {
           id: "move_and_count",
-          label: "Organizando capturas de tela",
+          labelKey: "process.step_move_screenshots",
           type: "shell",
           func: "run_batch_command",
           params: ctx => [
@@ -51,7 +51,7 @@ const ProcessConfig = {
         },
         {
           id: "save_summary",
-          label: "Salvando resumo da organização",
+          labelKey: "process.step_save_summary",
           type: "js",
           func: "saveScreenshotSummary",
           params: ctx => [
@@ -66,25 +66,25 @@ const ProcessConfig = {
     },
 
     organize_recordings: {
-      title: "Organizar Gravações de Tela",
+      titleKey: "process.organize_recordings_title",
       steps: [
         {
           id: "scan_recordings",
-          label: "Analisando gravações de tela",
+          labelKey: "process.step_scan_recordings",
           type: "shell",
           func: "scan_media_app_packages",
           params: () => ["mp4", ENV.SOURCE_RECORDINGS_PATH]
         },
         {
           id: "resolve_app_names",
-          label: "Identificando aplicativos",
+          labelKey: "process.step_resolve_apps",
           type: "js",
           func: "resolveAppNames",
           params: ctx => [ctx.scan_recordings]
         },
         {
           id: "create_app_folders",
-          label: "Criando pastas dos aplicativos",
+          labelKey: "process.step_create_folders",
           type: "shell",
           func: "create_app_media_folders",
           params: ctx => [
@@ -94,7 +94,7 @@ const ProcessConfig = {
         },
         {
           id: "prepare_file_moves",
-          label: "Preparando arquivos para organização",
+          labelKey: "process.step_prepare_moves",
           type: "js",
           func: "prepareMediaOrganization",
           params: ctx => [
@@ -106,7 +106,7 @@ const ProcessConfig = {
         },
         {
           id: "move_and_count",
-          label: "Organizando gravações de tela",
+          labelKey: "process.step_move_recordings",
           type: "shell",
           func: "run_batch_command",
           params: ctx => [
@@ -116,7 +116,7 @@ const ProcessConfig = {
         },
         {
           id: "save_summary",
-          label: "Salvando resumo da organização",
+          labelKey: "process.step_save_summary",
           type: "js",
           func: "saveRecordingSummary",
           params: ctx => [
@@ -131,18 +131,18 @@ const ProcessConfig = {
     },
 
     cleanup_old_files: {
-      title: "Limpeza de Arquivos Antigos",
+      titleKey: "process.cleanup_title",
       steps: [
         {
           id: "load_cleanup_rules",
-          label: "Carregando regras de limpeza",
+          labelKey: "process.step_load_rules",
           type: "js",
           func: "loadCleanupRules",
           params: () => []
         },
         {
           id: "find_all_expired",
-          label: "Localizando arquivos antigos",
+          labelKey: "process.step_find_expired",
           type: "js",
           func: "findAllExpiredMedia",
           params: ctx => [
@@ -153,14 +153,14 @@ const ProcessConfig = {
         },
         {
           id: "delete_all_expired",
-          label: "Removendo arquivos antigos",
+          labelKey: "process.step_delete_expired",
           type: "shell",
           func: "delete_files_batch",
           params: ctx => [JSON.stringify(ctx.find_all_expired.all)]
         },
         {
           id: "save_cleanup_summary",
-          label: "Salvando resumo da limpeza",
+          labelKey: "process.step_save_cleanup",
           type: "js",
           func: "saveCleanupSummary",
           params: ctx => [

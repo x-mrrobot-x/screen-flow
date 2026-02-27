@@ -116,6 +116,7 @@
 .dashboard-info-label {
   font-size: var(--font-xs);
   color: hsl(var(--muted-foreground));
+  text-transform: capitalize;
 }
 
 .dashboard-top-app-card {
@@ -201,6 +202,7 @@
   text-align: center;
   line-height: 1.3;
   letter-spacing: 0.05rem;
+  text-transform: capitalize;
 }
 
 .dashboard-automations-section {

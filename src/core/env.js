@@ -55,12 +55,12 @@ const ENV = (() => {
     TRANSLATIONS: {
       web: {
         type: "fetch",
-        pathTemplate: "i18n/{lang}.json",
-        default: DEFAULT_TRANSLATIONS
+        path: "src/i18n/{lang}.json",
+        default: {}
       },
       tasker: {
         type: "file",
-        pathTemplate: "i18n/{lang}.json",
+        path: "src/i18n/{lang}.json",
         default: {}
       }
     },
@@ -78,8 +78,8 @@ const ENV = (() => {
     }
   };
 
-  function resolvePath(pathTemplate, params = {}) {
-    return pathTemplate.replace(/\{(\w+)\}/g, (_, key) => params[key] ?? _);
+  function resolvePath(path, params = {}) {
+    return path.replace(/\{(\w+)\}/g, (_, key) => params[key] ?? _);
   }
 
   function getDefault(key) {
@@ -118,7 +118,7 @@ const ENV = (() => {
         }
 
         if (cfg.type === "fetch") {
-          const path = resolvePath(cfg.pathTemplate, params);
+          const path = resolvePath(cfg.path, params);
           const res = await fetch(path);
           if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
           return await res.json();
@@ -196,9 +196,16 @@ const ENV = (() => {
       return true;
     }
 
+    function getSystemLanguage() {
+      return (navigator.language || navigator.userLanguage || "en").split(
+        "-"
+      )[0];
+    }
+
     return {
       WORK_DIR: "",
       isWeb: true,
+      getSystemLanguage,
       resolveIconPath,
       getData,
       getDefault,
@@ -228,9 +235,7 @@ const ENV = (() => {
 
     function getFilePath(key, params = {}) {
       const cfg = STORAGE_CONFIG[key].tasker;
-      const relative = cfg.pathTemplate
-        ? resolvePath(cfg.pathTemplate, params)
-        : cfg.path;
+      const relative = cfg.path ? resolvePath(cfg.path, params) : cfg.path;
       return `${WORK_DIR}${relative}`;
     }
 
@@ -318,9 +323,14 @@ const ENV = (() => {
       return tk.taskRunning(taskName);
     }
 
+    function getSystemLanguage() {
+      return (tk.local("%system_language") || "en").split("-")[0];
+    }
+
     return {
       WORK_DIR,
       isWeb: false,
+      getSystemLanguage,
       resolveIconPath,
       getData,
       getDefault,

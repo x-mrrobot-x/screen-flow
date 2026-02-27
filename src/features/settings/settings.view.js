@@ -8,7 +8,9 @@ const SettingsView = (function () {
       tabContent: DOM.qs("#tab-settings"),
       themeBtns: DOM.qsa(".settings-theme-button"),
       resetBtn: DOM.qs("#reset-settings-btn"),
-      deleteBtn: DOM.qs("#delete-all-btn")
+      deleteBtn: DOM.qs("#delete-all-btn"),
+      languageSelect: DOM.qs("#language-select"),
+      languageLabel: DOM.qs("#current-language-label")
     };
   }
 
@@ -34,6 +36,7 @@ const SettingsView = (function () {
       settingsKeys.forEach(key => update.setting(key, settings[key]));
       render.theme(settings.theme, themes);
       update.themeSelector(settings.theme);
+      update.languageLabel(settings.language || "en");
     }
   };
 
@@ -41,6 +44,12 @@ const SettingsView = (function () {
     themeSelector: theme => {
       elements.themeBtns.forEach(btn => btn.classList.remove("active"));
       DOM.qs(`#theme-${theme}`)?.classList.add("active");
+    },
+
+    languageLabel: lang => {
+      const label = I18n.t(`languages.${lang}`);
+      if (elements.languageLabel) elements.languageLabel.textContent = label;
+      if (elements.languageSelect) elements.languageSelect.value = lang;
     },
 
     setting: (key, value) => {

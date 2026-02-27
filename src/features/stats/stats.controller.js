@@ -4,9 +4,11 @@ const StatsController = (function () {
   let isInitialized = false;
 
   const CHART_CONFIG = {
-    LABEL: {
-      screenshots: "Capturas de tela",
-      recordings: "Gravações de tela"
+    get LABEL() {
+      return {
+        screenshots: I18n.t("common.screenshots_label"),
+        recordings: I18n.t("common.recordings_label")
+      };
     },
     COLOR: {
       screenshots: "hsla(213 94% 68% / 0.8)",

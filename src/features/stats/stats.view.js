@@ -173,7 +173,7 @@ const StatsView = (function () {
         ?.classList.add("active");
 
       elements.chartTitle.textContent =
-        mediaType === "screenshots" ? "Capturas por Dia" : "Gravações por Dia";
+        mediaType === "screenshots" ? I18n.t("stats.chart_screenshots") : I18n.t("stats.chart_recordings");
     }
   };
 

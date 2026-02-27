@@ -37,7 +37,7 @@ const OrganizerView = (function () {
       const isRecordings = activeFilter === "recordings";
       const count = isRecordings ? srCount : ssCount;
       const icon = Icons.getSvg(isRecordings ? "video" : "image");
-      const label = isRecordings ? "Gravações de tela" : "Capturas de tela";
+      const label = isRecordings ? I18n.t("common.recordings_label") : I18n.t("common.screenshots_label");
       return `<div class="organizer-folder-badge">${icon} <span>${count}</span> <span>${label}</span></div>`;
     },
 
@@ -70,17 +70,16 @@ const OrganizerView = (function () {
     emptyState: activeFilter => {
       const copy = {
         screenshots: {
-          title: "Nenhuma pasta com capturas de tela",
-          subtitle: "Nenhuma pasta com capturas de tela foi encontrada."
+          title: I18n.t("organizer.empty_screenshots_title"),
+          subtitle: I18n.t("organizer.empty_screenshots_subtitle")
         },
         recordings: {
-          title: "Nenhuma pasta com gravações de tela",
-          subtitle: "Nenhuma pasta com gravações de tela foi encontrada."
+          title: I18n.t("organizer.empty_recordings_title"),
+          subtitle: I18n.t("organizer.empty_recordings_subtitle")
         },
         all: {
-          title: "Nenhuma pasta organizada",
-          subtitle:
-            "Seus arquivos serão organizados automaticamente em pastas por aplicativo."
+          title: I18n.t("organizer.empty_all_title"),
+          subtitle: I18n.t("organizer.empty_all_subtitle")
         }
       };
       const { title, subtitle } = copy[activeFilter] ?? copy.all;
@@ -99,7 +98,7 @@ const OrganizerView = (function () {
       <div class="organizer-folder-actions-popup" data-folder-id="${folderId}">
         <div class="organizer-folder-action-item" data-action="clear">
           ${Icons.getSvg("trash")}
-          <span>Limpar pasta</span>
+          <span>${I18n.t("organizer.folder_action_clear")}</span>
         </div>
       </div>`
   };

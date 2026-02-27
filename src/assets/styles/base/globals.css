@@ -2,6 +2,10 @@ svg {
   display: flex;
 }
 
+#app {
+  visibility: hidden;
+}
+
 .truncate-text {
   white-space: nowrap;
   overflow: hidden;

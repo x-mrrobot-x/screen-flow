@@ -124,7 +124,7 @@ const DashboardView = (function () {
         inactiveText
       ) => {
         statusEl.textContent = active ? activeText : inactiveText;
-        badgeEl.textContent = active ? "Ativa" : "Inativa";
+        badgeEl.textContent = active ? I18n.t("dashboard.status_active") : I18n.t("dashboard.status_inactive");
         badgeEl
           .closest(".dashboard-automation-card")
           ?.classList.toggle("active", active);
@@ -134,15 +134,15 @@ const DashboardView = (function () {
         automations.organizerStatus,
         automations.organizerBadge,
         autoOrganizer,
-        "Novas capturas e gravações de tela serão organizadas periodicamente",
-        "Novas capturas e gravações de tela não serão organizadas periodicamente"
+        I18n.t("dashboard.organizer_desc_on"),
+        I18n.t("dashboard.organizer_desc_off")
       );
       setAutomation(
         automations.cleanerStatus,
         automations.cleanerBadge,
         autoCleaner,
-        "Capturas e gravações de tela serão removidas periodicamente após o prazo configurado",
-        "Capturas e gravações de tela não serão removidas periodicamente"
+        I18n.t("dashboard.cleaner_desc_on"),
+        I18n.t("dashboard.cleaner_desc_off")
       );
     },
 

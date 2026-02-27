@@ -1,12 +1,18 @@
 const App = (function () {
   "use strict";
 
+  function reveal() {
+    const app = DOM.qs("#app");
+    app.style.visibility = "visible";
+  }
+
   async function init() {
     try {
       Logger.init();
       ScrollManager.init();
       Icons.init();
       await AppState.init();
+      await I18n.init();
       SubfolderMonitor.init();
       AppMonitor.init();
       Navigation.init();
@@ -19,9 +25,12 @@ const App = (function () {
       SettingsController.init();
       ConfirmationDialog.init();
 
+      reveal();
+
       Logger.info("✓ Application initialized successfully");
     } catch (error) {
       Logger.error("❌ Failed to initialize application:", error);
+      reveal();
     }
   }
 

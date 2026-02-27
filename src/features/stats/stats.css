@@ -13,6 +13,7 @@
   font-weight: 500;
   padding: var(--space-xs) var(--space-md);
   border-radius: var(--radius-md);
+  text-transform: capitalize;
 }
 
 .stats-media-type-button.active[data-media-type="screenshots"] {

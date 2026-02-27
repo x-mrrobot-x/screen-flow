@@ -107,9 +107,9 @@ const AppMonitor = (() => {
     const anyAttempted = ssResult.attempted || srResult.attempted;
 
     if (anySuccess) {
-      Toast.success(`Pasta(s) do app '${appName}' foram atualizadas.`);
+      Toast.success(I18n.t("monitor.folders_updated", { name: appName }));
     } else if (anyAttempted) {
-      Toast.error(`Falha ao renomear pasta(s) para '${appName}'.`);
+      Toast.error(I18n.t("monitor.folders_error", { name: appName }));
     }
   }
 
@@ -210,7 +210,7 @@ const AppMonitor = (() => {
 
       await renameFoldersForNewApps(appsToAdd);
 
-      Toast.success("Lista de aplicativos atualizada.");
+      Toast.success(I18n.t("monitor.apps_updated"));
       AppState.setApps([...existingApps, ...appsToAdd]);
     } catch (error) {
       Logger.error("[AppMonitor] Failed to add new apps to state:", error);

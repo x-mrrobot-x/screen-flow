@@ -1,80 +1,100 @@
 const ActivityHelper = (() => {
   "use strict";
 
-  const MEDIA_LABEL = {
-    ss: "capturas de tela",
-    sr: "gravações de tela",
-    screenshots: "capturas",
-    recordings: "gravações",
-  };
-
-  const MEDIA_LABEL_TITLE = {
-    screenshots: "Capturas",
-    recordings: "Gravações",
-  };
-
-  const FEATURE_NAMES = {
-    "auto-organizer": "Organização Automática",
-    "auto-cleaner": "Limpeza Automática",
-  };
-
   const ACTIVITY_CONFIG = {
     cleaner: {
       icon: "broom",
       class: "icon-purple",
-      getTitle: () => "Limpeza",
-      getDescription: (data) => `${data.count || 0} arquivos excluídos.`,
+      getTitle: () => I18n.t("nav.cleaner"),
+      getDescription: data =>
+        I18n.t("activity.cleaner_desc", { count: data.count || 0 })
     },
 
     "cleaner-folder": {
       icon: "folder-minus",
       class: "icon-purple",
-      getTitle: () => "Limpeza de Pasta",
-      getDescription: (data) => {
-        const media = MEDIA_LABEL[data.mediaType] ?? "arquivos";
-        return `${data.count || 0} ${media} removidos da pasta "${data.folder}".`;
-      },
+      getTitle: () => I18n.t("activity.cleaner_folder_title"),
+      getDescription: data => {
+        const media =
+          data.mediaType === "ss" || data.mediaType === "screenshots"
+            ? I18n.t("common.screenshots_label").toLowerCase()
+            : I18n.t("common.recordings_label").toLowerCase();
+        return I18n.t("activity.cleaner_folder_desc", {
+          count: data.count || 0,
+          media,
+          folder: data.folder
+        });
+      }
     },
 
     organizer: {
       icon: "folder-open",
       class: "icon-green",
-      getTitle: (data) => {
-        const label = MEDIA_LABEL_TITLE[data.mediaType] ?? "Arquivos";
-        return `Organização de ${label}`;
+      getTitle: data => {
+        const label =
+          data.mediaType === "screenshots"
+            ? I18n.t("common.screenshots_short")
+            : data.mediaType === "recordings"
+            ? I18n.t("common.recordings_short")
+            : I18n.t("common.files_plural");
+
+        return I18n.t("activity.organizer_title", {
+          label: Utils.capitalizeFirstLetter(label)
+        });
       },
-      getDescription: (data) => {
-        const media = MEDIA_LABEL[data.mediaType] ?? "arquivos";
-        return `${data.count || 0} ${media} organizadas.`;
-      },
+      getDescription: data => {
+        const media =
+          data.mediaType === "screenshots"
+            ? I18n.t("common.screenshots_label")
+            : I18n.t("common.recordings_label");
+        return I18n.t("activity.organizer_desc", {
+          count: data.count || 0,
+          media
+        });
+      }
     },
 
     "feature-toggle": {
       icon: "toggle-right",
       class: "icon-green",
-      getTitle: (data) => FEATURE_NAMES[data.feature] ?? data.feature,
-      getDescription: (data) =>
-        `Recurso ${data.enabled ? "ativado" : "desativado"}.`,
-      getIcon: (data) => (data.enabled ? "toggle-right" : "toggle-left"),
-      getClass: (data) => {
+      getTitle: data => {
+        if (data.feature === "auto-organizer")
+          return I18n.t("features.auto_organizer");
+        if (data.feature === "auto-cleaner")
+          return I18n.t("features.auto_cleaner");
+        return data.feature;
+      },
+      getDescription: data =>
+        data.enabled
+          ? I18n.t("activity.feature_toggle_on")
+          : I18n.t("activity.feature_toggle_off"),
+      getIcon: data => (data.enabled ? "toggle-right" : "toggle-left"),
+      getClass: data => {
         if (!data.enabled) return "icon-gray";
         return data.feature.includes("cleaner") ? "icon-purple" : "icon-green";
-      },
+      }
     },
 
     "cleaner-folder-toggle": {
       icon: "toggle-right",
       class: "icon-blue",
-      getTitle: () => "Limpeza de Pasta",
-      getDescription: (data) => {
+      getTitle: () => I18n.t("activity.cleaner_folder_title"),
+      getDescription: data => {
         const media = data.feature.includes("screenshots")
-          ? "capturas de tela"
-          : "gravações de tela";
-        return `Limpeza de ${media} na pasta "${data.folder}" foi ${data.enabled ? "ativada" : "desativada"}.`;
+          ? I18n.t("common.screenshots_label").toLowerCase()
+          : I18n.t("common.recordings_label").toLowerCase();
+        const state = data.enabled
+          ? I18n.t("activity.toggle_activated")
+          : I18n.t("activity.toggle_deactivated");
+        return I18n.t("activity.folder_toggle_desc", {
+          media,
+          folder: data.folder,
+          state
+        });
       },
-      getIcon: (data) => (data.enabled ? "toggle-right" : "toggle-left"),
-      getClass: (data) => (data.enabled ? "icon-blue" : "icon-gray"),
-    },
+      getIcon: data => (data.enabled ? "toggle-right" : "toggle-left"),
+      getClass: data => (data.enabled ? "icon-blue" : "icon-gray")
+    }
   };
 
   const OVERRIDDEN_KEYS = new Set([
@@ -84,7 +104,7 @@ const ActivityHelper = (() => {
     "description",
     "timestamp",
     "icon",
-    "class",
+    "class"
   ]);
 
   function enrichActivity(activity) {
@@ -104,7 +124,7 @@ const ActivityHelper = (() => {
       description: config.getDescription(activity),
       icon: config.getIcon ? config.getIcon(activity) : config.icon,
       class: config.getClass ? config.getClass(activity) : config.class,
-      ...extra,
+      ...extra
     };
   }
 

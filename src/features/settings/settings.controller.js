@@ -32,24 +32,36 @@ const SettingsController = (function () {
       SettingsView.update.setting(switchEl.dataset.settingKey, newValue);
     },
 
+    onLanguageChange: e => {
+      const lang = e.target.value;
+      if (!lang) return;
+      SettingsModel.setSetting("language", lang);
+      I18n.setLocale(lang).then(() => {
+        SettingsView.update.languageLabel(lang);
+        DashboardController.loadStats();
+        StatsController.refresh();
+        EventBus.emit("appstate:changed", { key: "folders" });
+        EventBus.emit("appstate:changed", { key: "activities" });
+      });
+    },
+
     onReset: () => {
       SettingsModel.resetAllSettings();
-      Toast.success("Configurações restauradas com sucesso!");
+      Toast.success(I18n.t("settings.reset_success"));
     },
 
     onDelete: () => {
       ConfirmationDialog.open(
         {
-          title: "Apagar Todos os Dados",
-          message:
-            "Tem certeza de que deseja apagar todos os dados do aplicativo? Esta ação não pode ser desfeita."
+          title: I18n.t("settings.delete_all_title"),
+          message: I18n.t("settings.delete_message")
         },
         () => {
           const ok = SettingsModel.deleteAllData();
           Toast[ok ? "success" : "error"](
             ok
-              ? "Dados apagados com sucesso!"
-              : "Ocorreu um erro ao apagar os dados."
+              ? I18n.t("settings.delete_success")
+              : I18n.t("settings.delete_error")
           );
         }
       );
@@ -61,17 +73,19 @@ const SettingsController = (function () {
   };
 
   function attachEvents() {
-    const { tabContent, resetBtn, deleteBtn } = SettingsView.getElements();
+    const { tabContent, resetBtn, deleteBtn, languageSelect } =
+      SettingsView.getElements();
 
     const events = [
       [tabContent, "click", handlers.onThemeClick],
       [tabContent, "change", handlers.onSwitchChange],
+      [languageSelect, "change", handlers.onLanguageChange],
       [resetBtn, "click", handlers.onReset],
       [deleteBtn, "click", handlers.onDelete]
     ];
-    events.forEach(([el, event, handler]) =>
-      el.addEventListener(event, handler)
-    );
+    events.forEach(([el, event, handler]) => {
+      if (el) el.addEventListener(event, handler);
+    });
 
     EventBus.on("appstate:changed", handlers.onStateChange);
   }

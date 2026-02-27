@@ -57,6 +57,7 @@
   white-space: nowrap;
   padding: var(--space-xs) var(--space-md);
   border-radius: var(--radius-md);
+  text-transform: capitalize;
 }
 
 .organizer-filter-button.active {

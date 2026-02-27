@@ -29,7 +29,5 @@ const DEFAULT_SETTINGS = {
   animationsEnabled: true,
   customDestination: null,
   scheduleTime: null,
-  language: "pt-BR"
+  language: null
 };
-
-const DEFAULT_TRANSLATIONS = {};

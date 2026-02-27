@@ -25,7 +25,7 @@ const ProcessView = (function () {
           <div class="process-step-spinner"></div>
           <div class="process-step-checkmark">${Icons.getSvg("check")}</div>
         </div>
-        <span class="process-step-label">${step.label}</span>
+        <span class="process-step-label">${I18n.t(step.labelKey)}</span>
       </div>`,
 
     animateStepsIn: count => {
@@ -161,9 +161,9 @@ const ProcessView = (function () {
   };
 
   function reset() {
-    elements.title.textContent = "Processando";
+    elements.title.textContent = I18n.t("dialog.process_title");
     elements.bar.style.width = "0%";
-    elements.label.textContent = "Iniciando...";
+    elements.label.textContent = I18n.t("process.label_starting");
     elements.percent.textContent = "0%";
     elements.steps.innerHTML = "";
     elements.completion.classList.remove("visible");

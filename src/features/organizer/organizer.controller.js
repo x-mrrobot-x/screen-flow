@@ -43,7 +43,7 @@ const OrganizerController = (function () {
     const folders = OrganizerModel.getFolders();
     const folder = folders.find(f => f.id === folderId);
     if (!folder) {
-      Toast.error("Pasta não encontrada.");
+      Toast.error(I18n.t("organizer.folder_not_found"));
       return;
     }
 
@@ -80,17 +80,20 @@ const OrganizerController = (function () {
         });
         AppState.incrementStat("cleanedFiles", removedCount);
         Toast.success(
-          `${Utils.pluralize(removedCount, "item")} 
-          ${Utils.pluralize(removedCount, "removido", false)}`
+          I18n.t("organizer.clear_success", {
+            count: removedCount,
+            item: removedCount === 1 ? I18n.t("common.items") : I18n.t("common.items_plural"),
+            removed: removedCount === 1 ? I18n.t("common.removed") : I18n.t("common.removed_plural")
+          })
         );
       } else {
-        Toast.info("Nenhum arquivo foi removido ou a pasta já estava vazia.");
+        Toast.info(I18n.t("organizer.clear_empty"));
       }
 
       updatePartial(folderId);
     } catch (error) {
       Logger.error("Error clearing folder:", error);
-      Toast.error("Erro ao limpar a pasta. Tente novamente.");
+      Toast.error(I18n.t("organizer.clear_error"));
     } finally {
       suppressNextRender = false;
       if (folderCard) {
