@@ -274,10 +274,11 @@ const ENV = (() => {
 
     async function getData(key, params = {}) {
       try {
-        return await execute({
-          command: "read_file",
-          args: [getFilePath(key, params), JSON.stringify(getDefault(key))]
-        });
+        const raw = tk.local(key.toLowerCase());
+        if (!raw) {
+          return getDefault(key);
+        }
+        return JSON.parse(raw);
       } catch (e) {
         Logger.error(`Error getting ${key}:`, e);
         return getDefault(key);
