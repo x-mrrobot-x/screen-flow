@@ -2,6 +2,7 @@ const Navigation = (function () {
   "use strict";
 
   let elements = null;
+  const lazyControllers = {};
 
   function queryElements() {
     elements = {
@@ -15,6 +16,16 @@ const Navigation = (function () {
     elements.app.scrollTo({ top: 0 });
   }
 
+  function registerLazy(tabId, initFn) {
+    lazyControllers[tabId] = initFn;
+  }
+
+  function initLazyController(tabId) {
+    if (lazyControllers[tabId]) {
+      lazyControllers[tabId]();
+    }
+  }
+
   function navigateTo(tabId) {
     DOM.qs(".nav-button.active").classList.remove("active");
     DOM.qs(".tab-content.active").classList.remove("active", "page-enter");
@@ -25,6 +36,7 @@ const Navigation = (function () {
     targetBtn.classList.add("active");
 
     if (targetTab) {
+      initLazyController(tabId);
       targetTab.classList.add("active", "page-enter");
       targetTab.style.display = "";
       EventBus.emit("navigation:changed", { tab: tabId });
@@ -48,6 +60,7 @@ const Navigation = (function () {
   return {
     init,
     navigateTo,
-    scrollToTop
+    scrollToTop,
+    registerLazy
   };
 })();

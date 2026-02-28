@@ -53,13 +53,6 @@ const Utils = (function () {
       );
   }
 
-  function pluralize(n, word, returnCount = true) {
-    if (returnCount) {
-      return `${n} ${word}${n === 1 ? "" : "s"}`;
-    }
-    return `${word}${n === 1 ? "" : "s"}`;
-  }
-
   function capitalizeFirstLetter(text) {
     return text.charAt(0).toUpperCase() + text.slice(1);
   }
@@ -75,7 +68,6 @@ const Utils = (function () {
   return {
     formatTimestamp,
     sanitizeFolderName,
-    pluralize,
     capitalizeFirstLetter,
     debounce
   };

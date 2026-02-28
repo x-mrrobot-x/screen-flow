@@ -6,6 +6,17 @@ const App = (function () {
     app.style.visibility = "visible";
   }
 
+  function applyBootSettings() {
+    const THEMES = ["light", "dark", "system"];
+    const { theme, animationsEnabled } = AppState.getSettings();
+
+    SettingsView.render.theme(theme, THEMES);
+
+    if (animationsEnabled === false) {
+      document.documentElement.classList.add("no-animations");
+    }
+  }
+
   async function init() {
     try {
       Logger.init();
@@ -13,19 +24,20 @@ const App = (function () {
       Icons.init();
       await AppState.init();
       await I18n.init();
+      applyBootSettings();
+      reveal();
       SubfolderMonitor.init();
       AppMonitor.init();
       Navigation.init();
 
       DashboardController.init();
       ProcessController.init();
-      OrganizerController.init();
-      StatsController.init();
-      CleanerController.init();
-      SettingsController.init();
       ConfirmationDialog.init();
 
-      reveal();
+      Navigation.registerLazy("organizer", () => OrganizerController.init());
+      Navigation.registerLazy("stats", () => StatsController.init());
+      Navigation.registerLazy("cleaner", () => CleanerController.init());
+      Navigation.registerLazy("settings", () => SettingsController.init());
 
       Logger.info("✓ Application initialized successfully");
     } catch (error) {

@@ -29,7 +29,6 @@ const SettingsView = (function () {
             : "light"
           : theme;
       root.classList.add(themeToApply);
-      if (typeof StatsController !== "undefined") StatsController.refresh();
     },
 
     all: (settings, themes, settingsKeys) => {

@@ -21,15 +21,12 @@ const SettingsController = (function () {
       const theme = e.target.closest("[data-theme]")?.dataset.theme;
       if (!theme) return;
       SettingsModel.setSetting("theme", theme);
-      SettingsView.render.theme(theme, THEMES);
-      SettingsView.update.themeSelector(theme);
     },
 
     onSwitchChange: e => {
       const switchEl = e.target.closest("[data-setting-key]");
       if (!switchEl) return;
-      const newValue = SettingsModel.toggleSetting(switchEl.dataset.settingKey);
-      SettingsView.update.setting(switchEl.dataset.settingKey, newValue);
+      SettingsModel.toggleSetting(switchEl.dataset.settingKey);
     },
 
     onLanguageChange: e => {
@@ -39,7 +36,8 @@ const SettingsController = (function () {
       I18n.setLocale(lang).then(() => {
         SettingsView.update.languageLabel(lang);
         DashboardController.loadStats();
-        StatsController.refresh();
+
+        EventBus.emit("appstate:changed", { key: "stats" });
         EventBus.emit("appstate:changed", { key: "folders" });
         EventBus.emit("appstate:changed", { key: "activities" });
       });
