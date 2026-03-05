@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ScreenFlow Auto Process</title>
+  </head>
+  <body>
+    <script>
+      const I18n = {
+        t: key => key,
+        getLocale: () => "pt"
+      };
+
+      const EventBus = {
+        emit: () => {},
+        on: () => {},
+        off: () => {},
+        once: () => {}
+      };
+
+      const ActivityHelper = {
+        enrichActivities: () => []
+      };
+    </script>
+
+    <script src="%work_dir/src/lib/defaults.js"></script>
+    <script src="%work_dir/src/lib/utils.js"></script>
+    <script src="%work_dir/src/core/logger.js"></script>
+    <script src="%work_dir/src/core/env.js"></script>
+    <script src="%work_dir/src/core/app-state.js"></script>
+    <script src="%work_dir/src/core/task-queue.js"></script>
+    <script src="%work_dir/src/features/dashboard/process/process.config.js"></script>
+    <script src="%work_dir/src/features/dashboard/process/process.model.js"></script>
+    <script src="%work_dir/src/core/process-engine.js"></script>
+    <script src="%work_dir/tasker/auto-process/runner.js"></script>
+  </body>
+</html>

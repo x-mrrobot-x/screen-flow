@@ -76,6 +76,14 @@ const MockEnv = (() => {
     }
   };
 
+  const MOCK_VARIABLES = {
+    process_type: "organize_screenshots"
+  };
+
+  function getVariable(name) {
+    return MOCK_VARIABLES[name] || null;
+  }
+
   function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
@@ -275,6 +283,7 @@ const MockEnv = (() => {
 
   return {
     executeCommand,
-    processTask
+    processTask,
+    getVariable
   };
 })();

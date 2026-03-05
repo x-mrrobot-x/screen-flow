@@ -33,7 +33,7 @@ const ProcessModel = (function () {
     if (patterns.length === 0) {
       return {
         countCommand: "echo 0",
-        moveCommand: "echo 'Nenhum arquivo para mover'"
+        moveCommand: "echo 'No files to move'"
       };
     }
 
@@ -135,7 +135,13 @@ const ProcessModel = (function () {
     }
   }
 
-  async function saveSummary(processType, stats, activityType, mediaType) {
+  async function saveSummary(
+    processType,
+    stats,
+    activityType,
+    mediaType,
+    execution = "manual"
+  ) {
     updateStats({
       processType,
       organizedCount: stats.moved || 0,
@@ -143,7 +149,7 @@ const ProcessModel = (function () {
     });
 
     AppState.addActivity({
-      execution: "manual",
+      execution,
       type: activityType,
       count: stats.moved || stats.total_removed || 0,
       ...(mediaType && { mediaType })
@@ -152,16 +158,28 @@ const ProcessModel = (function () {
     return { success: true, savedStats: stats };
   }
 
-  async function saveScreenshotSummary(processType, stats) {
-    return saveSummary(processType, stats, "organizer", "screenshots");
+  async function saveScreenshotSummary(processType, stats, execution) {
+    return saveSummary(
+      processType,
+      stats,
+      "organizer",
+      "screenshots",
+      execution
+    );
   }
 
-  async function saveRecordingSummary(processType, stats) {
-    return saveSummary(processType, stats, "organizer", "recordings");
+  async function saveRecordingSummary(processType, stats, execution) {
+    return saveSummary(
+      processType,
+      stats,
+      "organizer",
+      "recordings",
+      execution
+    );
   }
 
-  async function saveCleanupSummary(processType, stats) {
-    return saveSummary(processType, stats, "cleaner");
+  async function saveCleanupSummary(processType, stats, execution) {
+    return saveSummary(processType, stats, "cleaner", undefined, execution);
   }
 
   async function hasCleanerConfigs() {

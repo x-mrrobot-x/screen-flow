@@ -65,10 +65,19 @@ const Utils = (function () {
     };
   }
 
+  function escapeShellArg(arg) {
+    const str =
+      typeof arg === "object" && arg !== null
+        ? JSON.stringify(arg)
+        : String(arg);
+    return "'" + str.replace(/'/g, "'\\''") + "'";
+  }
+
   return {
     formatTimestamp,
     sanitizeFolderName,
     capitalizeFirstLetter,
-    debounce
+    debounce,
+    escapeShellArg
   };
 })();

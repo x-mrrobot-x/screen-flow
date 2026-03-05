@@ -21,19 +21,15 @@ const TaskQueue = (function () {
       commandName: task.action,
       params: task.params,
       type: task.type,
-      fullCommand: null
+      fullCommand: null,
+      scene: ENV.SCENE_NAME,
+      webview: ENV.WEBVIEW_NAME
     };
 
     if (task.type === "shell") {
       const scriptPath = `${ENV.WORK_DIR}src/features/dashboard/process/script.sh`;
       const quotedArgs = (Array.isArray(task.params) ? task.params : [])
-        .map(arg => {
-          const str =
-            typeof arg === "object" && arg !== null
-              ? JSON.stringify(arg)
-              : String(arg);
-          return "'" + str.replace(/'/g, "'\\''") + "'";
-        })
+        .map(Utils.escapeShellArg)
         .join(" ");
 
       base.fullCommand = `sh "${scriptPath}" ${task.action} ${quotedArgs}`;

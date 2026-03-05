@@ -59,7 +59,8 @@ const ProcessConfig = {
             {
               moved: ctx.move_and_count.moved || 0,
               created: ctx.create_app_folders.created
-            }
+            },
+            ctx._execution
           ]
         }
       ]
@@ -124,7 +125,8 @@ const ProcessConfig = {
             {
               moved: ctx.move_and_count.moved || 0,
               created: ctx.create_app_folders.created
-            }
+            },
+            ctx._execution
           ]
         }
       ]
@@ -169,7 +171,8 @@ const ProcessConfig = {
               ss_removed: ctx.find_all_expired.screenshots.length,
               sr_removed: ctx.find_all_expired.recordings.length,
               total_removed: ctx.find_all_expired.all.length
-            }
+            },
+            ctx._execution
           ]
         }
       ]

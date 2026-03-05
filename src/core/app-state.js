@@ -155,6 +155,21 @@ const AppState = (() => {
       persist.settings();
       emitChange("settings");
     },
+
+    async flushPersist() {
+      Object.keys(timers).forEach(key => {
+        clearTimeout(timers[key]);
+        delete timers[key];
+      });
+      await Promise.allSettled([
+        ENV.setData("FOLDERS", folders),
+        ENV.setData("SETTINGS", settings),
+        ENV.setData("STATS", stats),
+        ENV.setData("ACTIVITIES", activities),
+        ENV.setData("APPS", apps)
+      ]);
+    },
+
     deleteAll,
     getTopFoldersByType
   };
