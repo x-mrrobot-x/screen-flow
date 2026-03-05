@@ -37,7 +37,9 @@ const OrganizerView = (function () {
       const isRecordings = activeFilter === "recordings";
       const count = isRecordings ? srCount : ssCount;
       const icon = Icons.getSvg(isRecordings ? "video" : "image");
-      const label = isRecordings ? I18n.t("common.recordings_label") : I18n.t("common.screenshots_label");
+      const label = isRecordings
+        ? I18n.t("common.recordings_label")
+        : I18n.t("common.screenshots_label");
       return `<div class="organizer-folder-badge">${icon} <span>${count}</span> <span>${label}</span></div>`;
     },
 
@@ -110,14 +112,12 @@ const OrganizerView = (function () {
       return folders.filter(f => f.ss || f.sr);
     },
 
-    folders: (folders, activeFilter) => {
-      const filtered = render.getFiltered(folders, activeFilter);
-      elements.grid.innerHTML =
-        filtered.length > 0
-          ? filtered
-              .map((f, i) => templates.folderCard(f, i, activeFilter))
-              .join("")
-          : templates.emptyState(activeFilter);
+    folderNode: (folder, index, activeFilter) => {
+      const wrapper = document.createElement("div");
+      wrapper.innerHTML = templates
+        .folderCard(folder, index, activeFilter)
+        .trim();
+      return wrapper.firstChild;
     },
 
     mediaCounter: (folders, activeFilter) => {

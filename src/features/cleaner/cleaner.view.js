@@ -142,15 +142,16 @@ const CleanerView = (function () {
       }
     },
 
-    folderList: folders => {
-      elements.list.innerHTML = folders
-        .map((folder, index) => templates.folderCard(folder, index))
-        .join("");
+    folderNode: (folder, index) => {
+      const html = templates.folderCard(folder, index);
+      if (!html) return null;
+      const wrapper = document.createElement("div");
+      wrapper.innerHTML = html.trim();
+      return wrapper.firstChild;
     },
 
     cleaner: folders => {
       render.counts(folders);
-      render.folderList(folders);
     }
   };
 

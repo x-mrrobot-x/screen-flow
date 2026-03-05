@@ -6,6 +6,12 @@ svg {
   visibility: hidden;
 }
 
+.pagination-sentinel {
+  pointer-events: none;
+  width: 100%;
+  height: 0.1rem;
+}
+
 .truncate-text {
   white-space: nowrap;
   overflow: hidden;

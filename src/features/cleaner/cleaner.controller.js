@@ -3,9 +3,21 @@ const CleanerController = (function () {
 
   let isInitialized = false;
   let suppressNextRender = false;
+  let paginator = null;
 
   function renderUI() {
     const folders = CleanerModel.getFolders();
+    const { list } = CleanerView.getElements();
+
+    if (!paginator) {
+      paginator = PaginationManager.create({
+        container: list,
+        renderItem: (folder, i) => CleanerView.render.folderNode(folder, i),
+        emptyState: () => null
+      });
+    }
+
+    paginator.reset(folders);
     CleanerView.render.cleaner(folders);
     CleanerView.update.autoCleaner(CleanerModel.getAutoCleanerSetting());
   }

@@ -4,11 +4,27 @@ const OrganizerController = (function () {
   let isInitialized = false;
   let suppressNextRender = false;
   let currentPopupMenu = null;
+  let paginator = null;
 
   function renderUI() {
     const folders = OrganizerModel.getFolders();
     const state = OrganizerModel.getState();
-    OrganizerView.render.folders(folders, state.activeFilter);
+    const { grid } = OrganizerView.getElements();
+    const filtered = OrganizerView.render.getFiltered(
+      folders,
+      state.activeFilter
+    );
+
+    if (!paginator) {
+      paginator = PaginationManager.create({
+        container: grid,
+        renderItem: (folder, i) =>
+          OrganizerView.render.folderNode(folder, i, state.activeFilter),
+        emptyState: () => OrganizerView.templates.emptyState(state.activeFilter)
+      });
+    }
+
+    paginator.reset(filtered);
     OrganizerView.render.mediaCounter(folders, state.activeFilter);
     OrganizerView.render.filters(state.activeFilter);
     OrganizerView.update.autoOrganizer(
@@ -82,8 +98,14 @@ const OrganizerController = (function () {
         Toast.success(
           I18n.t("organizer.clear_success", {
             count: removedCount,
-            item: removedCount === 1 ? I18n.t("common.items") : I18n.t("common.items_plural"),
-            removed: removedCount === 1 ? I18n.t("common.removed") : I18n.t("common.removed_plural")
+            item:
+              removedCount === 1
+                ? I18n.t("common.items")
+                : I18n.t("common.items_plural"),
+            removed:
+              removedCount === 1
+                ? I18n.t("common.removed")
+                : I18n.t("common.removed_plural")
           })
         );
       } else {
