@@ -43,7 +43,7 @@ const I18n = (() => {
 
   async function loadTranslations(lang) {
     try {
-      const data = await ENV.getData("TRANSLATIONS", { lang });
+      const data = await ENV.readFile("TRANSLATIONS", { lang });
       if (!data || Object.keys(data).length === 0)
         throw new Error("Empty translation data");
       return data;

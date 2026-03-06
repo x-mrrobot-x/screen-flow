@@ -263,11 +263,7 @@ const AppMonitor = (() => {
   }
 
   function init() {
-    if (AppState.isReady()) {
-      loadInstalledApps();
-      return;
-    }
-    EventBus.once("appstate:ready", loadInstalledApps);
+    loadInstalledApps();
   }
 
   return {

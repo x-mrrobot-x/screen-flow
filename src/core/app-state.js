@@ -6,7 +6,6 @@ const AppState = (() => {
   let activities = [];
   let folders = [];
   let apps = [];
-  let isReady = false;
 
   const MAX_ACTIVITIES = 10;
   const timers = {};
@@ -14,7 +13,7 @@ const AppState = (() => {
   function debouncedPersist(dataKey, data, delay) {
     clearTimeout(timers[dataKey]);
     timers[dataKey] = setTimeout(() => {
-      ENV.setData(dataKey, data);
+      ENV.writeFile(dataKey, data);
       delete timers[dataKey];
     }, delay);
   }
@@ -72,26 +71,21 @@ const AppState = (() => {
       .slice(0, 5);
   }
 
-  async function loadStates() {
-    [settings, stats, folders, activities, apps] = await Promise.all([
-      ENV.getData("SETTINGS"),
-      ENV.getData("STATS"),
-      ENV.getData("FOLDERS"),
-      ENV.getData("ACTIVITIES"),
-      ENV.getData("APPS")
-    ]);
+  function loadStates() {
+    settings = ENV.getVariable("settings");
+    stats = ENV.getVariable("stats");
+    folders = ENV.getVariable("folders");
+    activities = ENV.getVariable("activities");
+    apps = ENV.getVariable("apps");
   }
 
-  async function init() {
-    await loadStates();
-    isReady = true;
-    EventBus.emit("appstate:ready");
+  function init() {
+    loadStates();
   }
 
   return {
     init,
     loadStates,
-    isReady: () => isReady,
 
     getFolders: () => [...folders],
     setFolders(newFolders) {
@@ -162,11 +156,11 @@ const AppState = (() => {
         delete timers[key];
       });
       await Promise.allSettled([
-        ENV.setData("FOLDERS", folders),
-        ENV.setData("SETTINGS", settings),
-        ENV.setData("STATS", stats),
-        ENV.setData("ACTIVITIES", activities),
-        ENV.setData("APPS", apps)
+        ENV.writeFile("FOLDERS", folders),
+        ENV.writeFile("SETTINGS", settings),
+        ENV.writeFile("STATS", stats),
+        ENV.writeFile("ACTIVITIES", activities),
+        ENV.writeFile("APPS", apps)
       ]);
     },
 

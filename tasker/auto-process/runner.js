@@ -10,7 +10,7 @@ const Runner = (function () {
     }
 
     try {
-      await AppState.init();
+      AppState.init();
       await I18n.init();
 
       if (processType === "cleanup_old_files") {

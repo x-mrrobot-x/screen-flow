@@ -22,7 +22,7 @@ const App = (function () {
       Logger.init();
       ScrollManager.init();
       Icons.init();
-      await AppState.init();
+      AppState.init();
       await I18n.init();
       applyBootSettings();
       reveal();

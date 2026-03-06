@@ -113,13 +113,16 @@ const ENV = (function () {
     }
 
     function getVariable(name) {
-      if (typeof MockEnv !== "undefined" && MockEnv.getVariable) {
-        return MockEnv.getVariable(name);
+      const key = name.toUpperCase();
+      const cfg = STORAGE_CONFIG[key]?.web;
+      if (cfg?.type === "localStorage") {
+        const raw = localStorage.getItem(STORAGE_PREFIX + cfg.key);
+        return raw ? JSON.parse(raw) : getDefault(key);
       }
       return null;
     }
 
-    async function getData(key, params = {}) {
+    async function readFile(key, params = {}) {
       try {
         const cfg = STORAGE_CONFIG[key].web;
 
@@ -140,7 +143,7 @@ const ENV = (function () {
       }
     }
 
-    function setData(key, data) {
+    function writeFile(key, data) {
       try {
         const cfg = STORAGE_CONFIG[key].web;
         if (cfg.type === "fetch")
@@ -218,9 +221,9 @@ const ENV = (function () {
       getSystemLanguage,
       resolveIconPath,
       getVariable,
-      getData,
+      readFile,
       getDefault,
-      setData,
+      writeFile,
       runTask,
       isTaskRunning,
       sendNotification,
@@ -271,20 +274,33 @@ const ENV = (function () {
     }
 
     function getVariable(name) {
-      return tk.local(name);
+      const raw = tk.local(name);
+      if (raw) {
+        try {
+          return JSON.parse(raw);
+        } catch {
+          return raw;
+        }
+      }
+      const key = name.toUpperCase();
+      return STORAGE_CONFIG[key] ? getDefault(key) : null;
     }
 
-    async function getData(key, params = {}) {
+    async function readFile(key, params = {}) {
       try {
-        const raw = tk.local(key.toLowerCase());
-        return raw ? JSON.parse(raw) : getDefault(key);
+        const filePath = getFilePath(key, params);
+        const result = await execute({
+          command: "read_file",
+          args: [filePath]
+        });
+        return result ?? getDefault(key);
       } catch (e) {
-        Logger.error(`Error getting ${key}:`, e);
+        Logger.error(`Error reading file ${key}:`, e);
         return getDefault(key);
       }
     }
 
-    async function setData(key, data, params = {}) {
+    async function writeFile(key, data, params = {}) {
       try {
         await execute({
           command: "write_file",
@@ -343,9 +359,9 @@ const ENV = (function () {
       getSystemLanguage,
       resolveIconPath,
       getVariable,
-      getData,
+      readFile,
       getDefault,
-      setData,
+      writeFile,
       execute,
       runTask,
       isTaskRunning,
