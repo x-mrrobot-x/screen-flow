@@ -11,6 +11,7 @@ const Runner = (function () {
 
     try {
       await AppState.init();
+      await I18n.init();
 
       if (processType === "cleanup_old_files") {
         const hasConfigs = await ProcessModel.hasCleanerConfigs();
@@ -20,8 +21,16 @@ const Runner = (function () {
       await ProcessEngine.run(
         processType,
         {
-          onDone: async () => {
+          onDone: async (processType, stats) => {
             await AppState.flushPersist();
+
+            const processData = ProcessConfig.PROCESS_TYPES[processType];
+            const notifKey = processData?.notificationKey;
+            if (notifKey && AppState.getSetting(notifKey)) {
+              const title = I18n.t(processData.notificationTitleKey);
+              const content = Utils.buildCompletionText(processType, stats);
+              ENV.sendNotification(title, content);
+            }
           },
           onError: (error, step) => {
             Logger.error(

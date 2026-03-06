@@ -2,6 +2,9 @@ const ProcessConfig = {
   PROCESS_TYPES: {
     organize_screenshots: {
       titleKey: "process.organize_screenshots_title",
+      notificationTitleKey: "nav.organizer",
+      doneLabelKey: "process.organize_done_label",
+      notificationKey: "notifyOrganizationResult",
       steps: [
         {
           id: "scan_screenshots",
@@ -68,6 +71,9 @@ const ProcessConfig = {
 
     organize_recordings: {
       titleKey: "process.organize_recordings_title",
+      notificationTitleKey: "nav.organizer",
+      doneLabelKey: "process.organize_done_label",
+      notificationKey: "notifyOrganizationResult",
       steps: [
         {
           id: "scan_recordings",
@@ -134,6 +140,9 @@ const ProcessConfig = {
 
     cleanup_old_files: {
       titleKey: "process.cleanup_title",
+      notificationTitleKey: "nav.cleaner",
+      doneLabelKey: "process.cleanup_done_label",
+      notificationKey: "notifyCleanupResult",
       steps: [
         {
           id: "load_cleanup_rules",

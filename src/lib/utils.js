@@ -73,11 +73,32 @@ const Utils = (function () {
     return "'" + str.replace(/'/g, "'\\''") + "'";
   }
 
+  function buildCompletionText(processType, stats) {
+    if (processType === "organize_screenshots") {
+      const count = stats.moved || 0;
+      return I18n.t("process.notify_screenshots_done", { count });
+    }
+    if (processType === "organize_recordings") {
+      const count = stats.moved || 0;
+      return I18n.t("process.notify_recordings_done", { count });
+    }
+    if (processType === "cleanup_old_files") {
+      const count = stats.total_removed || 0;
+      return I18n.t("process.cleanup_done", {
+        count,
+        file: I18n.t("common.files", { n: count }),
+        removed: I18n.t("common.removed", { n: count })
+      });
+    }
+    return I18n.t("process.finished");
+  }
+
   return {
     formatTimestamp,
     sanitizeFolderName,
     capitalizeFirstLetter,
     debounce,
-    escapeShellArg
+    escapeShellArg,
+    buildCompletionText
   };
 })();

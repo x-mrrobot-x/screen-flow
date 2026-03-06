@@ -8,29 +8,6 @@ const ProcessController = (function () {
 
   const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-  function buildCompletionText(processType, stats) {
-    if (
-      processType === "organize_screenshots" ||
-      processType === "organize_recordings"
-    ) {
-      const count = stats.moved || 0;
-      return I18n.t("process.organize_done", {
-        count,
-        file: I18n.t("common.files", { n: count }),
-        moved: I18n.t("common.moved", { n: count })
-      });
-    }
-    if (processType === "cleanup_old_files") {
-      const count = stats.total_removed || 0;
-      return I18n.t("process.cleanup_done", {
-        count,
-        file: I18n.t("common.files", { n: count }),
-        removed: I18n.t("common.removed", { n: count })
-      });
-    }
-    return I18n.t("process.finished");
-  }
-
   function notifyChanges(stats) {
     if ((stats.moved ?? 0) > 0 || (stats.total_removed ?? 0) > 0) {
       SubfolderMonitor.runScan();
@@ -75,11 +52,20 @@ const ProcessController = (function () {
       },
 
       onDone: (processType, stats) => {
+        const processData = ProcessConfig.PROCESS_TYPES[processType];
+        const doneLabel = I18n.t(processData?.doneLabelKey ?? "process.step_done");
         ProcessView.update.progress(100);
-        ProcessView.update.stepLabel(I18n.t("process.step_done"));
-        ProcessView.update.completion(buildCompletionText(processType, stats));
+        ProcessView.update.stepLabel(doneLabel);
+        ProcessView.update.completion(Utils.buildCompletionText(processType, stats), doneLabel);
         state.isRunning = false;
         notifyChanges(stats);
+
+        const notifKey = processData?.notificationKey;
+        if (notifKey && SettingsModel.getSetting(notifKey)) {
+          const title = I18n.t(processData.notificationTitleKey);
+          const content = Utils.buildCompletionText(processType, stats);
+          ENV.sendNotification(title, content);
+        }
       },
 
       onError: (error, step, index) => {
@@ -93,6 +79,7 @@ const ProcessController = (function () {
         ProcessView.update.stepStatus(index, "failed");
         ProcessView.update.completion(
           I18n.t("process.step_error", { label: I18n.t(step.labelKey) }),
+          undefined,
           false
         );
         state.isRunning = false;

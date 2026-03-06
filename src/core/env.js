@@ -206,6 +206,10 @@ const ENV = (function () {
       Logger.debug("Closing the application...");
     }
 
+    function sendNotification(title, content) {
+      console.log("[NOTIFY]", title, "→", content);
+    }
+
     return {
       WORK_DIR: "",
       isWeb: true,
@@ -219,6 +223,7 @@ const ENV = (function () {
       setData,
       runTask,
       isTaskRunning,
+      sendNotification,
       exit,
       getFilePath,
       ...PATHS
@@ -227,6 +232,7 @@ const ENV = (function () {
 
   function TaskerEnvironment() {
     const WORK_DIR = `${tk.local("%work_dir")}/`;
+    const NOTIFY_TASK_NAME = "SO - NOTIFY";
 
     function resolveIconPath(pkg) {
       return `content://net.dinglisch.android.taskerm.iconprovider//app/${pkg}`;
@@ -325,6 +331,10 @@ const ENV = (function () {
       tk.destroyScene(this.SCENE_NAME || SCENE_NAME);
     }
 
+    function sendNotification(title, content) {
+      runTask(NOTIFY_TASK_NAME, 10, title, content);
+    }
+
     return {
       WORK_DIR,
       isWeb: false,
@@ -339,6 +349,7 @@ const ENV = (function () {
       execute,
       runTask,
       isTaskRunning,
+      sendNotification,
       getFilePath,
       exit,
       ...PATHS

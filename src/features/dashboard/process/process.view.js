@@ -13,6 +13,7 @@ const ProcessView = (function () {
       percent: DOM.qs("#process-dialog-percent"),
       steps: DOM.qs("#process-dialog-steps"),
       completion: DOM.qs("#process-dialog-completion"),
+      completionTitle: DOM.qs(".process-completion-title"),
       result: DOM.qs("#process-dialog-result"),
       closeBtn: DOM.qs("#process-dialog-close")
     };
@@ -135,8 +136,9 @@ const ProcessView = (function () {
       }
     },
 
-    completion: (resultText, success = true) => {
+    completion: (resultText, titleText, success = true) => {
       elements.result.textContent = resultText;
+      if (titleText) elements.completionTitle.textContent = titleText;
 
       if (success) elements.info.classList.add("done");
 
