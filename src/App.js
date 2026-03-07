@@ -17,6 +17,14 @@ const App = (function () {
     }
   }
 
+  function handleTaskResult(resultJson) {
+    TaskQueue.onResult(resultJson);
+  }
+
+  function goBack(resultJson) {
+    return DialogStack.goBack();
+  }
+
   async function init() {
     try {
       Logger.init();
@@ -44,14 +52,6 @@ const App = (function () {
       Logger.error("❌ Failed to initialize application:", error);
       reveal();
     }
-  }
-
-  function handleTaskResult(resultJson) {
-    TaskQueue.onResult(resultJson);
-  }
-
-  function goBack(resultJson) {
-    return DialogStack.goBack();
   }
 
   return {

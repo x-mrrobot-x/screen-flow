@@ -1,21 +1,40 @@
 const ENV = (function () {
   "use strict";
 
+  // ─── Environment detection ───
+
   const isWeb = typeof tk === "undefined";
 
-  const SCENE_NAME = "SO - SCREENSHOTS ORGANIZER";
-  const WEBVIEW_NAME = "APP";
+  // ─── Tasker constants ───
 
-  const PATHS = {
-    SOURCE_SCREENSHOTS_PATH: "/storage/emulated/0/DCIM/Screenshots",
-    SOURCE_RECORDINGS_PATH: "/storage/emulated/0/DCIM/ScreenRecorder",
-    ORGANIZED_SCREENSHOTS_PATH:
-      "/storage/emulated/0/OrganizedMedia/Screenshots",
-    ORGANIZED_RECORDINGS_PATH:
-      "/storage/emulated/0/OrganizedMedia/ScreenRecordings"
+  const TASKER = {
+    SCENES: {
+      MAIN: "SO - SCREENSHOTS ORGANIZER",
+      AUTO_PROCESS: "SO - AUTO PROCESS"
+    },
+    WEBVIEWS: {
+      MAIN: "APP",
+      AUTO_PROCESS: "AUTO PROCESS"
+    },
+    TASKS: {
+      QUEUE: "SO 07 - TASK QUEUE",
+      STOP_QUEUE: "SO 09 - STOP TASK QUEUE",
+      NOTIFY: "SO 10 - NOTIFY"
+    }
   };
 
-  const STORAGE_CONFIG = {
+  // ─── Android file system paths ---
+
+  const PATHS = {
+    SOURCE_SCREENSHOTS: "/storage/emulated/0/DCIM/Screenshots",
+    SOURCE_RECORDINGS: "/storage/emulated/0/DCIM/ScreenRecorder",
+    ORGANIZED_SCREENSHOTS: "/storage/emulated/0/OrganizedMedia/Screenshots",
+    ORGANIZED_RECORDINGS: "/storage/emulated/0/OrganizedMedia/ScreenRecordings"
+  };
+
+  // ─── Storage configuration ---
+
+  const STORAGE = {
     FOLDERS: {
       web: {
         type: "localStorage",
@@ -90,19 +109,23 @@ const ENV = (function () {
     }
   };
 
+  // ─── Shared utilities ───
+
   function resolvePath(path, params = {}) {
     return path.replace(/\{(\w+)\}/g, (_, key) => params[key] ?? _);
   }
 
   function getDefault(key) {
-    const cfg = STORAGE_CONFIG[key];
+    const cfg = STORAGE[key];
     if (!cfg) return null;
     const envCfg = isWeb ? cfg.web : cfg.tasker;
     return JSON.parse(JSON.stringify(envCfg.default));
   }
 
+  // ─── Web environment ────
+
   function WebEnvironment() {
-    const STORAGE_PREFIX = "@screenflow:";
+    const PREFIX = "@screenflow:";
 
     function resolveIconPath(pkg) {
       return `src/assets/icons/${pkg}.png`;
@@ -114,9 +137,9 @@ const ENV = (function () {
 
     function getVariable(name) {
       const key = name.toUpperCase();
-      const cfg = STORAGE_CONFIG[key]?.web;
+      const cfg = STORAGE[key]?.web;
       if (cfg?.type === "localStorage") {
-        const raw = localStorage.getItem(STORAGE_PREFIX + cfg.key);
+        const raw = localStorage.getItem(PREFIX + cfg.key);
         return raw ? JSON.parse(raw) : getDefault(key);
       }
       return null;
@@ -124,10 +147,10 @@ const ENV = (function () {
 
     async function readFile(key, params = {}) {
       try {
-        const cfg = STORAGE_CONFIG[key].web;
+        const cfg = STORAGE[key].web;
 
         if (cfg.type === "localStorage") {
-          const raw = localStorage.getItem(STORAGE_PREFIX + cfg.key);
+          const raw = localStorage.getItem(PREFIX + cfg.key);
           return raw ? JSON.parse(raw) : getDefault(key);
         }
 
@@ -143,12 +166,12 @@ const ENV = (function () {
       }
     }
 
-    function writeFile(key, data) {
+    async function writeFile(key, data) {
       try {
-        const cfg = STORAGE_CONFIG[key].web;
+        const cfg = STORAGE[key].web;
         if (cfg.type === "fetch")
           throw new Error(`Cannot write to ${key} (fetch type)`);
-        localStorage.setItem(STORAGE_PREFIX + cfg.key, JSON.stringify(data));
+        localStorage.setItem(PREFIX + cfg.key, JSON.stringify(data));
         return true;
       } catch (e) {
         Logger.error(`Error saving ${key}:`, e);
@@ -157,41 +180,40 @@ const ENV = (function () {
     }
 
     function runTask(taskName, priority, ...params) {
-      if (taskName === "SO - FILE QUEUE WORKER") {
-        try {
-          const taskerParams = JSON.parse(params[0]);
-          const {
-            id,
-            commandName,
-            action,
-            params: taskParams,
-            type
-          } = taskerParams;
-          const realCommand = commandName || action;
+      if (taskName !== TASKER.TASKS.QUEUE) return;
 
-          (async function processMockTask() {
-            try {
-              const payload = await MockEnv.processTask(
-                realCommand,
-                taskParams,
-                type
-              );
-              App.handleTaskResult(
-                JSON.stringify({ id, status: "success", payload })
-              );
-            } catch (error) {
-              Logger.error(
-                `[WEB ENV] Error processing task "${realCommand}":`,
-                error
-              );
-              App.handleTaskResult(
-                JSON.stringify({ id, status: "error", payload: String(error) })
-              );
-            }
-          })();
-        } catch (e) {
-          Logger.error("[WEB ENV] Failed to parse taskerParams:", e);
-        }
+      try {
+        const {
+          id,
+          commandName,
+          action,
+          params: taskParams,
+          type
+        } = JSON.parse(params[0]);
+        const realCommand = commandName || action;
+
+        (async function processMockTask() {
+          try {
+            const payload = await MockEnv.processTask(
+              realCommand,
+              taskParams,
+              type
+            );
+            App.handleTaskResult(
+              JSON.stringify({ id, status: "success", payload })
+            );
+          } catch (error) {
+            Logger.error(
+              `[WEB ENV] Error processing task "${realCommand}":`,
+              error
+            );
+            App.handleTaskResult(
+              JSON.stringify({ id, status: "error", payload: String(error) })
+            );
+          }
+        })();
+      } catch (e) {
+        Logger.error("[WEB ENV] Failed to parse taskerParams:", e);
       }
     }
 
@@ -214,35 +236,38 @@ const ENV = (function () {
     }
 
     return {
-      WORK_DIR: "",
       isWeb: true,
-      SCENE_NAME,
-      WEBVIEW_NAME,
+      WORK_DIR: "",
+      SCENE_NAME: TASKER.SCENES.MAIN,
+      WEBVIEW_NAME: TASKER.WEBVIEWS.MAIN,
+      TASKER,
+      PATHS,
+      getDefault,
       getSystemLanguage,
       resolveIconPath,
+      getFilePath,
       getVariable,
       readFile,
-      getDefault,
       writeFile,
       runTask,
       isTaskRunning,
       sendNotification,
-      exit,
-      getFilePath,
-      ...PATHS
+      exit
     };
   }
 
+  // ─── Tasker environment ─
+
   function TaskerEnvironment() {
     const WORK_DIR = `${tk.local("%work_dir")}/`;
-    const NOTIFY_TASK_NAME = "SO - NOTIFY";
+    const SCENE_NAME = TASKER.SCENES.MAIN;
 
     function resolveIconPath(pkg) {
       return `content://net.dinglisch.android.taskerm.iconprovider//app/${pkg}`;
     }
 
     function getFilePath(key, params = {}) {
-      const cfg = STORAGE_CONFIG[key].tasker;
+      const cfg = STORAGE[key].tasker;
       const relative = cfg.path ? resolvePath(cfg.path, params) : cfg.path;
       return `${WORK_DIR}${relative}`;
     }
@@ -283,15 +308,14 @@ const ENV = (function () {
         }
       }
       const key = name.toUpperCase();
-      return STORAGE_CONFIG[key] ? getDefault(key) : null;
+      return STORAGE[key] ? getDefault(key) : null;
     }
 
     async function readFile(key, params = {}) {
       try {
-        const filePath = getFilePath(key, params);
         const result = await execute({
           command: "read_file",
-          args: [filePath]
+          args: [getFilePath(key, params)]
         });
         return result ?? getDefault(key);
       } catch (e) {
@@ -344,31 +368,32 @@ const ENV = (function () {
     }
 
     function exit() {
-      tk.destroyScene(this.SCENE_NAME || SCENE_NAME);
+      tk.destroyScene(this.SCENE_NAME);
     }
 
     function sendNotification(title, content) {
-      runTask(NOTIFY_TASK_NAME, 10, title, content);
+      runTask(TASKER.TASKS.NOTIFY, 10, title, content);
     }
 
     return {
-      WORK_DIR,
       isWeb: false,
+      WORK_DIR,
       SCENE_NAME,
-      WEBVIEW_NAME,
+      WEBVIEW_NAME: TASKER.WEBVIEWS.MAIN,
+      TASKER,
+      PATHS,
+      getDefault,
       getSystemLanguage,
       resolveIconPath,
+      getFilePath,
       getVariable,
       readFile,
-      getDefault,
       writeFile,
       execute,
       runTask,
       isTaskRunning,
       sendNotification,
-      getFilePath,
-      exit,
-      ...PATHS
+      exit
     };
   }
 

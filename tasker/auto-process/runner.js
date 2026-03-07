@@ -51,8 +51,8 @@ const Runner = (function () {
   }
 
   function init() {
-    ENV.SCENE_NAME = "SO - AUTO PROCESS";
-    ENV.WEBVIEW_NAME = "AUTO PROCESS";
+    ENV.SCENE_NAME = ENV.TASKER.SCENES.AUTO_PROCESS;
+    ENV.WEBVIEW_NAME = ENV.TASKER.WEBVIEWS.AUTO_PROCESS;
 
     window.App = {
       handleTaskResult: json => TaskQueue.onResult(json)

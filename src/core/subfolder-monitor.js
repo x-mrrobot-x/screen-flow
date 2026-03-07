@@ -193,8 +193,8 @@ const SubfolderMonitor = (function () {
   async function loadFoldersData() {
     try {
       const [ssOnDisk, srOnDisk] = await Promise.all([
-        processFolderType("screenshots", ENV.ORGANIZED_SCREENSHOTS_PATH),
-        processFolderType("screenrecordings", ENV.ORGANIZED_RECORDINGS_PATH)
+        processFolderType("screenshots", ENV.PATHS.ORGANIZED_SCREENSHOTS),
+        processFolderType("screenrecordings", ENV.PATHS.ORGANIZED_RECORDINGS)
       ]);
 
       const foldersInState = AppState.getFolders();

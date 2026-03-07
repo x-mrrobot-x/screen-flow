@@ -11,7 +11,7 @@ const ProcessConfig = {
           labelKey: "process.step_scan_screenshots",
           type: "shell",
           func: "scan_media_app_packages",
-          params: () => ["jpg", ENV.SOURCE_SCREENSHOTS_PATH]
+          params: () => ["jpg", ENV.PATHS.SOURCE_SCREENSHOTS]
         },
         {
           id: "resolve_app_names",
@@ -27,7 +27,7 @@ const ProcessConfig = {
           func: "create_app_media_folders",
           params: ctx => [
             JSON.stringify([...new Set(Object.values(ctx.resolve_app_names))]),
-            ENV.ORGANIZED_SCREENSHOTS_PATH
+            ENV.PATHS.ORGANIZED_SCREENSHOTS
           ]
         },
         {
@@ -37,8 +37,8 @@ const ProcessConfig = {
           func: "prepareMediaOrganization",
           params: ctx => [
             ctx.resolve_app_names,
-            ENV.SOURCE_SCREENSHOTS_PATH,
-            ENV.ORGANIZED_SCREENSHOTS_PATH,
+            ENV.PATHS.SOURCE_SCREENSHOTS,
+            ENV.PATHS.ORGANIZED_SCREENSHOTS,
             "jpg"
           ]
         },
@@ -80,7 +80,7 @@ const ProcessConfig = {
           labelKey: "process.step_scan_recordings",
           type: "shell",
           func: "scan_media_app_packages",
-          params: () => ["mp4", ENV.SOURCE_RECORDINGS_PATH]
+          params: () => ["mp4", ENV.PATHS.SOURCE_RECORDINGS]
         },
         {
           id: "resolve_app_names",
@@ -96,7 +96,7 @@ const ProcessConfig = {
           func: "create_app_media_folders",
           params: ctx => [
             JSON.stringify(Object.values(ctx.resolve_app_names)),
-            ENV.ORGANIZED_RECORDINGS_PATH
+            ENV.PATHS.ORGANIZED_RECORDINGS
           ]
         },
         {
@@ -106,8 +106,8 @@ const ProcessConfig = {
           func: "prepareMediaOrganization",
           params: ctx => [
             ctx.resolve_app_names,
-            ENV.SOURCE_RECORDINGS_PATH,
-            ENV.ORGANIZED_RECORDINGS_PATH,
+            ENV.PATHS.SOURCE_RECORDINGS,
+            ENV.PATHS.ORGANIZED_RECORDINGS,
             "mp4"
           ]
         },
@@ -158,8 +158,8 @@ const ProcessConfig = {
           func: "findAllExpiredMedia",
           params: ctx => [
             ctx.load_cleanup_rules,
-            ENV.ORGANIZED_SCREENSHOTS_PATH,
-            ENV.ORGANIZED_RECORDINGS_PATH
+            ENV.PATHS.ORGANIZED_SCREENSHOTS,
+            ENV.PATHS.ORGANIZED_RECORDINGS
           ]
         },
         {

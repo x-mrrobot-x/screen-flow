@@ -65,12 +65,12 @@ const OrganizerModel = (function () {
 
       if ((type === "ss" || type === "both") && folder.ss) {
         clearPromises.push(
-          clearMedia(folder, "ss", ENV.ORGANIZED_SCREENSHOTS_PATH)
+          clearMedia(folder, "ss", ENV.PATHS.ORGANIZED_SCREENSHOTS)
         );
       }
       if ((type === "sr" || type === "both") && folder.sr) {
         clearPromises.push(
-          clearMedia(folder, "sr", ENV.ORGANIZED_RECORDINGS_PATH)
+          clearMedia(folder, "sr", ENV.PATHS.ORGANIZED_RECORDINGS)
         );
       }
 

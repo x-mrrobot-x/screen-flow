@@ -1,9 +1,7 @@
 const TaskQueue = (function () {
   "use strict";
 
-  const WORKER_TASK_NAME = "SO - FILE QUEUE WORKER";
   const WORKER_TASK_PRIORITY = 9;
-  const STOPPER_TASK_NAME = "SO - STOP WORKER TASK";
   const STOPPER_TASK_PRIORITY = 10;
   const TASK_CHECK_INTERVAL = 2000;
   const MAX_CHECKS = 180;
@@ -49,7 +47,7 @@ const TaskQueue = (function () {
         return;
       }
 
-      if (!ENV.isTaskRunning(WORKER_TASK_NAME)) {
+      if (!ENV.isTaskRunning(ENV.TASKER.TASKS.QUEUE)) {
         clearInterval(interval);
         resolveTask(task.id, "error", "Worker task disappeared.");
       } else if (checks >= MAX_CHECKS) {
@@ -84,7 +82,7 @@ const TaskQueue = (function () {
 
       const taskerParams = buildTaskerParams(task);
       ENV.runTask(
-        WORKER_TASK_NAME,
+        ENV.TASKER.TASKS.QUEUE,
         WORKER_TASK_PRIORITY,
         JSON.stringify(taskerParams)
       );
@@ -132,7 +130,11 @@ const TaskQueue = (function () {
 
     const runningIds = Object.keys(pending);
     if (runningIds.length === 0) return;
-    ENV.runTask(STOPPER_TASK_NAME, STOPPER_TASK_PRIORITY, WORKER_TASK_NAME);
+    ENV.runTask(
+      ENV.TASKER.TASKS.STOP_QUEUE,
+      STOPPER_TASK_PRIORITY,
+      ENV.TASKER.TASKS.QUEUE
+    );
 
     for (const id of runningIds) {
       const task = pending[id];

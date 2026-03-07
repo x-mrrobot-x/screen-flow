@@ -4,11 +4,11 @@ const AppMonitor = (() => {
   const MEDIA_TYPES = {
     SCREENSHOTS: {
       name: "screenshots",
-      path: ENV.ORGANIZED_SCREENSHOTS_PATH
+      path: ENV.PATHS.ORGANIZED_SCREENSHOTS
     },
     RECORDINGS: {
       name: "screen recordings",
-      path: ENV.ORGANIZED_RECORDINGS_PATH
+      path: ENV.PATHS.ORGANIZED_RECORDINGS
     }
   };
 
@@ -152,10 +152,10 @@ const AppMonitor = (() => {
     const [screenshotFolders, recordingFolders] = await Promise.allSettled([
       TaskQueue.add(
         "get_subfolders",
-        [ENV.ORGANIZED_SCREENSHOTS_PATH],
+        [ENV.PATHS.ORGANIZED_SCREENSHOTS],
         "shell"
       ),
-      TaskQueue.add("get_subfolders", [ENV.ORGANIZED_RECORDINGS_PATH], "shell")
+      TaskQueue.add("get_subfolders", [ENV.PATHS.ORGANIZED_RECORDINGS], "shell")
     ]);
 
     return {

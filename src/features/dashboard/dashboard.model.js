@@ -20,12 +20,12 @@ const DashboardModel = (function () {
       const [screenshotsResult, recordingsResult] = await Promise.all([
         TaskQueue.add(
           "count_media_items",
-          ["jpg", ENV.SOURCE_SCREENSHOTS_PATH],
+          ["jpg", ENV.PATHS.SOURCE_SCREENSHOTS],
           "shell"
         ),
         TaskQueue.add(
           "count_media_items",
-          ["mp4", ENV.SOURCE_RECORDINGS_PATH],
+          ["mp4", ENV.PATHS.SOURCE_RECORDINGS],
           "shell"
         )
       ]);
@@ -46,12 +46,12 @@ const DashboardModel = (function () {
         [
           TaskQueue.add(
             "count_subfolders",
-            [ENV.ORGANIZED_SCREENSHOTS_PATH],
+            [ENV.PATHS.ORGANIZED_SCREENSHOTS],
             "shell"
           ),
           TaskQueue.add(
             "count_subfolders",
-            [ENV.ORGANIZED_RECORDINGS_PATH],
+            [ENV.PATHS.ORGANIZED_RECORDINGS],
             "shell"
           )
         ]
