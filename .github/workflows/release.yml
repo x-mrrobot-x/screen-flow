@@ -1,0 +1,94 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      PROJECT_NAME: "Screen Flow"
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate Changelog
+        run: |
+          improve_commit_messages() {
+            local messages="$1"
+            
+            if [ -n "$GEMINI_API_KEY" ] && [ -n "$messages" ]; then
+              response=$(curl -s -X POST \
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}" \
+                -H "Content-Type: application/json" \
+                -d "{
+                  \"contents\": [{
+                    \"parts\": [{
+                      \"text\": \"Transform these commit messages into a changelog. Convert to past tense, make them user-friendly, concise and clear. Return only the improved messages, one per line, in the same order, with each message starting with '- ':\\n\\n${messages}\"
+                    }]
+                  }]
+                }")
+              
+              improved=$(echo "$response" | grep -o '"text"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/"text"[[:space:]]*:[[:space:]]*"//g' | sed 's/"$//g' | head -1)
+              
+              if [ -n "$improved" ] && [ "$improved" != "null" ]; then
+                echo "$improved"
+              else
+                echo "$messages" | sed 's/^/- /'
+              fi
+            else
+              echo "$messages" | sed 's/^/- /'
+            fi
+          }
+
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "")
+          if [ -n "$PREVIOUS_TAG" ]; then
+            COMMITS=$(git log --pretty=format:"%s" $PREVIOUS_TAG..HEAD)
+          else
+            COMMITS=$(git log --pretty=format:"%s")
+          fi
+
+          ALL_MSGS=$(echo "$COMMITS" | sed 's/^[^:]*: //' | sed '/^$/d')
+
+          CHANGELOG_CONTENT=""
+
+          if [ -n "$ALL_MSGS" ]; then
+            improved_messages=$(improve_commit_messages "$(echo -e "$ALL_MSGS" | sed '/^$/d')")
+            CHANGELOG_CONTENT="$improved_messages"
+          fi
+
+          cp .github/templates/release-notes.md release_notes.md
+
+          if [ -n "$CHANGELOG_CONTENT" ]; then
+            echo -e "$CHANGELOG_CONTENT" > temp_changelog.txt
+            sed -i '/{{CHANGELOG_CONTENT}}/r temp_changelog.txt' release_notes.md
+            sed -i '/{{CHANGELOG_CONTENT}}/d' release_notes.md
+            rm temp_changelog.txt
+          else
+            sed -i 's/{{CHANGELOG_CONTENT}}/- No significant changes in this release/g' release_notes.md
+          fi
+
+      - name: Create Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create ${{ github.ref_name }} \
+            --title "🚀 ${PROJECT_NAME} ${{ github.ref_name }}" \
+            --notes-file release_notes.md
+
+          xml_file=$(find . -name "*.xml" -type f | head -1)
+
+          if [ -n "$xml_file" ]; then
+            gh release upload "v1.0.1" "$xml_file" --clobber
+          else
+            echo "No XML file found, skipping upload"
+          fi
