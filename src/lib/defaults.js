@@ -31,3 +31,8 @@ const DEFAULT_SETTINGS = {
   scheduleTime: null,
   language: null
 };
+
+export default {
+  DEFAULT_STATS,
+  DEFAULT_SETTINGS
+};

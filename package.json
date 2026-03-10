@@ -1,0 +1,18 @@
+{
+  "name": "screenflow",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build:main": "vite build --mode main",
+    "build:tasker": "vite build --mode tasker",
+    "build:all": "npm run build:main && npm run build:tasker",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "eruda": "^3.4.3",
+    "vite": "^7.3.1",
+    "vite-plugin-singlefile": "^2.3.0",
+    "vite-plugin-static-copy": "^3.2.0"
+  }
+}

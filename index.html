@@ -15,36 +15,20 @@
       rel="stylesheet"
     />
 
-    <!-- Styles -->
-    <link rel="stylesheet" href="src/assets/styles/base/reset.css" />
-    <link rel="stylesheet" href="src/assets/styles/base/variables.css" />
-    <link rel="stylesheet" href="src/assets/styles/base/typography.css" />
-    <link rel="stylesheet" href="src/assets/styles/base/globals.css" />
-    <link rel="stylesheet" href="src/assets/styles/base/info-card.css" />
-    <link rel="stylesheet" href="src/assets/styles/base/buttons.css" />
-    <link rel="stylesheet" href="src/assets/styles/base/dialog.css" />
-    <link rel="stylesheet" href="src/assets/styles/base/toast.css" />
-    <link rel="stylesheet" href="src/assets/styles/animations.css" />
-    <link rel="stylesheet" href="src/assets/styles/navigation.css" />
+    <!-- Base styles -->
+    <link rel="stylesheet" href="/src/assets/styles/base/reset.css" />
+    <link rel="stylesheet" href="/src/assets/styles/base/variables.css" />
+    <link rel="stylesheet" href="/src/assets/styles/base/typography.css" />
+    <link rel="stylesheet" href="/src/assets/styles/base/globals.css" />
 
-    <!-- Feature CSS -->
-    <link rel="stylesheet" href="src/features/dashboard/dashboard.css" />
-    <link rel="stylesheet" href="src/features/dashboard/process/process.css" />
-    <link rel="stylesheet" href="src/features/stats/stats.css" />
-    <link rel="stylesheet" href="src/features/cleaner/cleaner.css" />
-    <link rel="stylesheet" href="src/features/organizer/organizer.css" />
-    <link rel="stylesheet" href="src/features/settings/settings.css" />
-
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-    <script>
-      eruda.init();
-    </script>
+    <script type="module" src="/src/main.js" defer></script>
   </head>
   <body>
     <div id="app">
       <main class="app-main">
-        <!-- PAINEL PRINCIPAL -->
+        <!-- MAIN DASHBOARD -->
         <article
           id="tab-dashboard"
           class="tab-content active page-container animate-fade-in"
@@ -430,7 +414,7 @@
           </section>
         </article>
 
-        <!-- ORGANIZAÇÃO -->
+        <!-- ORGANIZER -->
         <article
           id="tab-organizer"
           class="tab-content page-container page-enter animate-fade-in"
@@ -548,7 +532,7 @@
           ></section>
         </article>
 
-        <!-- LIMPEZA -->
+        <!-- CLEANER -->
         <article
           id="tab-cleaner"
           class="tab-content page-container page-enter animate-fade-in"
@@ -611,7 +595,7 @@
           ></section>
         </article>
 
-        <!-- ESTATÍSTICAS -->
+        <!-- STATS -->
         <article
           id="tab-stats"
           class="tab-content page-container page-enter animate-fade-in"
@@ -708,7 +692,7 @@
           </section>
         </article>
 
-        <!-- CONFIGURAÇÕES -->
+        <!-- SETTINGS -->
         <article
           id="tab-settings"
           class="tab-content page-container page-enter animate-fade-in"
@@ -1121,7 +1105,7 @@
         </article>
       </main>
 
-      <!-- NAVEGAÇÃO INFERIOR -->
+      <!-- BOTTOM NAVIGATION -->
       <footer class="app-footer">
         <nav
           class="nav-container animate-fade-in-up"
@@ -1263,55 +1247,5 @@
         </button>
       </footer>
     </dialog>
-
-    <!-- 1. Utilitários -->
-    <script src="src/lib/defaults.js"></script>
-    <script src="src/lib/utils.js"></script>
-    <script src="src/lib/dom.js"></script>
-    <script src="src/lib/activity-helper.js"></script>
-    <script src="src/lib/toast.js"></script>
-    <script src="src/lib/confirmation-dialog.js"></script>
-    <script src="src/lib/icons-library.js"></script>
-    <script src="src/core/logger.js"></script>
-    <script src="src/data/mock-env.js"></script>
-
-    <!-- 2. Core -->
-    <script src="src/core/dialog-stack.js"></script>
-    <script src="src/core/scroll.js"></script>
-    <script src="src/core/icons.js"></script>
-    <script src="src/core/env.js"></script>
-    <script src="src/core/event-bus.js"></script>
-    <script src="src/core/task-queue.js"></script>
-    <script src="src/core/app-state.js"></script>
-    <script src="src/core/i18n.js"></script>
-    <script src="src/core/app-monitor.js"></script>
-    <script src="src/core/navigation.js"></script>
-    <script src="src/core/subfolder-monitor.js"></script>
-    <script src="src/core/pagination.js"></script>
-
-    <!-- 3. Features -->
-    <script src="src/features/dashboard/dashboard.model.js"></script>
-    <script src="src/features/dashboard/dashboard.view.js"></script>
-    <script src="src/features/dashboard/dashboard.controller.js"></script>
-    <script src="src/features/dashboard/process/process.config.js"></script>
-    <script src="src/features/dashboard/process/process.model.js"></script>
-    <script src="src/core/process-engine.js"></script>
-    <script src="src/features/dashboard/process/process.view.js"></script>
-    <script src="src/features/dashboard/process/process.controller.js"></script>
-    <script src="src/features/stats/stats.model.js"></script>
-    <script src="src/features/stats/stats.view.js"></script>
-    <script src="src/features/stats/stats.controller.js"></script>
-    <script src="src/features/cleaner/cleaner.model.js"></script>
-    <script src="src/features/cleaner/cleaner.view.js"></script>
-    <script src="src/features/cleaner/cleaner.controller.js"></script>
-    <script src="src/features/organizer/organizer.model.js"></script>
-    <script src="src/features/organizer/organizer.view.js"></script>
-    <script src="src/features/organizer/organizer.controller.js"></script>
-    <script src="src/features/settings/settings.model.js"></script>
-    <script src="src/features/settings/settings.view.js"></script>
-    <script src="src/features/settings/settings.controller.js"></script>
-
-    <!-- 4. App -->
-    <script src="src/app.js"></script>
   </body>
 </html>

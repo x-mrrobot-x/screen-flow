@@ -1,3 +1,5 @@
 src/data/*.json
 
+dist/src/data/*.json
+
 screenflow-*

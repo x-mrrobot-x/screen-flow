@@ -1,35 +1,36 @@
-const DOM = (function () {
-  "use strict";
+function qs(selector, parent = document) {
+  return parent.querySelector(selector);
+}
 
-  function qs(selector, parent = document) {
-    return parent.querySelector(selector);
-  }
+function qsa(selector, parent = document) {
+  return Array.from(parent.querySelectorAll(selector));
+}
 
-  function qsa(selector, parent = document) {
-    return Array.from(parent.querySelectorAll(selector));
-  }
-
-  function create(tag, attrs = {}) {
-    const el = document.createElement(tag);
-    for (const [key, value] of Object.entries(attrs)) {
-      if (key === "className") {
-        el.className = value;
-      } else if (key === "dataset") {
-        Object.assign(el.dataset, value);
-      } else if (key === "textContent" || key === "innerHTML") {
-        el[key] = value;
-      } else {
-        el.setAttribute(key, value);
-      }
+function create(tag, attrs = {}) {
+  const el = document.createElement(tag);
+  for (const [key, value] of Object.entries(attrs)) {
+    if (key === "className") {
+      el.className = value;
+    } else if (key === "dataset") {
+      Object.assign(el.dataset, value);
+    } else if (key === "textContent" || key === "innerHTML") {
+      el[key] = value;
+    } else {
+      el.setAttribute(key, value);
     }
-    return el;
   }
+  return el;
+}
 
-  function delegate(parent, selector, event, handler) {
-    parent.addEventListener(event, (e) => {
-      if (e.target.closest(selector)) handler(e);
-    });
-  }
+function delegate(parent, selector, event, handler) {
+  parent.addEventListener(event, e => {
+    if (e.target.closest(selector)) handler(e);
+  });
+}
 
-  return { qs, qsa, create, delegate };
-})();
+export default {
+  qs,
+  qsa,
+  create,
+  delegate
+};

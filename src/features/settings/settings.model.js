@@ -1,36 +1,34 @@
-const SettingsModel = (function () {
-  "use strict";
+import AppState from "../../core/state/app-state.js";
 
-  function getSettings() {
-    return AppState.getSettings();
-  }
+function getSettings() {
+  return AppState.getSettings();
+}
 
-  function getSetting(key) {
-    return AppState.getSetting(key);
-  }
+function getSetting(key) {
+  return AppState.getSetting(key);
+}
 
-  function setSetting(key, value) {
-    AppState.setSetting(key, value);
-  }
+function setSetting(key, value) {
+  AppState.setSetting(key, value);
+}
 
-  function toggleSetting(key) {
-    return AppState.toggleSetting(key);
-  }
+function toggleSetting(key) {
+  return AppState.toggleSetting(key);
+}
 
-  function resetAllSettings() {
-    AppState.resetConfig();
-  }
+function resetAllSettings() {
+  AppState.resetConfig();
+}
 
-  function deleteAllData() {
-    return AppState.deleteAll();
-  }
+function deleteAllData() {
+  return AppState.deleteAll();
+}
 
-  return {
-    getSettings,
-    getSetting,
-    setSetting,
-    toggleSetting,
-    resetAllSettings,
-    deleteAllData
-  };
-})();
+export default {
+  getSettings,
+  getSetting,
+  setSetting,
+  toggleSetting,
+  resetAllSettings,
+  deleteAllData
+};

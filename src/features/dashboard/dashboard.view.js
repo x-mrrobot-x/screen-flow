@@ -1,184 +1,174 @@
-const DashboardView = (function () {
-  "use strict";
+import DOM from "../../lib/dom.js";
+import Icons from "../../core/ui/icons.js";
+import I18n from "../../core/services/i18n.js";
+import ENV from "../../core/platform/env.js";
+import Utils from "../../lib/utils.js";
 
-  let elements = null;
+let elements = null;
 
-  function queryElements() {
-    elements = {
-      tabContent: DOM.qs("#tab-dashboard"),
-      summary: {
-        organized: DOM.qs("#dashboard-summary-organized-files"),
-        removed: DOM.qs("#dashboard-summary-removed-files")
-      },
-      toOrganize: {
-        screenshots: DOM.qs("#to-organize-screenshots"),
-        recordings: DOM.qs("#to-organize-recordings")
-      },
-      foldersCreated: {
-        screenshots: DOM.qs("#folders-created-screenshots"),
-        recordings: DOM.qs("#folders-created-recordings")
-      },
-      lastOrg: {
-        screenshots: DOM.qs("#last-organization-screenshots"),
-        recordings: DOM.qs("#last-organization-recordings")
-      },
-      lastClean: {
-        screenshots: DOM.qs("#last-cleanup-screenshots"),
-        recordings: DOM.qs("#last-cleanup-recordings")
-      },
-      topApp: {
-        icon: DOM.qs("#top-app-icon"),
-        name: DOM.qs("#top-app-name"),
-        count: DOM.qs("#top-app-count")
-      },
-      automations: {
-        section: DOM.qs("#automations"),
-        organizerStatus: DOM.qs("#automation-organizer-status"),
-        organizerBadge: DOM.qs("#automation-organizer-badge"),
-        cleanerStatus: DOM.qs("#automation-cleaner-status"),
-        cleanerBadge: DOM.qs("#automation-cleaner-badge")
-      }
-    };
-  }
+function queryElements() {
+  elements = {
+    tabContent: DOM.qs("#tab-dashboard"),
+    summary: {
+      organized: DOM.qs("#dashboard-summary-organized-files"),
+      removed: DOM.qs("#dashboard-summary-removed-files")
+    },
+    toOrganize: {
+      screenshots: DOM.qs("#to-organize-screenshots"),
+      recordings: DOM.qs("#to-organize-recordings")
+    },
+    foldersCreated: {
+      screenshots: DOM.qs("#folders-created-screenshots"),
+      recordings: DOM.qs("#folders-created-recordings")
+    },
+    lastOrg: {
+      screenshots: DOM.qs("#last-organization-screenshots"),
+      recordings: DOM.qs("#last-organization-recordings")
+    },
+    lastClean: {
+      screenshots: DOM.qs("#last-cleanup-screenshots"),
+      recordings: DOM.qs("#last-cleanup-recordings")
+    },
+    topApp: {
+      icon: DOM.qs("#top-app-icon"),
+      name: DOM.qs("#top-app-name"),
+      count: DOM.qs("#top-app-count")
+    },
+    automations: {
+      section: DOM.qs("#automations"),
+      organizerStatus: DOM.qs("#automation-organizer-status"),
+      organizerBadge: DOM.qs("#automation-organizer-badge"),
+      cleanerStatus: DOM.qs("#automation-cleaner-status"),
+      cleanerBadge: DOM.qs("#automation-cleaner-badge")
+    }
+  };
+}
 
-  function getElements() {
-    return elements;
-  }
+function getElements() {
+  return elements;
+}
 
-  function animateValue(element, newValue) {
-    if (!element) return;
-    const newText = String(newValue);
-    if (element.textContent === newText) return;
+function animateValue(element, newValue) {
+  if (!element) return;
+  const newText = String(newValue);
+  if (element.textContent === newText) return;
+  element.textContent = newText;
 
-    element.textContent = newText;
-
-    const pulse = () => {
+  const pulse = () => {
+    element.classList.remove("animate-pulse-highlight");
+    void element.offsetWidth;
+    element.classList.add("animate-pulse-highlight");
+    element.addEventListener("animationend", function onEnd() {
       element.classList.remove("animate-pulse-highlight");
-      void element.offsetWidth;
-      element.classList.add("animate-pulse-highlight");
-      element.addEventListener("animationend", function onEnd() {
-        element.classList.remove("animate-pulse-highlight");
-        element.removeEventListener("animationend", onEnd);
-      });
+      element.removeEventListener("animationend", onEnd);
+    });
+  };
+
+  const entranceParent = element.closest(
+    ".animate-fade-in-up, .animate-fade-in, .animate-scale-in"
+  );
+  if (entranceParent?.getAnimations) {
+    const animations = entranceParent.getAnimations();
+    if (animations.length > 0) {
+      Promise.all(animations.map(a => a.finished)).then(pulse);
+      return;
+    }
+  }
+  pulse();
+}
+
+const update = {
+  summary: (organizedFiles, removedFiles) => {
+    animateValue(elements.summary.organized, organizedFiles.toLocaleString());
+    animateValue(elements.summary.removed, removedFiles.toLocaleString());
+  },
+  toOrganize: (screenshots, recordings) => {
+    animateValue(elements.toOrganize.screenshots, screenshots ?? 0);
+    animateValue(elements.toOrganize.recordings, recordings ?? 0);
+  },
+  foldersCreated: (screenshots, recordings) => {
+    animateValue(elements.foldersCreated.screenshots, screenshots ?? 0);
+    animateValue(elements.foldersCreated.recordings, recordings ?? 0);
+  },
+  lastOrganization: (screenshots, recordings) => {
+    animateValue(elements.lastOrg.screenshots, screenshots);
+    animateValue(elements.lastOrg.recordings, recordings);
+  },
+  lastClean: (screenshots, recordings) => {
+    animateValue(elements.lastClean.screenshots, screenshots);
+    animateValue(elements.lastClean.recordings, recordings);
+  },
+  mostCapturedApp: app => {
+    if (elements.topApp.name.textContent !== app.name)
+      elements.topApp.name.textContent = app.name;
+    animateValue(elements.topApp.count, app.count.toLocaleString());
+    const newIconSrc = ENV.resolveIconPath(app.pkg);
+    if (elements.topApp.icon.getAttribute("src") !== newIconSrc)
+      elements.topApp.icon.src = newIconSrc;
+  },
+  automations: (autoOrganizer, autoCleaner) => {
+    const { automations } = elements;
+    const setAutomation = (
+      statusEl,
+      badgeEl,
+      active,
+      activeText,
+      inactiveText
+    ) => {
+      statusEl.textContent = active ? activeText : inactiveText;
+      badgeEl.textContent = active
+        ? I18n.t("dashboard.status_active")
+        : I18n.t("dashboard.status_inactive");
+      badgeEl
+        .closest(".dashboard-automation-card")
+        ?.classList.toggle("active", active);
     };
-
-    const entranceParent = element.closest(
-      ".animate-fade-in-up, .animate-fade-in, .animate-scale-in"
+    setAutomation(
+      automations.organizerStatus,
+      automations.organizerBadge,
+      autoOrganizer,
+      I18n.t("dashboard.organizer_desc_on"),
+      I18n.t("dashboard.organizer_desc_off")
     );
-    if (entranceParent?.getAnimations) {
-      const animations = entranceParent.getAnimations();
-      if (animations.length > 0) {
-        Promise.all(animations.map(a => a.finished)).then(pulse);
-        return;
-      }
-    }
-    pulse();
+    setAutomation(
+      automations.cleanerStatus,
+      automations.cleanerBadge,
+      autoCleaner,
+      I18n.t("dashboard.cleaner_desc_on"),
+      I18n.t("dashboard.cleaner_desc_off")
+    );
+  },
+  all: data => {
+    if (!data) return;
+    update.summary(data.organizedFiles, data.removedFiles);
+    update.toOrganize(
+      data.toOrganize?.screenshots,
+      data.toOrganize?.recordings
+    );
+    update.foldersCreated(
+      data.foldersCreated?.screenshots,
+      data.foldersCreated?.recordings
+    );
+    update.lastOrganization(
+      data.lastOrganization.screenshots,
+      data.lastOrganization.recordings
+    );
+    update.lastClean(data.lastClean.screenshots, data.lastClean.recordings);
+    update.mostCapturedApp(data.mostCapturedApp);
+    if (data.settings)
+      update.automations(
+        data.settings.autoOrganizer,
+        data.settings.autoCleaner
+      );
   }
+};
 
-  const update = {
-    summary: (organizedFiles, removedFiles) => {
-      animateValue(elements.summary.organized, organizedFiles.toLocaleString());
-      animateValue(elements.summary.removed, removedFiles.toLocaleString());
-    },
+function init() {
+  queryElements();
+}
 
-    toOrganize: (screenshots, recordings) => {
-      animateValue(elements.toOrganize.screenshots, screenshots ?? 0);
-      animateValue(elements.toOrganize.recordings, recordings ?? 0);
-    },
-
-    foldersCreated: (screenshots, recordings) => {
-      animateValue(elements.foldersCreated.screenshots, screenshots ?? 0);
-      animateValue(elements.foldersCreated.recordings, recordings ?? 0);
-    },
-
-    lastOrganization: (screenshots, recordings) => {
-      animateValue(elements.lastOrg.screenshots, screenshots);
-      animateValue(elements.lastOrg.recordings, recordings);
-    },
-
-    lastClean: (screenshots, recordings) => {
-      animateValue(elements.lastClean.screenshots, screenshots);
-      animateValue(elements.lastClean.recordings, recordings);
-    },
-
-    mostCapturedApp: app => {
-      if (elements.topApp.name.textContent !== app.name) {
-        elements.topApp.name.textContent = app.name;
-      }
-      animateValue(elements.topApp.count, app.count.toLocaleString());
-
-      const newIconSrc = ENV.resolveIconPath(app.pkg);
-      if (elements.topApp.icon.getAttribute("src") !== newIconSrc) {
-        elements.topApp.icon.src = newIconSrc;
-      }
-    },
-
-    automations: (autoOrganizer, autoCleaner) => {
-      const { automations } = elements;
-
-      const setAutomation = (
-        statusEl,
-        badgeEl,
-        active,
-        activeText,
-        inactiveText
-      ) => {
-        statusEl.textContent = active ? activeText : inactiveText;
-        badgeEl.textContent = active ? I18n.t("dashboard.status_active") : I18n.t("dashboard.status_inactive");
-        badgeEl
-          .closest(".dashboard-automation-card")
-          ?.classList.toggle("active", active);
-      };
-
-      setAutomation(
-        automations.organizerStatus,
-        automations.organizerBadge,
-        autoOrganizer,
-        I18n.t("dashboard.organizer_desc_on"),
-        I18n.t("dashboard.organizer_desc_off")
-      );
-      setAutomation(
-        automations.cleanerStatus,
-        automations.cleanerBadge,
-        autoCleaner,
-        I18n.t("dashboard.cleaner_desc_on"),
-        I18n.t("dashboard.cleaner_desc_off")
-      );
-    },
-
-    all: data => {
-      if (!data) return;
-      update.summary(data.organizedFiles, data.removedFiles);
-      update.toOrganize(
-        data.toOrganize?.screenshots,
-        data.toOrganize?.recordings
-      );
-      update.foldersCreated(
-        data.foldersCreated?.screenshots,
-        data.foldersCreated?.recordings
-      );
-      update.lastOrganization(
-        data.lastOrganization.screenshots,
-        data.lastOrganization.recordings
-      );
-      update.lastClean(data.lastClean.screenshots, data.lastClean.recordings);
-      update.mostCapturedApp(data.mostCapturedApp);
-      if (data.settings) {
-        update.automations(
-          data.settings.autoOrganizer,
-          data.settings.autoCleaner
-        );
-      }
-    }
-  };
-
-  function init() {
-    queryElements();
-  }
-
-  return {
-    init,
-    getElements,
-    update
-  };
-})();
+export default {
+  init,
+  getElements,
+  update
+};

@@ -1,77 +1,69 @@
-const CleanerModel = (function () {
-  "use strict";
+import AppState from "../../core/state/app-state.js";
 
-  function updateFolderState(folderId, mediaType, updateFn) {
-    const folders = AppState.getFolders();
-    const updatedFolders = folders.map(folder => {
-      if (folder.id === folderId) {
-        const newState = { ...folder };
-        updateFn(newState);
-        return newState;
-      }
-      return folder;
-    });
-    AppState.setFolders(updatedFolders);
-    return updatedFolders;
-  }
+function updateFolderState(folderId, mediaType, updateFn) {
+  const folders = AppState.getFolders();
+  const updatedFolders = folders.map(folder => {
+    if (folder.id === folderId) {
+      const newState = { ...folder };
+      updateFn(newState);
+      return newState;
+    }
+    return folder;
+  });
+  AppState.setFolders(updatedFolders);
+  return updatedFolders;
+}
 
-  function toggleFolderClean(folderId, mediaType) {
-    const updatedFolders = updateFolderState(folderId, mediaType, folder => {
-      const key = mediaType === "screenshots" ? "ss" : "sr";
-      if (folder[key]?.cleaner) {
-        folder[key].cleaner.on = !folder[key].cleaner.on;
-      }
-    });
+function toggleFolderClean(folderId, mediaType) {
+  const updatedFolders = updateFolderState(folderId, mediaType, folder => {
+    const key = mediaType === "screenshots" ? "ss" : "sr";
+    if (folder[key]?.cleaner) folder[key].cleaner.on = !folder[key].cleaner.on;
+  });
 
-    const folder = updatedFolders.find(f => f.id === folderId);
-    if (folder) {
-      const actionType =
-        mediaType === "screenshots" ? "screenshots" : "recordings";
-      const key = mediaType === "screenshots" ? "ss" : "sr";
-
-      if (folder[key]?.cleaner) {
-        AppState.addActivity({
-          type: "cleaner-folder-toggle",
-          feature: `cleaner-folder-${actionType}`,
-          folder: folder.name,
-          enabled: folder[key].cleaner.on
-        });
-      }
+  const folder = updatedFolders.find(f => f.id === folderId);
+  if (folder) {
+    const actionType =
+      mediaType === "screenshots" ? "screenshots" : "recordings";
+    const key = mediaType === "screenshots" ? "ss" : "sr";
+    if (folder[key]?.cleaner) {
+      AppState.addActivity({
+        type: "cleaner-folder-toggle",
+        feature: `cleaner-folder-${actionType}`,
+        folder: folder.name,
+        enabled: folder[key].cleaner.on
+      });
     }
   }
+}
 
-  function setFolderDays(folderId, mediaType, days) {
-    updateFolderState(folderId, mediaType, folder => {
-      const key = mediaType === "screenshots" ? "ss" : "sr";
-      if (folder[key]?.cleaner) {
-        folder[key].cleaner.days = days;
-      }
-    });
-  }
+function setFolderDays(folderId, mediaType, days) {
+  updateFolderState(folderId, mediaType, folder => {
+    const key = mediaType === "screenshots" ? "ss" : "sr";
+    if (folder[key]?.cleaner) folder[key].cleaner.days = days;
+  });
+}
 
-  function toggleAutoCleaner() {
-    const newValue = AppState.toggleSetting("autoCleaner");
-    AppState.addActivity({
-      type: "feature-toggle",
-      feature: "auto-cleaner",
-      enabled: newValue
-    });
-    return newValue;
-  }
+function toggleAutoCleaner() {
+  const newValue = AppState.toggleSetting("autoCleaner");
+  AppState.addActivity({
+    type: "feature-toggle",
+    feature: "auto-cleaner",
+    enabled: newValue
+  });
+  return newValue;
+}
 
-  function getFolders() {
-    return AppState.getFolders();
-  }
+function getFolders() {
+  return AppState.getFolders();
+}
+function getAutoCleanerSetting() {
+  return AppState.getSetting("autoCleaner");
+}
 
-  function getAutoCleanerSetting() {
-    return AppState.getSetting("autoCleaner");
-  }
-
-  return {
-    toggleFolderClean,
-    setFolderDays,
-    toggleAutoCleaner,
-    getFolders,
-    getAutoCleanerSetting
-  };
-})();
+export default {
+  toggleFolderClean,
+  setFolderDays,
+  toggleAutoCleaner,
+  getFolders,
+  getAutoCleanerSetting
+};
