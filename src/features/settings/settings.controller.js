@@ -6,6 +6,7 @@ import Toast from "../../core/ui/toast.js";
 import ConfirmationDialog from "../../core/ui/confirmation-dialog.js";
 import Logger from "../../core/platform/logger.js";
 import ENV from "../../core/platform/env.js";
+import TaskQueue from "../../core/platform/task-queue.js";
 
 let isInitialized = false;
 
@@ -66,20 +67,32 @@ const handlers = {
       }
     );
   },
+  onDestinationClick: async () => {
+    try {
+      const result = await TaskQueue.add("select_directory", [], "default");
+      const path = result?.path ?? null;
+      if (!path) return;
+      SettingsModel.setSetting("customDestination", path);
+    } catch (error) {
+      Logger.error("[Settings] Failed to select directory:", error);
+      Toast.error(I18n.t("settings.destination_error"));
+    }
+  },
   onStateChange: data => {
     if (data?.key === "settings") renderAll();
   }
 };
 
 function attachEvents() {
-  const { tabContent, resetBtn, deleteBtn, languageSelect } =
+  const { tabContent, resetBtn, deleteBtn, languageSelect, destinationBtn } =
     SettingsView.getElements();
   const events = [
     [tabContent, "click", handlers.onThemeClick],
     [tabContent, "change", handlers.onSwitchChange],
     [languageSelect, "change", handlers.onLanguageChange],
     [resetBtn, "click", handlers.onReset],
-    [deleteBtn, "click", handlers.onDelete]
+    [deleteBtn, "click", handlers.onDelete],
+    [destinationBtn, "click", handlers.onDestinationClick]
   ];
   events.forEach(([el, event, handler]) => {
     if (el) el.addEventListener(event, handler);

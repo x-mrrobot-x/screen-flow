@@ -195,6 +195,10 @@ const MOCK_COMMANDS = {
     return { changed: true, packages: MOCK_APPS.map(a => a.pkg) };
   },
 
+  select_directory() {
+    return { path: "/storage/emulated/0/OrganizedMedia/Custom" };
+  },
+
   delete_folder_contents(args) {
     const [folderPath] = args;
     const mediaType = getFolderMediaType(folderPath);

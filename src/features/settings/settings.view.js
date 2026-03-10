@@ -10,7 +10,9 @@ function queryElements() {
     resetBtn: DOM.qs("#reset-settings-btn"),
     deleteBtn: DOM.qs("#delete-all-btn"),
     languageSelect: DOM.qs("#language-select"),
-    languageLabel: DOM.qs("#current-language-label")
+    languageLabel: DOM.qs("#current-language-label"),
+    destinationBtn: DOM.qs("#setting-custom-destination"),
+    destinationPathEl: DOM.qs("#custom-destination-path")
   };
 }
 
@@ -36,6 +38,7 @@ const render = {
     render.theme(settings.theme, themes);
     update.themeSelector(settings.theme);
     update.languageLabel(settings.language || "en");
+    update.destinationPath(settings.customDestination);
   }
 };
 
@@ -48,6 +51,17 @@ const update = {
     const label = I18n.t(`languages.${lang}`);
     if (elements.languageLabel) elements.languageLabel.textContent = label;
     if (elements.languageSelect) elements.languageSelect.value = lang;
+  },
+  destinationPath: path => {
+    const el = elements.destinationPathEl;
+    if (!el) return;
+    if (path) {
+      el.removeAttribute("data-i18n");
+      el.textContent = path;
+    } else {
+      el.setAttribute("data-i18n", "settings.destination_default");
+      el.textContent = I18n.t("settings.destination_default");
+    }
   },
   setting: (key, value) => {
     const switchEl = DOM.qs(

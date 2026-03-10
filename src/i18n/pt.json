@@ -149,6 +149,7 @@
     "section_files": "Arquivos",
     "destination_title": "Pasta de Destino",
     "destination_default": "Usando diretório padrão do sistema",
+    "destination_error": "Falha ao selecionar a pasta de destino.",
     "section_schedule": "Agendamento",
     "schedule_title": "Horário de Execução",
     "schedule_realtime": "Monitoramento em tempo real",
