@@ -7,6 +7,7 @@ import ConfirmationDialog from "../../core/ui/confirmation-dialog.js";
 import Logger from "../../core/platform/logger.js";
 import ENV from "../../core/platform/env.js";
 import TaskQueue from "../../core/platform/task-queue.js";
+import SubfolderMonitor from "../../core/services/subfolder-monitor.js";
 
 let isInitialized = false;
 
@@ -73,6 +74,8 @@ const handlers = {
       const path = result?.path ?? null;
       if (!path) return;
       SettingsModel.setSetting("customDestination", path);
+      EventBus.emit("dashboard:reload-stats");
+      SubfolderMonitor.runScan();
     } catch (error) {
       Logger.error("[Settings] Failed to select directory:", error);
       Toast.error(I18n.t("settings.destination_error"));

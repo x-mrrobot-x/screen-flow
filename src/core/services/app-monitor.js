@@ -7,16 +7,18 @@ import Toast from "../ui/toast.js";
 import I18n from "./i18n.js";
 import Utils from "../../lib/utils.js";
 
-const MEDIA_TYPES = {
-  SCREENSHOTS: {
-    name: "screenshots",
-    path: ENV.PATHS.ORGANIZED_SCREENSHOTS
-  },
-  RECORDINGS: {
-    name: "screen recordings",
-    path: ENV.PATHS.ORGANIZED_RECORDINGS
-  }
-};
+function getMediaTypes() {
+  return {
+    SCREENSHOTS: {
+      name: "screenshots",
+      path: ENV.PATHS.ORGANIZED_SCREENSHOTS
+    },
+    RECORDINGS: {
+      name: "screen recordings",
+      path: ENV.PATHS.ORGANIZED_RECORDINGS
+    }
+  };
+}
 
 function createPackageSet(apps) {
   return new Set(apps.map(app => app.pkg));
@@ -98,7 +100,7 @@ async function renameFolderForMediaType(
 }
 
 async function renameMediaFolders(oldName, newName) {
-  const { SCREENSHOTS, RECORDINGS } = MEDIA_TYPES;
+  const { SCREENSHOTS, RECORDINGS } = getMediaTypes();
   return Promise.all([
     renameFolderForMediaType(
       oldName,

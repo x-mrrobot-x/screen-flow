@@ -1,8 +1,7 @@
 import TaskQueue from "../platform/task-queue.js";
 import Logger from "../platform/logger.js";
-
-let ProcessConfig;
-let ProcessModel;
+import ProcessConfig from "../../features/dashboard/process/process.config.js";
+import ProcessModel from "../../features/dashboard/process/process.model.js";
 
 function executeShellStep(step, context) {
   return TaskQueue.add(step.func, step.params(context), "shell");
@@ -91,12 +90,6 @@ async function run(processType, callbacks = {}, options = {}) {
   await cb.onDone?.(processType, summary.savedStats || {}, context);
 }
 
-function init(deps) {
-  ProcessConfig = deps.ProcessConfig;
-  ProcessModel = deps.ProcessModel;
-}
-
 export default {
-  init,
   run
 };

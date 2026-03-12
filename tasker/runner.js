@@ -3,8 +3,8 @@ import AppState from "../src/core/state/app-state.js";
 import I18n from "../src/core/services/i18n.js";
 import TaskQueue from "../src/core/platform/task-queue.js";
 import ProcessConfig from "../src/features/dashboard/process/process.config.js";
-import ProcessModel from "../src/features/dashboard/process/process.model.js";
 import ProcessEngine from "../src/core/services/process-engine.js";
+import ProcessModel from "../src/features/dashboard/process/process.model.js";
 import Logger from "../src/core/platform/logger.js";
 import Format from "../src/core/ui/format.js";
 
@@ -46,8 +46,8 @@ async function run() {
 
   try {
     AppState.init();
+    ENV.setSettingsGetter(key => AppState.getSetting(key));
     await I18n.init();
-    ProcessEngine.init({ ProcessConfig, ProcessModel });
 
     const canProceed = await checkCleanupPreConditions(processType);
     if (!canProceed) return;

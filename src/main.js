@@ -18,22 +18,16 @@ import "./features/settings/settings.css";
 
 // ─── Core modules ───
 import Logger from "./core/platform/logger.js";
-import ProcessEngine from "./core/services/process-engine.js";
 import ENV from "./core/platform/env.js";
 import TaskQueue from "./core/platform/task-queue.js";
-
-// ─── Feature dependencies for DI ───
-import ProcessConfig from "./features/dashboard/process/process.config.js";
-import ProcessModel from "./features/dashboard/process/process.model.js";
+import AppState from "./core/state/app-state.js";
 
 // ─── App entry ────
 import App from "./app.js";
 
 // ─── Dependency Injection ───
-ProcessEngine.init({ ProcessConfig, ProcessModel });
-
-// Connect ENV web mock task results to TaskQueue
 ENV.setTaskResultHandler(result => TaskQueue.onResult(result));
+ENV.setSettingsGetter(key => AppState.getSetting(key));
 
 // ─── Boot  ───
 if (import.meta.env.DEV) {

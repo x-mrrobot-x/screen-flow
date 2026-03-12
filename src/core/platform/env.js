@@ -23,11 +23,29 @@ const TASKER = {
   }
 };
 
+const DEFAULT_BASE = "/storage/emulated/0/OrganizedMedia";
+
+let settingsGetter = null;
+
+function setSettingsGetter(fn) {
+  settingsGetter = fn;
+}
+
+function resolveDestination(subfolder) {
+  const custom = settingsGetter ? settingsGetter("customDestination") : null;
+  const base = custom || DEFAULT_BASE;
+  return `${base}/${subfolder}`;
+}
+
 const PATHS = {
   SOURCE_SCREENSHOTS: "/storage/emulated/0/DCIM/Screenshots",
   SOURCE_RECORDINGS: "/storage/emulated/0/DCIM/ScreenRecorder",
-  ORGANIZED_SCREENSHOTS: "/storage/emulated/0/OrganizedMedia/Screenshots",
-  ORGANIZED_RECORDINGS: "/storage/emulated/0/OrganizedMedia/ScreenRecordings"
+  get ORGANIZED_SCREENSHOTS() {
+    return resolveDestination("Screenshots");
+  },
+  get ORGANIZED_RECORDINGS() {
+    return resolveDestination("ScreenRecordings");
+  }
 };
 
 const STORAGE = {
@@ -248,6 +266,7 @@ function WebEnvironment() {
     isTaskRunning,
     sendNotification,
     setTaskResultHandler,
+    setSettingsGetter,
     exit
   };
 }
@@ -396,6 +415,7 @@ function TaskerEnvironment() {
     isTaskRunning,
     sendNotification,
     setTaskResultHandler,
+    setSettingsGetter,
     exit
   };
 }
