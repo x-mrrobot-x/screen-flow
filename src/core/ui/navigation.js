@@ -27,7 +27,7 @@ function initLazyController(tabId) {
 
 function deactivateCurrent() {
   DOM.qs(".nav-button.active").classList.remove("active");
-  DOM.qs(".tab-content.active").classList.remove("active", "page-enter");
+  DOM.qs(".tab-content.active").classList.remove("active");
 }
 
 function activateTab(tabId) {
@@ -38,7 +38,7 @@ function activateTab(tabId) {
 
   if (!targetTab) return;
   initLazyController(tabId);
-  targetTab.classList.add("active", "page-enter");
+  targetTab.classList.add("active");
   targetTab.style.display = "";
   EventBus.emit("navigation:changed", { tab: tabId });
 }

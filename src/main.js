@@ -1,14 +1,14 @@
 // ─── CSS  ─────
-import "./assets/styles/base/reset.css";
-import "./assets/styles/base/variables.css";
-import "./assets/styles/base/typography.css";
-import "./assets/styles/base/globals.css";
-import "./assets/styles/base/info-card.css";
-import "./assets/styles/base/buttons.css";
-import "./assets/styles/base/dialog.css";
-import "./assets/styles/base/toast.css";
-import "./assets/styles/animations.css";
-import "./assets/styles/navigation.css";
+import "./assets/css/base/reset.css";
+import "./assets/css/base/variables.css";
+import "./assets/css/base/typography.css";
+import "./assets/css/base/globals.css";
+import "./assets/css/base/info-card.css";
+import "./assets/css/base/buttons.css";
+import "./assets/css/base/dialog.css";
+import "./assets/css/base/toast.css";
+import "./assets/css/animations.css";
+import "./assets/css/navigation.css";
 import "./features/dashboard/dashboard.css";
 import "./features/dashboard/process/process.css";
 import "./features/stats/stats.css";
