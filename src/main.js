@@ -1,4 +1,3 @@
-// ─── CSS  ─────
 import "./assets/css/base/reset.css";
 import "./assets/css/base/variables.css";
 import "./assets/css/base/typography.css";
@@ -16,20 +15,15 @@ import "./features/cleaner/cleaner.css";
 import "./features/organizer/organizer.css";
 import "./features/settings/settings.css";
 
-// ─── Core modules ───
 import Logger from "./core/platform/logger.js";
 import ENV from "./core/platform/env.js";
 import TaskQueue from "./core/platform/task-queue.js";
 import AppState from "./core/state/app-state.js";
-
-// ─── App entry ────
 import App from "./app.js";
 
-// ─── Dependency Injection ───
 ENV.setTaskResultHandler(result => TaskQueue.onResult(result));
 ENV.setSettingsGetter(key => AppState.getSetting(key));
 
-// ─── Boot  ───
 if (import.meta.env.DEV) {
   const { default: eruda } = await import("eruda");
   eruda.init();
@@ -38,8 +32,6 @@ if (import.meta.env.DEV) {
 (async () => {
   const t0 = performance.now();
   await App.init();
-
   window.App = App;
-
   Logger.warn(`App initialized in ${(performance.now() - t0).toFixed(2)} ms`);
 })();

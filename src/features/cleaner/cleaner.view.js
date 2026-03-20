@@ -62,6 +62,13 @@ const templates = {
     )
   }),
 
+  emptyState: () =>
+    `<div class="cleaner-empty-state animate-fade-in" style="animation-delay: 0.3s">
+      <div class="cleaner-empty-icon-wrapper">${Icons.getSvg("broom")}</div>
+      <p class="cleaner-empty-title">${I18n.t("cleaner.empty_title")}</p>
+      <p class="cleaner-empty-subtitle">${I18n.t("cleaner.empty_subtitle")}</p>
+    </div>`,
+
   folderCard: (folder, index) => {
     if (!folder.ss && !folder.sr) return "";
     const { screenshots, recordings } = templates.buildSwitches(folder);

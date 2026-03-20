@@ -1,0 +1,237 @@
+.dialog-tagging {
+  width: 92%;
+  max-width: 44rem;
+}
+
+.tagging-stats {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: var(--space-sm) var(--space-md);
+  border-bottom: 0.05rem solid hsl(var(--border));
+  background: hsl(var(--muted) / 0.25);
+}
+
+.tagging-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  flex: 1;
+}
+
+.tagging-stat-divider {
+  width: 0.05rem;
+  height: 2.4rem;
+  background: hsl(var(--border));
+}
+
+.tagging-stat-value {
+  font-size: var(--font-2xl);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.tagging-stat--pending .tagging-stat-value {
+  color: hsl(var(--warning));
+}
+
+.tagging-stat--tagged .tagging-stat-value {
+  color: hsl(var(--success));
+}
+
+.tagging-stat--skipped .tagging-stat-value {
+  color: hsl(var(--muted-foreground));
+}
+
+.tagging-stat-label {
+  font-size: var(--font-xxs);
+  color: hsl(var(--muted-foreground));
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 500;
+}
+
+.tagging-body {
+  gap: var(--space-md);
+  padding: var(--space-md);
+  overflow: visible;
+}
+
+.tagging-loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-xl) 0;
+}
+
+.tagging-loader-icon {
+  width: 2rem;
+  height: 2rem;
+}
+
+.tagging-card-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.tagging-enter-left {
+  animation: tagging-slide-in-left 0.28s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.tagging-enter-right {
+  animation: tagging-slide-in-right 0.28s cubic-bezier(0.22, 1, 0.36, 1)
+    forwards;
+}
+
+.tagging-image-wrapper {
+  position: relative;
+  width: 100%;
+  border-radius: var(--radius-lg);
+  background: hsl(var(--muted) / 0.6);
+  box-shadow: 0 0.4rem 2rem hsl(0 0% 0% / 0.3);
+  overflow: hidden;
+}
+
+.tagging-preview {
+  display: block;
+  width: 100%;
+  max-height: 42vh;
+  object-fit: contain;
+}
+
+.tagging-image-footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  background: hsl(var(--card) / 0.85);
+  backdrop-filter: blur(4px);
+}
+
+.tagging-filename-icon svg {
+  width: 1.2rem;
+  height: 1.2rem;
+  color: hsl(var(--muted-foreground));
+  flex-shrink: 0;
+}
+
+.tagging-filename {
+  font-size: var(--font-xs);
+  color: hsl(var(--muted-foreground));
+  word-break: break-all;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* ── Empty state ─── */
+.tagging-empty {
+  text-align: center;
+  color: hsl(var(--muted-foreground));
+  padding: var(--space-xl) 0;
+  font-size: var(--font-md);
+}
+
+/* ── Main actions ── */
+.tagging-main-actions {
+  display: flex;
+  gap: var(--space-sm);
+  width: 100%;
+}
+
+.tagging-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  font-size: var(--font-md);
+  font-weight: 600;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-lg);
+  transition:
+    transform 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.tagging-btn:active {
+  transform: scale(0.96);
+}
+
+.tagging-btn svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+}
+
+.tagging-btn-skip {
+  color: hsl(var(--muted-foreground));
+  border: 0.05rem solid hsl(var(--border));
+  background: hsl(var(--muted) / 0.8);
+}
+
+.tagging-btn-generate {
+  color: hsl(var(--primary-foreground));
+  background: var(--accent-gradient);
+  box-shadow: 0 0.2rem 1rem hsl(var(--primary) / 0.35);
+}
+
+.tagging-btn-batch {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  font-size: var(--font-sm);
+  font-weight: 500;
+  color: hsl(var(--muted-foreground));
+  border: 0.05rem solid hsl(var(--border));
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-full);
+  background: hsl(var(--muted) / 0.5);
+  transition: transform 0.15s ease;
+}
+
+.tagging-btn-batch svg {
+  width: 1.4rem;
+  height: 1.4rem;
+}
+
+.tagging-btn-batch:active {
+  transform: scale(0.96);
+}
+
+.tagging-btn-batch--primary {
+  color: hsl(var(--primary));
+  border-color: hsl(var(--primary) / 0.3);
+  background: hsl(var(--primary) / 0.12);
+}
+
+.tagging-btn-batch--stop {
+  color: hsl(var(--destructive));
+  border-color: hsl(var(--destructive) / 0.3);
+  background: hsl(var(--destructive) / 0.1);
+}
+
+/* ── Batch progress ── */
+.tagging-batch-progress {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-xl) 0;
+}
+
+.tagging-batch-label {
+  font-size: var(--font-sm);
+  color: hsl(var(--muted-foreground));
+  margin: 0;
+}
+
+/* ── Screenshot detail dialog ── */
+
+.dialog-tagging .dialog-actions {
+  justify-content: stretch;
+}

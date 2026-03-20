@@ -19,8 +19,6 @@
     "items_plural": "elementos",
     "removed": "eliminado",
     "removed_plural": "eliminados",
-    "moved": "movido",
-    "moved_plural": "movidos",
     "cleanup": "Limpieza",
     "none": "Ninguno"
   },
@@ -62,17 +60,25 @@
     "empty_screenshots_subtitle": "No se encontraron carpetas con capturas de pantalla.",
     "empty_recordings_title": "Sin carpetas con grabaciones de pantalla",
     "empty_recordings_subtitle": "No se encontraron carpetas con grabaciones de pantalla.",
-    "empty_all_title": "Sin carpetas organizadas",
-    "empty_all_subtitle": "Tus archivos se organizarán automáticamente en carpetas por aplicación.",
     "folder_not_found": "Carpeta no encontrada.",
     "clear_success": "{{count}} {{item}} {{removed}}",
     "clear_empty": "No se eliminaron archivos o la carpeta ya estaba vacía.",
     "clear_error": "Error al limpiar la carpeta. Por favor, inténtalo de nuevo.",
     "page_subtitle": "Visualiza y gestiona tus medios por carpeta",
-    "search_placeholder": "Buscar carpeta...",
-    "filter_all": "Todas",
     "auto_desc": "Verifica periódicamente nuevas capturas y grabaciones de pantalla y las organiza automáticamente en carpetas por aplicación",
-    "folder_action_clear": "Limpiar carpeta"
+    "folder_action_clear": "Limpiar carpeta",
+    "search_placeholder_tags": "Buscar carpetas o etiquetas...",
+    "back": "Volver",
+    "empty_screenshots_folder": "No hay capturas en esta carpeta.",
+    "empty_recordings_folder": "No hay grabaciones en esta carpeta.",
+    "info_folders": "carpetas",
+    "info_tagged": "con etiquetas",
+    "info_pending": "pendientes",
+    "info_skipped": "ignoradas",
+    "search_section_folders": "Carpetas",
+    "search_section_screenshots": "Capturas de pantalla",
+    "search_section_recordings": "Grabaciones",
+    "search_empty": "No se encontraron resultados"
   },
   "cleaner": {
     "no_active_folders": "Sin carpetas con limpieza activa",
@@ -84,7 +90,9 @@
     "count_screenshots": "carpeta con limpieza de capturas",
     "count_screenshots_plural": "carpetas con limpieza de capturas",
     "count_recordings": "carpeta con limpieza de grabaciones",
-    "count_recordings_plural": "carpetas con limpieza de grabaciones"
+    "count_recordings_plural": "carpetas con limpieza de grabaciones",
+    "empty_title": "No hay carpetas organizadas",
+    "empty_subtitle": "Organiza tus capturas y grabaciones primero para que puedan configurarse para la limpieza automática."
   },
   "stats": {
     "chart_screenshots": "Capturas por Día",
@@ -99,11 +107,9 @@
     "empty_recordings": "No se encontraron grabaciones de pantalla para organizar.",
     "empty_expired": "No se encontraron archivos antiguos para limpiar.",
     "no_cleaner_folders": "No hay carpetas configuradas para limpieza.",
-    "cancelled": "Proceso cancelado.",
     "cancelling": "Cancelando proceso...",
     "step_done": "¡Proceso completado!",
     "finished": "¡Proceso finalizado con éxito!",
-    "organize_done": "{{count}} {{file}} organizados.",
     "cleanup_done": "{{count}} {{file}} {{removed}}.",
     "notify_screenshots_done": "{{count}} capturas de pantalla organizadas.",
     "notify_recordings_done": "{{count}} grabaciones de pantalla organizadas.",
@@ -124,7 +130,10 @@
     "step_load_rules": "Cargando regras de limpieza",
     "step_find_expired": "Localizando archivos antiguos",
     "step_delete_expired": "Eliminando archivos antiguos",
-    "step_save_cleanup": "Guardando resumen de limpieza"
+    "step_save_cleanup": "Guardando resumen de limpieza",
+    "done": "¡Proceso Completado!",
+    "title": "Procesando",
+    "starting": "Iniciando proceso..."
   },
   "settings": {
     "reset_success": "¡Configuración restaurada con éxito!",
@@ -186,17 +195,56 @@
     "settings": "Configuración"
   },
   "dialog": {
-    "process_title": "Procesando",
-    "process_starting": "Iniciando proceso...",
-    "process_done": "¡Proceso Completado!",
     "confirmation_title": "Confirmación",
     "confirmation_message": "¿Estás seguro de que deseas continuar? Esta acción no se puede deshacer.",
     "cancel": "Cancelar",
-    "confirm": "Confirmar",
-    "close": "Cerrar"
+    "confirm": "Confirmar"
   },
   "features": {
     "auto_organizer": "Organización Automática",
     "auto_cleaner": "Limpieza Automática"
+  },
+  "tagging": {
+    "dialog_title": "Generar Etiquetas con IA",
+    "stats_pending": "Pendientes",
+    "stats_tagged": "Con Etiquetas",
+    "stats_skipped": "Omitidas",
+    "skip": "Omitir",
+    "generate": "Generar Etiquetas",
+    "skip_all": "Omitir Todas",
+    "generate_all": "Generar en Todas",
+    "all_done": "¡Todos los archivos analizados!",
+    "error_quota_exceeded": "Cuota diaria de Gemini alcanzada",
+    "error_rate_limit": "Demasiadas solicitudes, espera un momento",
+    "error_overloaded": "Gemini con alta demanda, intenta pronto",
+    "error_invalid_key": "API key inválida, revisa la configuración",
+    "error_bad_request": "Error al procesar la imagen",
+    "error_server": "Error del servidor Gemini, intenta de nuevo",
+    "error_network": "Sin conexión para acceder a Gemini",
+    "loading": "Cargando archivos...",
+    "no_tags": "Sin etiquetas",
+    "stop": "Detener",
+    "batch_progress": "Procesando {done} de {total}...",
+    "dialog_description": "La IA analiza cada archivo y genera palabras clave automáticamente para facilitar la búsqueda."
+  },
+  "media_detail": {
+    "screenshot_title": "Detalles de la Captura",
+    "recording_title": "Detalles de la Grabación",
+    "filename_label": "Nombre del archivo"
+  },
+  "gemini": {
+    "section_title": "Gemini AI",
+    "dialog_title": "Configuración de Gemini AI",
+    "dialog_subtitle": "Configure el modelo y las claves de API",
+    "model_label": "Modelo",
+    "api_key_label": "Claves de API",
+    "api_key_placeholder": "Ingrese su clave de API de Gemini",
+    "no_keys": "No hay claves de API agregadas",
+    "add_key": "Agregar clave",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "saved": "¡Configuración de Gemini guardada!",
+    "desc": "Configure el modelo Gemini AI para el etiquetado automático de capturas de pantalla",
+    "api_key_required": "Configura tu clave de API de Gemini AI para usar la generación automática de etiquetas."
   }
 }

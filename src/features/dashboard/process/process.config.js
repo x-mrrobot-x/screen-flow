@@ -2,6 +2,8 @@ import ENV from "../../../core/platform/env.js";
 
 const PROCESS_TYPES = {
   organize_screenshots: {
+    icon: "image",
+    iconClass: "icon-blue",
     titleKey: "process.organize_screenshots_title",
     notificationTitleKey: "nav.organizer",
     doneLabelKey: "process.organize_done_label",
@@ -64,13 +66,15 @@ const PROCESS_TYPES = {
             moved: ctx.move_and_count.moved || 0,
             created: ctx.create_app_folders.created
           },
-          ctx._execution
+          ctx.executionMode
         ]
       }
     ]
   },
 
   organize_recordings: {
+    icon: "video",
+    iconClass: "icon-green",
     titleKey: "process.organize_recordings_title",
     notificationTitleKey: "nav.organizer",
     doneLabelKey: "process.organize_done_label",
@@ -133,13 +137,15 @@ const PROCESS_TYPES = {
             moved: ctx.move_and_count.moved || 0,
             created: ctx.create_app_folders.created
           },
-          ctx._execution
+          ctx.executionMode
         ]
       }
     ]
   },
 
   cleanup_old_files: {
+    icon: "broom",
+    iconClass: "icon-purple",
     titleKey: "process.cleanup_title",
     notificationTitleKey: "nav.cleaner",
     doneLabelKey: "process.cleanup_done_label",
@@ -182,7 +188,7 @@ const PROCESS_TYPES = {
             sr_removed: ctx.find_all_expired.recordings.length,
             total_removed: ctx.find_all_expired.all.length
           },
-          ctx._execution
+          ctx.executionMode
         ]
       }
     ]

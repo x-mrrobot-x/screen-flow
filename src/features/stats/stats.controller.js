@@ -2,46 +2,19 @@ import StatsModel from "./stats.model.js";
 import StatsView from "./stats.view.js";
 import EventBus from "../../core/platform/event-bus.js";
 import AppState from "../../core/state/app-state.js";
-import I18n from "../../core/services/i18n.js";
 import Utils from "../../lib/utils.js";
-import Logger from "../../core/platform/logger.js";
 
 let isInitialized = false;
 
-const CHART_CONFIG = {
-  get LABEL() {
-    return {
-      screenshots: I18n.t("common.screenshots_label"),
-      recordings: I18n.t("common.recordings_label")
-    };
-  },
-  COLOR: {
-    screenshots: "hsla(213 94% 68% / 0.8)",
-    recordings: "hsla(255 92% 76% / 0.8)"
-  },
-  COLOR_PALETTE: [
-    "hsl(210, 60%, 45%)",
-    "hsl(160, 60%, 45%)",
-    "hsl(260, 60%, 45%)",
-    "hsl(320, 60%, 45%)",
-    "hsl(40, 60%, 45%)",
-    "hsl(280, 60%, 45%)",
-    "hsl(120, 60%, 45%)",
-    "hsl(20, 60%, 45%)",
-    "hsl(190, 60%, 45%)",
-    "hsl(300, 60%, 45%)"
-  ]
-};
-
 function loadAndRender() {
   const data = StatsModel.getState();
-  StatsView.render.all(data, CHART_CONFIG);
+  StatsView.render.all(data, AppState.getActivities());
 }
 
 function refresh() {
   const data = StatsModel.getState();
-  StatsView.render.weeklyChart(data, CHART_CONFIG);
-  StatsView.render.foldersChart(data, CHART_CONFIG);
+  StatsView.render.weeklyChart(data);
+  StatsView.render.foldersChart(data);
 }
 
 const debouncedRefresh = Utils.debounce(refresh, 100);
@@ -71,6 +44,7 @@ function attachEvents() {
     [mediaTypeContainer, "click", handlers.onMediaTypeContainerClick]
   ];
   events.forEach(([el, event, handler]) => el.addEventListener(event, handler));
+
   EventBus.on("appstate:changed", handlers.onStateChange);
   EventBus.on("navigation:changed", handlers.onNavigationChange);
 }

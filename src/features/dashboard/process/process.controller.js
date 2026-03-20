@@ -10,7 +10,6 @@ import TaskQueue from "../../../core/platform/task-queue.js";
 import Logger from "../../../core/platform/logger.js";
 import Toast from "../../../core/ui/toast.js";
 import I18n from "../../../core/services/i18n.js";
-import Utils from "../../../lib/utils.js";
 import Format from "../../../core/ui/format.js";
 import ENV from "../../../core/platform/env.js";
 import SubfolderMonitor from "../../../core/services/subfolder-monitor.js";
@@ -19,6 +18,7 @@ const state = {
   isRunning: false,
   processType: null
 };
+
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 function notifyChanges(stats) {
@@ -28,77 +28,101 @@ function notifyChanges(stats) {
   }
 }
 
-function buildCallbacks(steps) {
+function sendCompletionNotification(processType, stats) {
+  const processData = ProcessConfig.PROCESS_TYPES[processType];
+  const notifKey = processData?.notificationKey;
+  if (!notifKey || !AppState.getSettings()[notifKey]) return;
+
+  const title = I18n.t(processData.notificationTitleKey);
+  const content = Format.buildCompletionText(processType, stats);
+  ENV.sendNotification(title, content);
+}
+
+function activateStep(i, step, steps) {
+  ProcessView.update.stepStatus(i, "running");
+  ProcessView.update.scrollToStep(i);
+  ProcessView.update.stepLabel(I18n.t(step.labelKey));
+  ProcessView.update.progress((i / steps.length) * 100);
+}
+
+function handleStepRunning(i, step, steps) {
+  activateStep(i, step, steps);
+}
+
+async function handleStepComplete(i, step, steps) {
+  ProcessView.update.stepStatus(i, "completed");
+
+  const hasNext = i < steps.length - 1;
+  if (!hasNext || !state.isRunning) return;
+
+  activateStep(i + 1, steps[i + 1], steps);
+  await sleep(500);
+}
+
+function handleProcessDone(processType, stats) {
+  const processData = ProcessConfig.PROCESS_TYPES[processType];
+  const doneLabel = I18n.t(processData?.doneLabelKey ?? "process.step_done");
+
+  ProcessView.update.progress(100);
+  ProcessView.update.stepLabel(doneLabel);
+  ProcessView.update.completion(
+    Format.buildCompletionText(processType, stats),
+    doneLabel
+  );
+
+  state.isRunning = false;
+  notifyChanges(stats);
+  sendCompletionNotification(processType, stats);
+}
+
+function handleProcessError(error, step, index) {
+  if (error === "Cancelled") {
+    Logger.warn(`Processo '${state.processType}' cancelado pelo usuário.`);
+    return;
+  }
+  Logger.error(`Erro na etapa ${step?.id}:`, error);
+  ProcessView.update.stepStatus(index, "failed");
+  ProcessView.update.completion(
+    I18n.t("process.step_error", { label: I18n.t(step.labelKey) }),
+    undefined,
+    false
+  );
+  state.isRunning = false;
+}
+
+const EMPTY_MESSAGES = {
+  scan_screenshots: "process.empty_screenshots",
+  scan_recordings: "process.empty_recordings",
+  find_all_expired: "process.empty_expired"
+};
+
+function buildCallbacks(processType, steps) {
   return {
     isCancelled: () => !state.isRunning,
-
-    onStepStart: (i, step) => {
-      ProcessView.update.stepStatus(i, "running");
-      ProcessView.update.scrollToStep(i);
-      ProcessView.update.stepLabel(I18n.t(step.labelKey));
-      ProcessView.update.progress((i / steps.length) * 100);
-    },
-
-    onStepComplete: async i => {
-      ProcessView.update.stepStatus(i, "completed");
-      const hasNext = i < steps.length - 1;
-      if (!hasNext || !state.isRunning) return;
-      const next = steps[i + 1];
-      ProcessView.update.stepStatus(i + 1, "running");
-      ProcessView.update.scrollToStep(i + 1);
-      ProcessView.update.stepLabel(I18n.t(next.labelKey));
-      ProcessView.update.progress(((i + 1) / steps.length) * 100);
-      await sleep(1000);
-    },
-
+    onStepStart: (i, step) => handleStepRunning(i, step, steps),
+    onStepComplete: async (i, step) => handleStepComplete(i, step, steps),
     onEmpty: stepId => {
-      const messageKeys = {
-        scan_screenshots: "process.empty_screenshots",
-        scan_recordings: "process.empty_recordings",
-        find_all_expired: "process.empty_expired"
-      };
       state.isRunning = false;
-      Toast.info(I18n.t(messageKeys[stepId]));
+      Toast.info(I18n.t(EMPTY_MESSAGES[stepId]));
       close();
     },
-
-    onDone: (processType, stats) => {
-      const processData = ProcessConfig.PROCESS_TYPES[processType];
-      const doneLabel = I18n.t(
-        processData?.doneLabelKey ?? "process.step_done"
-      );
-      ProcessView.update.progress(100);
-      ProcessView.update.stepLabel(doneLabel);
-      ProcessView.update.completion(
-        Format.buildCompletionText(processType, stats),
-        doneLabel
-      );
-      state.isRunning = false;
-      notifyChanges(stats);
-
-      const notifKey = processData?.notificationKey;
-      if (notifKey && AppState.getSettings()[notifKey]) {
-        const title = I18n.t(processData.notificationTitleKey);
-        const content = Format.buildCompletionText(processType, stats);
-        ENV.sendNotification(title, content);
-      }
-    },
-
-    onError: (error, step, index) => {
-      if (error === "Cancelled") {
-        Logger.warn(`Processo '${state.processType}' cancelado pelo usuário.`);
-        return;
-      }
-      Logger.error(`Erro na etapa ${step?.id}:`, error);
-      ProcessView.update.stepStatus(index, "failed");
-      ProcessView.update.completion(
-        I18n.t("process.step_error", { label: I18n.t(step.labelKey) }),
-        undefined,
-        false
-      );
-      state.isRunning = false;
-    }
+    onDone: stats => handleProcessDone(processType, stats),
+    onError: (error, step, index) => handleProcessError(error, step, index)
   };
+}
+
+function scheduleProcessExecution(processData, processType) {
+  const jsExecutor = (funcName, args) => ProcessModel[funcName](...args);
+  setTimeout(
+    () =>
+      ProcessEngine.run(
+        processData.steps,
+        buildCallbacks(processType, processData.steps),
+        { execution: "manual" },
+        jsExecutor
+      ),
+    500
+  );
 }
 
 function cancelCurrentProcess() {
@@ -119,17 +143,30 @@ function close() {
   DialogStack.goBack();
 }
 
+async function validateProcess(processType) {
+  if (processType !== "cleanup_old_files") return true;
+  const hasConfigs = await ProcessModel.hasCleanerConfigs();
+  if (!hasConfigs) {
+    Toast.info(I18n.t("process.no_cleaner_folders"));
+    Navigation.navigateToAndHighlight("cleaner", ".cleaner-folder-card");
+    return false;
+  }
+  return true;
+}
+
+function setupProcessView(processData) {
+  ProcessView.reset();
+  ProcessView.update.icon(processData.icon, processData.iconClass);
+  ProcessView.update.title(I18n.t(processData.titleKey));
+  ProcessView.render(processData.steps);
+  open();
+}
+
 async function start(processType) {
   if (state.isRunning) return;
 
-  if (processType === "cleanup_old_files") {
-    const hasConfigs = await ProcessModel.hasCleanerConfigs();
-    if (!hasConfigs) {
-      Toast.info(I18n.t("process.no_cleaner_folders"));
-      Navigation.navigateTo("cleaner");
-      return;
-    }
-  }
+  const isValid = await validateProcess(processType);
+  if (!isValid) return;
 
   const processData = ProcessConfig.PROCESS_TYPES[processType];
   if (!processData) {
@@ -140,18 +177,8 @@ async function start(processType) {
   state.isRunning = true;
   state.processType = processType;
 
-  ProcessView.reset();
-  ProcessView.update.title(I18n.t(processData.titleKey));
-  ProcessView.render(processData.steps);
-  open();
-
-  setTimeout(
-    () =>
-      ProcessEngine.run(processType, buildCallbacks(processData.steps), {
-        execution: "manual"
-      }),
-    500
-  );
+  setupProcessView(processData);
+  scheduleProcessExecution(processData, processType);
 }
 
 const handlers = {
@@ -160,18 +187,15 @@ const handlers = {
       .processType;
     if (processType) start(processType);
   },
-  onClose: () => close(),
-  onBackdropClick: e => {
-    if (e.target === ProcessView.getElements().dialog) close();
-  }
+  onClose: () => close()
 };
 
 function attachEvents() {
-  const { dialog, closeBtn } = ProcessView.getElements();
+  const { closeBtn } = ProcessView.getElements();
+
   const events = [
     [document, "click", handlers.onProcessBtn],
-    [closeBtn, "click", handlers.onClose],
-    [dialog, "click", handlers.onBackdropClick]
+    [closeBtn, "click", handlers.onClose]
   ];
   events.forEach(([el, event, handler]) => el.addEventListener(event, handler));
 }

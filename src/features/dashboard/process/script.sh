@@ -28,7 +28,7 @@ write_file() {
         return
     }
 
-    echo "$content" > "$filepath"
+    printf '%s\n' "$content" > "$filepath"
     if [ $? -eq 0 ]; then
         json_response "true" "true" "null"
     else
@@ -74,7 +74,7 @@ count_media_items() {
     ! -name ".trashed*" \
     2>/dev/null \
     | grep -vE "_[0-9]+\.${file_type}$" \
-    | wc -l)
+    | wc -l | tr -d ' \t')
 
   json_response "true" "${item_count:-0}" "null"
 }
@@ -110,9 +110,6 @@ EOF
 run_batch_command() {
     count_command="$1"
     move_command="$2"
-    local count
-    local remaining
-    local moved_count
 
     count=$(eval "$count_command" 2>/dev/null)
     count=$(echo "$count" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
@@ -215,38 +212,6 @@ delete_folder_contents() {
   json_response "true" "{\"deleted\": $deleted_count, \"mtime\": $folder_mtime}" "null"
 }
 
-get_folder_stats() {
-  base_path="$1"
-
-  if [ ! -d "$base_path" ]; then
-    json_response "false" "[]" "\"Base path does not exist: $base_path\""
-    return 1
-  fi
-
-  json_array=""
-  first=true
-  
-  cd "$base_path"
-  for d in */; do
-    if [ -d "$d" ]; then
-      count=$(ls -1 "$d" | wc -l)
-      count=$(echo "$count" | tr -d ' ')
-      folder_name="${d%/}"
-      escaped=$(printf "%s,%s" "$folder_name" "$count" | sed 's/\\/\\\\/g; s/"/\\"/g')
-      
-      if [ "$first" = true ]; then
-        first=false
-      else
-        json_array="$json_array,"
-      fi
-      
-      json_array="$json_array\"$escaped\""
-    fi
-  done
-  
-  json_response "true" "[$json_array]" "null"
-}
-
 get_subfolders() {
   base_path="$1"
 
@@ -295,21 +260,6 @@ count_subfolders() {
   folder_count=${folder_count:-0}
 
   json_response "true" "$folder_count" "null"
-}
-
-get_item_count() {
-  full_subfolder_path="$1"
-
-  if [ ! -d "$full_subfolder_path" ]; then
-    json_response "false" "0" "\"Folder not found: $full_subfolder_path\""
-    return 1
-  fi
-
-  item_count=$(ls -A "$full_subfolder_path" 2>/dev/null | wc -l)
-  item_count=$(echo "$item_count" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
-  item_count=${item_count:-0}
-
-  json_response "true" "$item_count" "null"
 }
 
 get_item_counts_batch() {
@@ -378,14 +328,155 @@ rename_folder() {
   fi
 }
 
-path_exists() {
-  path_to_check="$1"
-  if [ -e "$path_to_check" ]; then
-    json_response "true" "true" "null"
+get_media_stats() {
+  dir="$1"
+  ext="$2"
+
+  if [ ! -d "$dir" ]; then
+    json_response "true" "{\"pending\":0,\"tagged\":0,\"skipped\":0}" "null"
+    return 0
+  fi
+
+  total=$(find "$dir" -type f -iname "*.${ext}" 2>/dev/null | wc -l | tr -d ' \t')
+  skipped=$(find "$dir" -type f -iname "*\[skip\]*.${ext}" 2>/dev/null | wc -l | tr -d ' \t')
+  bracketed=$(find "$dir" -type f -iname "*\[*\]*.${ext}" 2>/dev/null | wc -l | tr -d ' \t')
+
+  tagged=$((bracketed - skipped))
+  pending=$((total - bracketed))
+  [ "$tagged" -lt 0 ] && tagged=0
+  [ "$pending" -lt 0 ] && pending=0
+
+  json_response "true" "{\"pending\":$pending,\"tagged\":$tagged,\"skipped\":$skipped}" "null"
+}
+
+get_pending_media() {
+  dir="$1"
+
+  if [ ! -d "$dir" ]; then
+    json_response "true" "{\"files\":[]}" "null"
+    return 0
+  fi
+
+  json_array=$(find "$dir" -type f ! -name "*\[*" -printf '"%P"\n' 2>/dev/null | sort | \
+    paste -sd ',')
+
+  json_response "true" "{\"files\":[${json_array}]}" "null"
+}
+
+list_media_in_folder() {
+  folder_path="$1"
+
+  if [ ! -d "$folder_path" ]; then
+    json_response "true" "{\"files\":[]}" "null"
+    return 0
+  fi
+
+  json_array=$(find "$folder_path" -maxdepth 1 -type f -printf '"%f"\n' 2>/dev/null | sort | \
+    paste -sd ',')
+
+  json_response "true" "{\"files\":[${json_array}]}" "null"
+}
+
+search_media_by_tag() {
+  dir="$1"
+  raw_query="$2"
+
+  if [ ! -d "$dir" ] || [ -z "$raw_query" ]; then
+    json_response "true" "{\"files\":[]}" "null"
+    return 0
+  fi
+
+  query=$(echo "$raw_query" | tr ' ' '-')
+
+  json_array=$(find "$dir" -type f -iname "*\[*${query}*\]*" \
+    -printf '{"path":"%p","name":"%f"}\n' 2>/dev/null | sort | \
+    paste -sd ',')
+
+  json_response "true" "{\"files\":[${json_array}]}" "null"
+}
+
+
+skip_screenshot() {
+  file_path="$1"
+
+  if [ ! -f "$file_path" ]; then
+    json_response "false" "null" "\"File not found: $file_path\""
+    return 1
+  fi
+
+  dir=$(dirname "$file_path")
+  name=$(basename "$file_path")
+  ext="${name##*.}"
+  base="${name%.*}"
+  base_clean=$(echo "$base" | sed 's/\[[^]]*\]//g' | sed 's/[[:space:]]*$//')
+  new_name="${base_clean}[skip].${ext}"
+  new_path="${dir}/${new_name}"
+
+  mv "$file_path" "$new_path"
+
+  if [ $? -eq 0 ]; then
+    escaped=$(printf "%s" "$new_path" | sed 's/\\/\\\\/g; s/"/\\"/g')
+    json_response "true" "{\"newPath\":\"${escaped}\"}" "null"
   else
-    json_response "true" "false" "null"
+    json_response "false" "null" "\"Failed to rename file\""
   fi
 }
+
+apply_tags_to_filename() {
+  file_path="$1"
+  tags_csv="$2"
+
+  if [ ! -f "$file_path" ]; then
+    json_response "false" "null" "\"File not found: $file_path\""
+    return 1
+  fi
+
+  dir=$(dirname "$file_path")
+  name=$(basename "$file_path")
+  ext="${name##*.}"
+  base="${name%.*}"
+  base_clean=$(echo "$base" | sed 's/\[[^]]*\]//g' | sed 's/[[:space:]]*$//')
+  tag_str=$(echo "$tags_csv" | tr ',' '\n' | while IFS= read -r tag; do
+    echo "$tag" | sed 's/[[:space:]]/-/g; s/-\+/-/g; s/^-//; s/-$//'
+  done | paste -sd '_')
+  new_name="${base_clean}[${tag_str}].${ext}"
+  new_path="${dir}/${new_name}"
+
+  mv "$file_path" "$new_path"
+
+  if [ $? -eq 0 ]; then
+    escaped=$(printf "%s" "$new_path" | sed 's/\\/\\\\/g; s/"/\\"/g')
+    json_response "true" "{\"newPath\":\"${escaped}\"}" "null"
+  else
+    json_response "false" "null" "\"Failed to rename file\""
+  fi
+}
+
+clear_tags_from_filename() {
+  file_path="$1"
+
+  if [ ! -f "$file_path" ]; then
+    json_response "false" "null" "\"File not found: $file_path\""
+    return 1
+  fi
+
+  dir=$(dirname "$file_path")
+  name=$(basename "$file_path")
+  ext="${name##*.}"
+  base="${name%.*}"
+  base_clean=$(echo "$base" | sed 's/\[[^]]*\]//g' | sed 's/[[:space:]]*$//')
+  new_path="${dir}/${base_clean}.${ext}"
+
+  mv "$file_path" "$new_path"
+
+  if [ $? -eq 0 ]; then
+    escaped=$(printf "%s" "$new_path" | sed 's/"/\\"/g')
+    json_response "true" "{\"newPath\":\"${escaped}\"}" "null"
+  else
+    json_response "false" "null" "\"Failed to rename file\""
+  fi
+}
+
 
 main() {
   command="$1"
@@ -415,17 +506,11 @@ main() {
     delete_files_batch)
       delete_files_batch "$1"
       ;;
-    get_folder_stats)
-      get_folder_stats "$1"
-      ;;
     get_subfolders)
       get_subfolders "$1"
       ;;
     count_subfolders)
       count_subfolders "$1"
-      ;;
-    get_item_count)
-      get_item_count "$1"
       ;;
     get_item_counts_batch)
       get_item_counts_batch "$1" "$2"
@@ -433,11 +518,29 @@ main() {
     rename_folder)
       rename_folder "$1" "$2" "$3"
       ;;
-    path_exists)
-      path_exists "$1"
-      ;;
     delete_folder_contents)
       delete_folder_contents "$1"
+      ;;
+    get_media_stats)
+      get_media_stats "$1" "$2"
+      ;;
+    get_pending_media)
+      get_pending_media "$1"
+      ;;
+    list_media_in_folder)
+      list_media_in_folder "$1"
+      ;;
+    search_media_by_tag)
+      search_media_by_tag "$1" "$2"
+      ;;
+    skip_screenshot)
+      skip_screenshot "$1"
+      ;;
+    apply_tags_to_filename)
+      apply_tags_to_filename "$1" "$2"
+      ;;
+    clear_tags_from_filename)
+      clear_tags_from_filename "$1"
       ;;
     *)
       json_response "false" "{}" "\"Unknown command: $command\""

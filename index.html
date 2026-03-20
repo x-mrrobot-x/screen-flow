@@ -93,7 +93,10 @@
                 style="animation-delay: 0.2s"
               >
                 <div class="dashboard-info-header">
-                  <div class="dashboard-info-icon icon-blue" aria-hidden="true">
+                  <div
+                    class="dashboard-info-icon icon-yellow"
+                    aria-hidden="true"
+                  >
                     <i data-icon="file-circle-question"></i>
                   </div>
                   <span
@@ -448,7 +451,7 @@
                 type="search"
                 class="organizer-search-input"
                 placeholder="Buscar pasta..."
-                data-i18n-placeholder="organizer.search_placeholder"
+                data-i18n-placeholder="organizer.search_placeholder_tags"
                 aria-label="Buscar pasta"
               />
             </div>
@@ -459,18 +462,10 @@
               aria-label="Filtrar por tipo de mídia"
             >
               <button
-                id="filter-all"
-                class="organizer-filter-button active card tap-scale"
-                data-filter="all"
-                aria-pressed="true"
-              >
-                <span data-i18n="organizer.filter_all">Todas</span>
-              </button>
-              <button
                 id="filter-screenshots"
-                class="organizer-filter-button card tap-scale"
+                class="organizer-filter-button active card tap-scale"
                 data-filter="screenshots"
-                aria-pressed="false"
+                aria-pressed="true"
               >
                 <i data-icon="image" aria-hidden="true"></i>
                 <span data-i18n="common.screenshots_short">Capturas</span>
@@ -484,21 +479,16 @@
                 <i data-icon="video" aria-hidden="true"></i>
                 <span data-i18n="common.recordings_short">Gravações</span>
               </button>
-
-              <div
-                class="organizer-media-counter"
-                id="media-counter"
-                aria-live="polite"
-              ></div>
             </nav>
           </header>
 
           <section
+            id="organizer-automation-section"
             class="automation-section animate-fade-in-up"
             style="animation-delay: 0.25s"
             aria-label="Configuração de organização automática"
           >
-            <label class="automation-card card">
+            <label id="organizer-automation-card" class="automation-card card">
               <div class="automation-info">
                 <div class="automation-icon icon-green" aria-hidden="true">
                   <i data-icon="folder-open"></i>
@@ -524,12 +514,35 @@
             </label>
           </section>
 
+          <button
+            class="organizer-back-btn animate-fade-in-up tap-scale"
+            id="organizer-back-btn"
+            style="display: none; animation-delay: 0.3s"
+          >
+            <i data-icon="arrow-left"></i>
+            <span data-i18n="organizer.back">Voltar</span>
+          </button>
+
+          <div
+            id="organizer-info-bar"
+            class="organizer-info-bar animate-fade-in-up"
+            style="animation-delay: 0.2s"
+          ></div>
+
           <section
             id="folders-grid"
             class="organizer-folders-grid animate-fade-in"
             style="animation-delay: 0.3s"
             aria-label="Pastas organizadas"
           ></section>
+
+          <button
+            class="organizer-fab tap-scale"
+            id="organizer-fab"
+            aria-label="Gerar tags"
+          >
+            <i data-icon="wand-magic-sparkles"></i>
+          </button>
         </article>
 
         <!-- CLEANER -->
@@ -562,7 +575,7 @@
             style="animation-delay: 0.1s"
             aria-label="Configuração de limpeza automática"
           >
-            <label class="automation-card card">
+            <label id="cleaner-automation-card" class="automation-card card">
               <div class="automation-info">
                 <div class="automation-icon icon-purple" aria-hidden="true">
                   <i data-icon="broom"></i>
@@ -754,7 +767,80 @@
 
           <section
             class="settings-section animate-fade-in-up"
+            style="animation-delay: 0.2s"
+          >
+            <h3 class="section-title" data-i18n="settings.section_language">
+              Idioma
+            </h3>
+            <div class="settings-card card">
+              <div
+                class="settings-row settings-row--action settings-row--language"
+                id="setting-language"
+                aria-label="Selecionar idioma"
+              >
+                <div class="settings-info">
+                  <div class="settings-icon icon-indigo" aria-hidden="true">
+                    <i data-icon="language"></i>
+                  </div>
+                  <div class="settings-text">
+                    <h4 data-i18n="settings.language_title">
+                      Idioma do Aplicativo
+                    </h4>
+                    <p id="current-language-label">Português (Brasil)</p>
+                  </div>
+                </div>
+                <div class="settings-chevron" aria-hidden="true">
+                  <i data-icon="chevron-right"></i>
+                </div>
+                <select
+                  id="language-select"
+                  class="language-select-overlay"
+                  aria-label="Selecionar idioma"
+                >
+                  <option value="pt">Português (Brasil)</option>
+                  <option value="en">English</option>
+                  <option value="es">Español</option>
+                </select>
+              </div>
+            </div>
+          </section>
+
+          <section
+            class="settings-section animate-fade-in-up"
             style="animation-delay: 0.3s"
+          >
+            <h3 class="section-title" data-i18n="gemini.section_title">
+              Gemini AI
+            </h3>
+            <div id="gemini-config-card" class="settings-card card">
+              <div
+                class="settings-row settings-row--action"
+                id="setting-gemini-config"
+                role="button"
+                tabindex="0"
+                aria-label="Configurar Gemini AI"
+              >
+                <div class="settings-info">
+                  <div class="settings-icon icon-violet" aria-hidden="true">
+                    <i data-icon="wand-magic-sparkles"></i>
+                  </div>
+                  <div class="settings-text">
+                    <h4 data-i18n="gemini.section_title">Gemini AI</h4>
+                    <p data-i18n="gemini.desc">
+                      Configure o modelo Gemini AI para tagging automático
+                    </p>
+                  </div>
+                </div>
+                <div class="settings-chevron" aria-hidden="true">
+                  <i data-icon="chevron-right"></i>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section
+            class="settings-section animate-fade-in-up"
+            style="animation-delay: 0.4s"
           >
             <h3 class="section-title" data-i18n="settings.section_visual">
               Visual
@@ -763,7 +849,7 @@
               <label class="settings-row">
                 <div class="settings-info">
                   <div class="settings-icon icon-blue" aria-hidden="true">
-                    <i data-icon="wand-magic-sparkles"></i>
+                    <i data-icon="spinner"></i>
                   </div>
                   <div class="settings-text">
                     <h4 data-i18n="settings.animations_title">Animações</h4>
@@ -786,7 +872,7 @@
 
           <section
             class="settings-section animate-fade-in-up"
-            style="animation-delay: 0.4s"
+            style="animation-delay: 0.5s"
           >
             <h3
               class="section-title"
@@ -845,7 +931,7 @@
               </label>
               <label class="settings-row">
                 <div class="settings-info">
-                  <div class="settings-icon icon-blue" aria-hidden="true">
+                  <div class="settings-icon icon-yellow" aria-hidden="true">
                     <i data-icon="file-circle-question"></i>
                   </div>
                   <div class="settings-text">
@@ -871,7 +957,7 @@
 
           <section
             class="settings-section animate-fade-in-up"
-            style="animation-delay: 0.5s"
+            style="animation-delay: 0.6s"
           >
             <h3 class="section-title" data-i18n="settings.section_files">
               Arquivos
@@ -885,7 +971,7 @@
                 aria-label="Configurar pasta de destino"
               >
                 <div class="settings-info">
-                  <div class="settings-icon icon-blue" aria-hidden="true">
+                  <div class="settings-icon icon-green" aria-hidden="true">
                     <i data-icon="folder-open"></i>
                   </div>
                   <div class="settings-text">
@@ -909,7 +995,7 @@
 
           <section
             class="settings-section animate-fade-in-up"
-            style="animation-delay: 0.6s"
+            style="animation-delay: 0.7s"
           >
             <h3 class="section-title" data-i18n="settings.section_schedule">
               Agendamento
@@ -923,7 +1009,7 @@
                 aria-label="Configurar horário de execução"
               >
                 <div class="settings-info">
-                  <div class="settings-icon icon-yellow" aria-hidden="true">
+                  <div class="settings-icon icon-orange" aria-hidden="true">
                     <i data-icon="clock"></i>
                   </div>
                   <div class="settings-text">
@@ -947,46 +1033,6 @@
 
           <section
             class="settings-section animate-fade-in-up"
-            style="animation-delay: 0.7s"
-          >
-            <h3 class="section-title" data-i18n="settings.section_language">
-              Idioma
-            </h3>
-            <div class="settings-card card">
-              <div
-                class="settings-row settings-row--action settings-row--language"
-                id="setting-language"
-                aria-label="Selecionar idioma"
-              >
-                <div class="settings-info">
-                  <div class="settings-icon icon-blue" aria-hidden="true">
-                    <i data-icon="language"></i>
-                  </div>
-                  <div class="settings-text">
-                    <h4 data-i18n="settings.language_title">
-                      Idioma do Aplicativo
-                    </h4>
-                    <p id="current-language-label">Português (Brasil)</p>
-                  </div>
-                </div>
-                <div class="settings-chevron" aria-hidden="true">
-                  <i data-icon="chevron-right"></i>
-                </div>
-                <select
-                  id="language-select"
-                  class="language-select-overlay"
-                  aria-label="Selecionar idioma"
-                >
-                  <option value="pt">Português (Brasil)</option>
-                  <option value="en">English</option>
-                  <option value="es">Español</option>
-                </select>
-              </div>
-            </div>
-          </section>
-
-          <section
-            class="settings-section animate-fade-in-up"
             style="animation-delay: 0.8s"
           >
             <h3 class="section-title" data-i18n="settings.section_data">
@@ -1001,7 +1047,7 @@
                 aria-label="Exportar dados do aplicativo"
               >
                 <div class="settings-info">
-                  <div class="settings-icon icon-green" aria-hidden="true">
+                  <div class="settings-icon icon-cyan" aria-hidden="true">
                     <i data-icon="download"></i>
                   </div>
                   <div class="settings-text">
@@ -1024,7 +1070,7 @@
                 aria-label="Importar dados do aplicativo"
               >
                 <div class="settings-info">
-                  <div class="settings-icon icon-blue" aria-hidden="true">
+                  <div class="settings-icon icon-pink" aria-hidden="true">
                     <i data-icon="upload"></i>
                   </div>
                   <div class="settings-text">
@@ -1057,7 +1103,7 @@
             <div class="settings-card card">
               <div class="settings-critical-action">
                 <div class="settings-info">
-                  <div class="settings-icon icon-yellow" aria-hidden="true">
+                  <div class="settings-icon icon-amber" aria-hidden="true">
                     <i data-icon="rotate-ccw"></i>
                   </div>
                   <div class="settings-text">
@@ -1142,19 +1188,30 @@
     </div>
 
     <!-- DIALOGS -->
-    <dialog
+    <div
       id="process-dialog"
       class="dialog"
+      role="dialog"
       aria-labelledby="process-dialog-title"
+      aria-hidden="true"
     >
       <header class="dialog-header">
-        <h2
-          class="dialog-title"
-          id="process-dialog-title"
-          data-i18n="dialog.process_title"
+        <div
+          class="dialog-header-icon"
+          id="process-dialog-icon"
+          aria-hidden="true"
         >
-          Processando
-        </h2>
+          <i data-icon="image"></i>
+        </div>
+        <div class="dialog-header-text">
+          <h2
+            class="dialog-title"
+            id="process-dialog-title"
+            data-i18n="process.title"
+          >
+            Processando
+          </h2>
+        </div>
         <button
           type="button"
           id="process-dialog-close"
@@ -1176,9 +1233,7 @@
         </div>
 
         <div class="process-progress-info">
-          <span
-            id="process-dialog-step-label"
-            data-i18n="dialog.process_starting"
+          <span id="process-dialog-step-label" data-i18n="process.starting"
             >Iniciando processo...</span
           >
           <span id="process-dialog-percent">0%</span>
@@ -1190,27 +1245,34 @@
           <div class="process-completion-icon" aria-hidden="true">
             <i data-icon="check"></i>
           </div>
-          <p class="process-completion-title" data-i18n="dialog.process_done">
+          <p class="process-completion-title" data-i18n="process.done">
             Processo Concluído!
           </p>
           <p id="process-dialog-result" class="process-completion-text"></p>
         </div>
       </div>
-    </dialog>
+    </div>
 
-    <dialog
+    <div
       id="confirmation-dialog"
       class="dialog"
+      role="dialog"
       aria-labelledby="confirmation-dialog-title"
+      aria-hidden="true"
     >
       <header class="dialog-header">
-        <h2
-          class="dialog-title"
-          id="confirmation-dialog-title"
-          data-i18n="dialog.confirmation_title"
-        >
-          Confirmação
-        </h2>
+        <div class="dialog-header-icon" aria-hidden="true">
+          <i data-icon="triangle-exclamation"></i>
+        </div>
+        <div class="dialog-header-text">
+          <h2
+            class="dialog-title"
+            id="confirmation-dialog-title"
+            data-i18n="dialog.confirmation_title"
+          >
+            Confirmação
+          </h2>
+        </div>
         <button
           type="button"
           id="confirmation-dialog-close"
@@ -1246,6 +1308,326 @@
           <span data-i18n="dialog.confirm">Confirmar</span>
         </button>
       </footer>
-    </dialog>
+    </div>
+
+    <!-- GEMINI CONFIG DIALOG -->
+    <div
+      class="dialog dialog-gemini"
+      id="dialog-gemini-config"
+      role="dialog"
+      aria-labelledby="dialog-gemini-title"
+      aria-hidden="true"
+    >
+      <header class="dialog-header">
+        <div class="dialog-header-icon" aria-hidden="true">
+          <i data-icon="wand-magic-sparkles"></i>
+        </div>
+        <div class="dialog-header-text">
+          <h2
+            class="dialog-title"
+            id="dialog-gemini-title"
+            data-i18n="gemini.dialog_title"
+          >
+            Gemini AI
+          </h2>
+          <p class="dialog-subtitle" data-i18n="gemini.dialog_subtitle">
+            Configure o modelo e as chaves de API
+          </p>
+        </div>
+        <button
+          type="button"
+          class="dialog-close tap-scale"
+          id="dialog-gemini-close"
+          aria-label="Fechar"
+        >
+          <i data-icon="x"></i>
+        </button>
+      </header>
+
+      <div class="dialog-body gemini-body">
+        <div class="gemini-field">
+          <label
+            class="gemini-label"
+            for="gemini-model-input"
+            data-i18n="gemini.model_label"
+            >Modelo</label
+          >
+          <div class="gemini-select-wrapper">
+            <select id="gemini-model-input" class="gemini-input"></select>
+            <i data-icon="chevron-down" class="gemini-select-arrow"></i>
+          </div>
+        </div>
+
+        <div class="gemini-field">
+          <label
+            class="gemini-label"
+            for="gemini-new-key-input"
+            data-i18n="gemini.api_key_label"
+            >Chaves de API</label
+          >
+          <div id="gemini-apikeys-list" class="gemini-keys-list"></div>
+
+          <div
+            class="gemini-add-key-row"
+            id="gemini-add-key-row"
+            style="display: none"
+          >
+            <input
+              type="password"
+              id="gemini-new-key-input"
+              class="gemini-input"
+              aria-label="Nova chave de API"
+              data-i18n-placeholder="gemini.api_key_placeholder"
+              placeholder="Insira sua chave de API do Gemini"
+            />
+            <button
+              type="button"
+              class="gemini-add-key-confirm tap-scale"
+              id="gemini-add-key-confirm"
+              aria-label="Confirmar chave"
+            >
+              <i data-icon="check"></i>
+            </button>
+          </div>
+
+          <button
+            type="button"
+            class="gemini-add-key-btn tap-scale"
+            id="gemini-add-key-btn"
+          >
+            <i data-icon="circle-fading-plus"></i>
+            <span data-i18n="gemini.add_key">Adicionar chave</span>
+          </button>
+        </div>
+      </div>
+
+      <footer class="dialog-actions">
+        <button
+          type="button"
+          class="btn btn-outline"
+          id="dialog-gemini-cancel"
+          data-i18n="gemini.cancel"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          id="dialog-gemini-save"
+          data-i18n="gemini.save"
+        >
+          Salvar
+        </button>
+      </footer>
+    </div>
+
+    <!-- TAGGING DIALOG -->
+    <div
+      class="dialog dialog-tagging"
+      id="dialog-tagging"
+      role="dialog"
+      aria-labelledby="dialog-tagging-title"
+      aria-hidden="true"
+    >
+      <header class="dialog-header">
+        <div class="dialog-header-icon" aria-hidden="true">
+          <i data-icon="tags"></i>
+        </div>
+        <div class="dialog-header-text">
+          <h2
+            class="dialog-title"
+            id="dialog-tagging-title"
+            data-i18n="tagging.dialog_title"
+          >
+            Gerar Tags com IA
+          </h2>
+          <p class="dialog-subtitle" data-i18n="tagging.dialog_description">
+            A IA analisa cada mídia e gera palavras-chave automaticamente para
+            facilitar a busca.
+          </p>
+        </div>
+        <button
+          type="button"
+          class="dialog-close tap-scale"
+          id="dialog-tagging-close"
+          aria-label="Fechar"
+        >
+          <i data-icon="x"></i>
+        </button>
+      </header>
+
+      <div
+        class="tagging-stats"
+        id="tagging-stats"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        <div class="tagging-stat tagging-stat--pending">
+          <span class="tagging-stat-value" id="tagging-stat-pending">0</span>
+          <span class="tagging-stat-label" data-i18n="tagging.stats_pending"
+            >Pendentes</span
+          >
+        </div>
+        <div class="tagging-stat-divider"></div>
+        <div class="tagging-stat tagging-stat--tagged">
+          <span class="tagging-stat-value" id="tagging-stat-tagged">0</span>
+          <span class="tagging-stat-label" data-i18n="tagging.stats_tagged"
+            >Tagueadas</span
+          >
+        </div>
+        <div class="tagging-stat-divider"></div>
+        <div class="tagging-stat tagging-stat--skipped">
+          <span class="tagging-stat-value" id="tagging-stat-skipped">0</span>
+          <span class="tagging-stat-label" data-i18n="tagging.stats_skipped"
+            >Ignoradas</span
+          >
+        </div>
+      </div>
+
+      <div class="dialog-body tagging-body">
+        <div class="tagging-loader" id="tagging-loader">
+          <div class="ui-spinner tagging-loader-icon"></div>
+        </div>
+
+        <div
+          class="tagging-card-area"
+          id="tagging-card-area"
+          style="display: none"
+        >
+          <div class="tagging-image-wrapper" id="tagging-image-wrapper">
+            <img id="tagging-preview" class="tagging-preview" src="" alt="" />
+            <div class="tagging-image-footer">
+              <i data-icon="file" class="tagging-filename-icon"></i>
+              <p class="tagging-filename" id="tagging-filename"></p>
+            </div>
+          </div>
+        </div>
+
+        <p
+          class="tagging-empty"
+          id="tagging-empty"
+          style="display: none"
+          data-i18n="tagging.all_done"
+        >
+          Todas as capturas foram processadas!
+        </p>
+
+        <div
+          class="tagging-batch-progress"
+          id="tagging-batch-progress"
+          style="display: none"
+        >
+          <div class="ui-spinner tagging-loader-icon"></div>
+          <p class="tagging-batch-label" id="tagging-batch-label"></p>
+        </div>
+
+        <div
+          class="tagging-main-actions"
+          id="tagging-main-actions"
+          style="display: none"
+        >
+          <button
+            type="button"
+            class="tagging-btn tagging-btn-skip tap-scale"
+            id="tagging-btn-skip"
+          >
+            <i data-icon="x"></i>
+            <span data-i18n="tagging.skip">Ignorar</span>
+          </button>
+          <button
+            type="button"
+            class="tagging-btn tagging-btn-generate tap-scale"
+            id="tagging-btn-generate"
+          >
+            <i data-icon="wand-magic-sparkles"></i>
+            <span data-i18n="tagging.generate">Gerar Tags</span>
+          </button>
+        </div>
+      </div>
+
+      <footer class="dialog-actions" id="tagging-batch-actions">
+        <button
+          type="button"
+          class="tagging-btn-batch tap-scale"
+          id="tagging-btn-skip-all"
+        >
+          <i data-icon="x"></i>
+          <span data-i18n="tagging.skip_all">Ignorar Todas</span>
+        </button>
+        <button
+          type="button"
+          class="tagging-btn-batch tagging-btn-batch--primary tap-scale"
+          id="tagging-btn-generate-all"
+        >
+          <i data-icon="wand-magic-sparkles"></i>
+          <span data-i18n="tagging.generate_all">Taguear Todas</span>
+        </button>
+        <button
+          type="button"
+          class="tagging-btn-batch tagging-btn-batch--stop tap-scale"
+          id="tagging-btn-stop"
+          style="display: none"
+        >
+          <i data-icon="square"></i>
+          <span data-i18n="tagging.stop">Parar</span>
+        </button>
+      </footer>
+    </div>
+
+    <!-- MEDIA DETAIL DIALOG -->
+    <div
+      class="dialog dialog-detail"
+      id="dialog-media-detail"
+      role="dialog"
+      aria-label="Detalhes da Captura"
+      aria-hidden="true"
+    >
+      <div class="dialog-body detail-body">
+        <button
+          type="button"
+          class="dialog-close detail-close-overlay tap-scale"
+          id="media-detail-close"
+          aria-label="Fechar"
+        >
+          <i data-icon="x" aria-hidden="true"></i>
+        </button>
+        <div class="detail-media-wrapper" id="media-detail-wrapper">
+          <img id="media-detail-preview" class="detail-media" src="" alt="" />
+          <video
+            id="media-detail-player"
+            class="detail-media"
+            preload="metadata"
+            playsinline
+            controls
+            aria-label="Player de gravação de tela"
+            style="display: none"
+          ></video>
+        </div>
+        <div class="detail-info">
+          <dl class="detail-meta">
+            <dt class="sr-only" data-i18n="media_detail.filename_label">
+              Nome do arquivo
+            </dt>
+            <dd class="detail-filename" id="media-detail-filename"></dd>
+          </dl>
+          <div class="detail-tags-section">
+            <div
+              class="detail-tags"
+              id="media-detail-tags"
+              aria-live="polite"
+            ></div>
+            <button
+              type="button"
+              class="detail-generate-btn tap-scale"
+              id="media-detail-generate-btn"
+              style="display: none"
+            >
+              <i data-icon="wand-magic-sparkles" aria-hidden="true"></i>
+              <span data-i18n="tagging.generate">Gerar Tags</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

@@ -35,19 +35,15 @@ function handleConfirm() {
 
 const handlers = {
   onConfirm: handleConfirm,
-  onClose: close,
-  onBackdrop: e => {
-    if (e.target === elements.dialog) close();
-  }
+  onClose: close
 };
 
 function attachEvents() {
-  const { dialog, closeBtn, confirmBtn, cancelBtn } = elements;
+  const { closeBtn, confirmBtn, cancelBtn } = elements;
   const events = [
     [confirmBtn, "click", handlers.onConfirm],
     [cancelBtn, "click", handlers.onClose],
-    [closeBtn, "click", handlers.onClose],
-    [dialog, "click", handlers.onBackdrop]
+    [closeBtn, "click", handlers.onClose]
   ];
   events.forEach(([el, event, handler]) => el.addEventListener(event, handler));
 }

@@ -48,7 +48,10 @@ function resolveValue(key, params) {
 
 function t(key, params) {
   const value = resolveValue(key, params);
-  if (value === null) return key;
+  if (value === null) {
+    Logger.warn("[i18n]: ", { key, params });
+    return key;
+  }
   return interpolate(value, params);
 }
 

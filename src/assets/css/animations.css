@@ -18,11 +18,15 @@
 }
 
 .animate-scale-in {
-  animation: scaleIn 0.5s var(--transition-spring) both;
+  animation: scaleIn 0.25s var(--transition-spring) both;
 }
 
 .animate-pulse-highlight {
   animation: pulseHighlight 0.4s var(--transition-spring);
+}
+
+.animate-card-highlight {
+  animation: cardHighlight 3s ease-in-out !important;
 }
 
 .tap-scale {
@@ -85,5 +89,87 @@
   }
   100% {
     transform: scale(1);
+  }
+}
+
+@keyframes cardHighlight {
+  0% {
+    border-color: hsl(var(--border));
+    background-color: hsl(var(--card));
+    box-shadow:
+      rgba(0, 0, 0, 0.05) 0rem 0.1rem 0.3rem 0rem,
+      rgba(0, 0, 0, 0.06) 0rem 0.1rem 0.2rem 0rem;
+  }
+  15% {
+    border-color: hsl(var(--primary) / 0.6);
+    background-color: hsl(var(--primary) / 0.2);
+    box-shadow:
+      0 0 0 0.3rem hsl(var(--primary) / 0.25),
+      0 0 2rem hsl(var(--primary) / 0.15),
+      rgba(0, 0, 0, 0.05) 0rem 0.1rem 0.3rem 0rem;
+  }
+  30% {
+    border-color: hsl(var(--primary) / 0.3);
+    background-color: hsl(var(--primary) / 0.08);
+    box-shadow:
+      0 0 0 0.1rem hsl(var(--primary) / 0.15),
+      rgba(0, 0, 0, 0.05) 0rem 0.1rem 0.3rem 0rem;
+  }
+  50% {
+    border-color: hsl(var(--primary) / 0.55);
+    background-color: hsl(var(--primary) / 0.18);
+    box-shadow:
+      0 0 0 0.3rem hsl(var(--primary) / 0.22),
+      0 0 2rem hsl(var(--primary) / 0.12),
+      rgba(0, 0, 0, 0.05) 0rem 0.1rem 0.3rem 0rem;
+  }
+  68% {
+    border-color: hsl(var(--primary) / 0.25);
+    background-color: hsl(var(--primary) / 0.06);
+    box-shadow:
+      0 0 0 0.05rem hsl(var(--primary) / 0.1),
+      rgba(0, 0, 0, 0.05) 0rem 0.1rem 0.3rem 0rem;
+  }
+  82% {
+    border-color: hsl(var(--primary) / 0.35);
+    background-color: hsl(var(--primary) / 0.1);
+    box-shadow:
+      0 0 0 0.15rem hsl(var(--primary) / 0.15),
+      rgba(0, 0, 0, 0.05) 0rem 0.1rem 0.3rem 0rem;
+  }
+  100% {
+    border-color: hsl(var(--border));
+    background-color: hsl(var(--card));
+    box-shadow:
+      rgba(0, 0, 0, 0.05) 0rem 0.1rem 0.3rem 0rem,
+      rgba(0, 0, 0, 0.06) 0rem 0.1rem 0.2rem 0rem;
+  }
+}
+
+@keyframes uiSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes tagging-slide-in-left {
+  from {
+    transform: translateX(-110%) rotate(-6deg);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes tagging-slide-in-right {
+  from {
+    transform: translateX(110%) rotate(6deg);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0) rotate(0deg);
+    opacity: 1;
   }
 }

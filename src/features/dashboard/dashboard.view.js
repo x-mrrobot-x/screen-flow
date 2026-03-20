@@ -2,7 +2,7 @@ import DOM from "../../lib/dom.js";
 import Icons from "../../core/ui/icons.js";
 import I18n from "../../core/services/i18n.js";
 import ENV from "../../core/platform/env.js";
-import Utils from "../../lib/utils.js";
+import Format from "../../core/ui/format.js";
 
 let elements = null;
 
@@ -91,16 +91,29 @@ const update = {
     animateValue(elements.foldersCreated.recordings, recordings ?? 0);
   },
   lastOrganization: (screenshots, recordings) => {
-    animateValue(elements.lastOrg.screenshots, screenshots);
-    animateValue(elements.lastOrg.recordings, recordings);
+    animateValue(
+      elements.lastOrg.screenshots,
+      Format.formatTimestamp(screenshots)
+    );
+    animateValue(
+      elements.lastOrg.recordings,
+      Format.formatTimestamp(recordings)
+    );
   },
   lastClean: (screenshots, recordings) => {
-    animateValue(elements.lastClean.screenshots, screenshots);
-    animateValue(elements.lastClean.recordings, recordings);
+    animateValue(
+      elements.lastClean.screenshots,
+      Format.formatTimestamp(screenshots)
+    );
+    animateValue(
+      elements.lastClean.recordings,
+      Format.formatTimestamp(recordings)
+    );
   },
   mostCapturedApp: app => {
-    if (elements.topApp.name.textContent !== app.name)
-      elements.topApp.name.textContent = app.name;
+    const displayName = app.name || I18n.t("common.none");
+    if (elements.topApp.name.textContent !== displayName)
+      elements.topApp.name.textContent = displayName;
     animateValue(elements.topApp.count, app.count.toLocaleString());
     const newIconSrc = ENV.resolveIconPath(app.pkg);
     if (elements.topApp.icon.getAttribute("src") !== newIconSrc)

@@ -6,7 +6,8 @@ function create({
   container,
   renderItem,
   emptyState,
-  pageSize = DEFAULT_PAGE_SIZE
+  pageSize = DEFAULT_PAGE_SIZE,
+  onBatchRendered = null
 }) {
   let page = 0;
   let allItems = [];
@@ -22,12 +23,16 @@ function create({
     const batch = allItems.slice(start, start + pageSize);
     if (!batch.length) return null;
 
+    const nodes = [];
     const fragment = document.createDocumentFragment();
     batch.forEach((item, i) => {
       const node = renderItem(item, i);
-      if (node) fragment.appendChild(node);
+      if (node) {
+        fragment.appendChild(node);
+        nodes.push(node);
+      }
     });
-    return fragment;
+    return { fragment, nodes };
   }
 
   function appendFragment(fragment) {
@@ -36,14 +41,16 @@ function create({
   }
 
   function insertBatch() {
-    const fragment = buildBatchFragment();
-    if (!fragment) {
+    const result = buildBatchFragment();
+    if (!result) {
       teardownObserver();
       return;
     }
 
+    const { fragment, nodes } = result;
     appendFragment(fragment);
     page++;
+    if (onBatchRendered) onBatchRendered(nodes);
     if (!hasMoreItems()) teardownObserver();
   }
 

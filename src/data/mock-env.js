@@ -164,9 +164,6 @@ const MOCK_COMMANDS = {
     );
   },
 
-  path_exists() {
-    return true;
-  },
 
   rename_folder() {
     return { renamed: true, timestamp: Math.floor(Date.now() / 1000) };
@@ -207,6 +204,152 @@ const MOCK_COMMANDS = {
       deleted: MOCK_MEDIA_FILES[mediaType]?.[folderName] ?? 0,
       mtime: MOCK_FOLDER_TIMESTAMPS[mediaType]?.[folderName] ?? null
     };
+  },
+
+  get_media_stats(args) {
+    const [dir, ext] = args;
+    if (ext === "mp4") return { pending: 8, tagged: 3, skipped: 1 };
+    return { pending: 12, tagged: 5, skipped: 2 };
+  },
+
+  get_pending_media(args) {
+    const [dir] = args;
+    const isRecordings =
+      dir?.includes("Recording") || dir?.includes("recording");
+    if (isRecordings) {
+      return {
+        files: [
+          "WhatsApp/Recording_2024-10-19-14-04-19.mp4",
+          "Instagram/Recording_2024-10-21-10-10-00.mp4",
+          "YouTube/Recording_2024-10-22-08-30-00.mp4"
+        ]
+      };
+    }
+    return {
+      files: [
+        "Telegram/Screenshot_2024-08-07-07-26-13-563_org.telegram.messenger.jpg",
+        "WhatsApp/Screenshot_2024-09-15-10-44-22_com.whatsapp.jpg",
+        "Instagram/Screenshot_2024-10-01-08-30-05_com.instagram.jpg"
+      ]
+    };
+  },
+
+  list_media_in_folder(args) {
+    const [folderPath] = args;
+    const isRecordings =
+      folderPath?.includes("Recording") || folderPath?.includes("recording");
+    if (isRecordings) {
+      return {
+        files: [
+          "Recording_2024-10-19-14-04-19.mp4",
+          "Recording_2024-10-20-09-11-45[gaming].mp4",
+          "Recording_2024-10-21-10-10-00[skip].mp4"
+        ]
+      };
+    }
+    return {
+      files: [
+        "Screenshot_2024-10-19-14-04-19.jpg",
+        "Screenshot_2024-10-19-15-22-01[free_fire_lobby].jpg",
+        "Screenshot_2024-10-20-09-11-45[skip].jpg",
+        "Screenshot_2024-10-20-11-33-57.jpg",
+        "Screenshot_2024-10-21-08-55-30.jpg",
+        "Screenshot_2024-10-21-10-10-00[youtube_music].jpg"
+      ]
+    };
+  },
+
+  search_media_by_tag(args) {
+    const [dir, query] = args;
+    if (!query) return { files: [] };
+    const isRecordings =
+      dir?.includes("Recording") || dir?.includes("recording");
+    if (isRecordings) {
+      return {
+        files: [
+          {
+            path: `${dir}/WhatsApp/Recording_2024-10-19[${query}].mp4`,
+            name: `Recording_2024-10-19[${query}].mp4`,
+            mtime: 1729351321
+          },
+          {
+            path: `${dir}/Instagram/Recording_2024-10-21[${query}_screen].mp4`,
+            name: `Recording_2024-10-21[${query}_screen].mp4`,
+            mtime: 1729501800
+          }
+        ]
+      };
+    }
+    return {
+      files: [
+        {
+          path: `${dir}/WhatsApp/Screenshot_2024-10-19[${query}].jpg`,
+          name: `Screenshot_2024-10-19[${query}].jpg`,
+          mtime: 1729351321
+        },
+        {
+          path: `${dir}/Instagram/Screenshot_2024-10-21[${query}_result].jpg`,
+          name: `Screenshot_2024-10-21[${query}_result].jpg`,
+          mtime: 1729501800
+        }
+      ]
+    };
+  },
+
+  skip_screenshot(args) {
+    const [filePath] = args;
+    const dir = filePath.substring(0, filePath.lastIndexOf("/"));
+    const name = filePath.substring(filePath.lastIndexOf("/") + 1);
+    const ext = name.substring(name.lastIndexOf("."));
+    const base = name
+      .substring(0, name.lastIndexOf("."))
+      .replace(/\[[^\]]*\]/g, "")
+      .trimEnd();
+    const newPath = `${dir}/${base}[skip]${ext}`;
+    return { newPath };
+  },
+
+  apply_tags_to_filename(args) {
+    const [filePath, tagsCsv] = args;
+    const dir = filePath.substring(0, filePath.lastIndexOf("/"));
+    const name = filePath.substring(filePath.lastIndexOf("/") + 1);
+    const ext = name.substring(name.lastIndexOf("."));
+    const base = name
+      .substring(0, name.lastIndexOf("."))
+      .replace(/\[[^\]]*\]/g, "")
+      .trimEnd();
+    const tagStr = (tagsCsv || "")
+      .replace(/,/g, "_")
+      .replace(/__+/g, "_")
+      .replace(/^_|_$/g, "");
+    const newPath = `${dir}/${base}[${tagStr}]${ext}`;
+    return { newPath };
+  },
+
+  clear_tags_from_filename(args) {
+    const [filePath] = args;
+    const dir = filePath.substring(0, filePath.lastIndexOf("/"));
+    const name = filePath.substring(filePath.lastIndexOf("/") + 1);
+    const ext = name.substring(name.lastIndexOf("."));
+    const base = name
+      .substring(0, name.lastIndexOf("."))
+      .replace(/\[[^\]]*\]/g, "")
+      .trimEnd();
+    return { newPath: `${dir}/${base}${ext}` };
+  },
+
+  generate_tags_gemini(args) {
+    const { image, model, apiKey } = args[0] || {};
+    const mockTagSets = [
+      ["game", "mobile", "screenshot"],
+      ["social_media", "feed", "post"],
+      ["chat", "message", "conversation"],
+      ["video", "streaming", "player"],
+      ["browser", "web", "article"],
+      ["settings", "app", "config"]
+    ];
+    const idx = Math.floor(Math.random() * mockTagSets.length);
+    return { tags: mockTagSets[idx] };
   }
 };
 

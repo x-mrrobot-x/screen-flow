@@ -6,7 +6,8 @@
   --icon-xl: 2.8rem;
   --icon-2xl: 3.6rem;
 
-  --radius-xs: 0.8rem;
+  --radius-xxs: 0.8rem;
+  --radius-xs: 1rem;
   --radius-sm: 1.2rem;
   --radius-md: 1.4rem;
   --radius-lg: 2rem;
@@ -29,7 +30,7 @@
   --font-xl: 2rem;
   --font-2xl: 2.2rem;
 
-  --primary: 213 94% 68%;
+  --primary: 217 91% 65%;
   --primary-foreground: 0 0% 100%;
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
@@ -43,10 +44,11 @@
     hsl(var(--gradient-start)) 0%,
     hsl(var(--gradient-end)) 100%
   );
+  --green: 174 100% 29%;
   --accent-gradient-foreground: 0 0% 100%;
   --success: 142 76% 45%;
   --warning: 38 92% 50%;
-  --accent: 255 92% 76%;
+  --accent: 258 90% 70%;
   --accent-foreground: 0 0% 100%;
 
   --transition-spring: cubic-bezier(0.2, 0.8, 0.2, 1);

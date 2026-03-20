@@ -19,8 +19,6 @@
     "items_plural": "items",
     "removed": "removed",
     "removed_plural": "removed",
-    "moved": "moved",
-    "moved_plural": "moved",
     "cleanup": "Cleanup",
     "none": "None"
   },
@@ -62,17 +60,48 @@
     "empty_screenshots_subtitle": "No folders with screenshots were found.",
     "empty_recordings_title": "No folders with screen recordings",
     "empty_recordings_subtitle": "No folders with screen recordings were found.",
-    "empty_all_title": "No organized folders",
-    "empty_all_subtitle": "Your files will be automatically organized into folders by app.",
     "folder_not_found": "Folder not found.",
     "clear_success": "{{count}} {{item}} {{removed}}",
     "clear_empty": "No files were removed or the folder was already empty.",
     "clear_error": "Error clearing the folder. Please try again.",
     "page_subtitle": "View and manage your media by folder",
-    "search_placeholder": "Search folder...",
-    "filter_all": "All",
+    "search_placeholder_tags": "Search folders or tags...",
     "auto_desc": "Periodically checks for new screenshots and screen recordings and automatically organizes them into folders by app",
-    "folder_action_clear": "Clear folder"
+    "folder_action_clear": "Clear folder",
+    "back": "Back",
+    "empty_screenshots_folder": "No screenshots in this folder.",
+    "empty_recordings_folder": "No recordings in this folder.",
+    "info_folders": "folders",
+    "info_tagged": "with tags",
+    "info_pending": "pending",
+    "info_skipped": "skipped",
+    "search_section_folders": "Folders",
+    "search_section_screenshots": "Screenshots",
+    "search_section_recordings": "Recordings",
+    "search_empty": "No results found"
+  },
+  "tagging": {
+    "dialog_title": "AI Tag Generator",
+    "stats_pending": "Pending",
+    "stats_tagged": "With Tags",
+    "stats_skipped": "Skipped",
+    "skip": "Skip",
+    "generate": "Generate Tags",
+    "skip_all": "Skip All",
+    "generate_all": "Generate for All",
+    "all_done": "All media analyzed!",
+    "error_quota_exceeded": "Gemini daily quota reached",
+    "error_rate_limit": "Too many requests, wait a moment",
+    "error_overloaded": "Gemini is overloaded, try again soon",
+    "error_invalid_key": "Invalid API key, check settings",
+    "error_bad_request": "Error processing image",
+    "error_server": "Gemini server error, try again",
+    "error_network": "No connection to reach Gemini",
+    "loading": "Loading media...",
+    "no_tags": "No tags",
+    "stop": "Stop",
+    "batch_progress": "Processing {done} of {total}...",
+    "dialog_description": "AI analyzes each media file and generates keywords automatically to help you search faster."
   },
   "cleaner": {
     "no_active_folders": "No folders with active cleanup",
@@ -84,7 +113,9 @@
     "count_screenshots": "folder with screenshot cleanup",
     "count_screenshots_plural": "folders with screenshot cleanup",
     "count_recordings": "folder with recording cleanup",
-    "count_recordings_plural": "folders with recording cleanup"
+    "count_recordings_plural": "folders with recording cleanup",
+    "empty_title": "No organized folders",
+    "empty_subtitle": "Organize your screenshots and recordings first so they can be configured for automatic cleanup."
   },
   "stats": {
     "chart_screenshots": "Screenshots per Day",
@@ -99,11 +130,9 @@
     "empty_recordings": "No screen recordings found to organize.",
     "empty_expired": "No outdated files found to clean.",
     "no_cleaner_folders": "No folders configured for cleanup.",
-    "cancelled": "Process cancelled.",
     "cancelling": "Cancelling process...",
     "step_done": "Process complete!",
     "finished": "Process completed successfully!",
-    "organize_done": "{{count}} {{file}} organized.",
     "cleanup_done": "{{count}} {{file}} {{removed}}.",
     "notify_screenshots_done": "{{count}} screenshots organized.",
     "notify_recordings_done": "{{count}} screen recordings organized.",
@@ -124,7 +153,10 @@
     "step_load_rules": "Loading cleanup rules",
     "step_find_expired": "Locating old files",
     "step_delete_expired": "Removing old files",
-    "step_save_cleanup": "Saving cleanup summary"
+    "step_save_cleanup": "Saving cleanup summary",
+    "done": "Process Complete!",
+    "title": "Processing",
+    "starting": "Starting process..."
   },
   "settings": {
     "reset_success": "Settings restored successfully!",
@@ -186,17 +218,33 @@
     "settings": "Settings"
   },
   "dialog": {
-    "process_title": "Processing",
-    "process_starting": "Starting process...",
-    "process_done": "Process Complete!",
     "confirmation_title": "Confirmation",
     "confirmation_message": "Are you sure you want to continue? This action cannot be undone.",
     "cancel": "Cancel",
-    "confirm": "Confirm",
-    "close": "Close"
+    "confirm": "Confirm"
   },
   "features": {
     "auto_organizer": "Auto Organization",
     "auto_cleaner": "Auto Cleanup"
+  },
+  "media_detail": {
+    "screenshot_title": "Screenshot Details",
+    "recording_title": "Recording Details",
+    "filename_label": "File name"
+  },
+  "gemini": {
+    "section_title": "Gemini AI",
+    "dialog_title": "Gemini AI Configuration",
+    "dialog_subtitle": "Configure model and API keys",
+    "model_label": "Model",
+    "api_key_label": "API Keys",
+    "api_key_placeholder": "Enter your Gemini API key",
+    "no_keys": "No API keys added",
+    "add_key": "Add key",
+    "save": "Save",
+    "cancel": "Cancel",
+    "saved": "Gemini settings saved!",
+    "desc": "Configure the Gemini AI model for automatic screenshot tagging",
+    "api_key_required": "Configure your Gemini AI API key to use automatic tag generation."
   }
 }

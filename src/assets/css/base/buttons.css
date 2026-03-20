@@ -9,9 +9,21 @@ button:active {
   transform: scale(0.95);
 }
 
+.btn-primary {
+  color: hsl(var(--primary-foreground));
+  padding: var(--space-sm) var(--space-md);
+  background: var(--accent-gradient);
+  box-shadow: 0 0.2rem 0.8rem hsl(var(--primary) / 0.35);
+}
+
+.btn-primary:active {
+  opacity: 0.85;
+  transform: scale(0.97);
+}
+
 .btn-outline {
   color: hsl(var(--secondary-foreground));
-  border: 1px solid hsl(var(--border));
+  border: 0.1rem solid hsl(var(--border));
   padding: var(--space-sm) var(--space-md);
   background-color: transparent;
 }
@@ -24,7 +36,7 @@ button:active {
 .btn-outline-danger:active {
   color: hsl(var(--destructive-foreground));
   padding: var(--space-sm) var(--space-md);
-  border: 1px solid hsl(var(--destructive));
+  border: 0.1rem solid hsl(var(--destructive));
   background: hsl(var(--destructive));
 }
 
@@ -32,6 +44,6 @@ button:active {
 .btn-danger:active {
   color: hsl(var(--destructive));
   padding: var(--space-sm) var(--space-md);
-  border: 1px solid hsl(var(--destructive));
+  border: 0.1rem solid hsl(var(--destructive));
   background: transparent;
 }

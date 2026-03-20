@@ -1,13 +1,13 @@
 import DOM from "../../../lib/dom.js";
 import Icons from "../../../core/ui/icons.js";
 import I18n from "../../../core/services/i18n.js";
-import Utils from "../../../lib/utils.js";
 
 let elements = null;
 
 function queryElements() {
   elements = {
     dialog: DOM.qs("#process-dialog"),
+    headerIcon: DOM.qs("#process-dialog-icon"),
     title: DOM.qs("#process-dialog-title"),
     bar: DOM.qs("#process-dialog-bar"),
     info: DOM.qs(".process-progress-info"),
@@ -21,8 +21,8 @@ function queryElements() {
   };
 }
 
-const helpers = {
-  stepItemTemplate: (step, index) => `
+const templates = {
+  stepItem: (step, index) => `
     <div class="process-step-item" id="process-step-${index}">
       <div class="process-step-icon-wrap" id="process-icon-${index}">
         <div class="process-step-spinner"></div>
@@ -31,6 +31,13 @@ const helpers = {
       <span class="process-step-label">${I18n.t(step.labelKey)}</span>
     </div>`,
 
+  headerIcon: icon => Icons.getSvg(icon),
+
+  stepList: steps =>
+    steps.map((step, i) => templates.stepItem(step, i)).join("")
+};
+
+const helpers = {
   animateStepsIn: count => {
     for (let i = 0; i < count; i++) {
       const el = DOM.qs(`#process-step-${i}`, elements.steps);
@@ -91,13 +98,15 @@ const helpers = {
 };
 
 function render(steps) {
-  elements.steps.innerHTML = steps
-    .map((step, i) => helpers.stepItemTemplate(step, i))
-    .join("");
+  elements.steps.innerHTML = templates.stepList(steps);
   helpers.animateStepsIn(steps.length);
 }
 
 const update = {
+  icon: (icon, iconClass) => {
+    elements.headerIcon.className = `dialog-header-icon ${iconClass}`;
+    elements.headerIcon.innerHTML = templates.headerIcon(icon);
+  },
   title: title => {
     elements.title.textContent = title;
   },
@@ -148,7 +157,7 @@ const update = {
 };
 
 function reset() {
-  elements.title.textContent = I18n.t("dialog.process_title");
+  elements.title.textContent = I18n.t("process.title");
   elements.bar.style.width = "0%";
   elements.label.textContent = I18n.t("process.label_starting");
   elements.percent.textContent = "0%";

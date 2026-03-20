@@ -2,7 +2,6 @@ import DashboardModel from "./dashboard.model.js";
 import DashboardView from "./dashboard.view.js";
 import EventBus from "../../core/platform/event-bus.js";
 import Navigation from "../../core/ui/navigation.js";
-import AppState from "../../core/state/app-state.js";
 import Logger from "../../core/platform/logger.js";
 import Utils from "../../lib/utils.js";
 
@@ -21,7 +20,7 @@ async function loadStats() {
       DashboardModel.getToOrganizeFileCounts(),
       DashboardModel.getOrganizedFolderCounts()
     ]);
-    AppState.setStats({ toOrganize, foldersCreated });
+    DashboardModel.setStats({ toOrganize, foldersCreated });
   } catch (error) {
     Logger.error("Failed to load dashboard stats:", error);
   }
@@ -35,7 +34,17 @@ const handlers = {
   onAutomationsClick: e => {
     const card = e.target.closest("[data-navigate]");
     if (!card) return;
-    Navigation.navigateTo(card.dataset.navigate);
+    const tab = card.dataset.navigate;
+    const highlightMap = {
+      organizer: "#organizer-automation-card",
+      cleaner: "#cleaner-automation-card"
+    };
+    const elementId = highlightMap[tab];
+    if (elementId) {
+      Navigation.navigateToAndHighlight(tab, elementId);
+    } else {
+      Navigation.navigateTo(tab);
+    }
   }
 };
 

@@ -19,8 +19,6 @@
     "items_plural": "itens",
     "removed": "removido",
     "removed_plural": "removidos",
-    "moved": "movido",
-    "moved_plural": "movidos",
     "cleanup": "Limpeza",
     "none": "Nenhum"
   },
@@ -62,17 +60,25 @@
     "empty_screenshots_subtitle": "Nenhuma pasta com capturas de tela foi encontrada.",
     "empty_recordings_title": "Nenhuma pasta com gravações de tela",
     "empty_recordings_subtitle": "Nenhuma pasta com gravações de tela foi encontrada.",
-    "empty_all_title": "Nenhuma pasta organizada",
-    "empty_all_subtitle": "Seus arquivos serão organizados automaticamente em pastas por aplicativo.",
     "folder_not_found": "Pasta não encontrada.",
     "clear_success": "{{count}} {{item}} {{removed}}",
     "clear_empty": "Nenhum arquivo foi removido ou a pasta já estava vazia.",
     "clear_error": "Erro ao limpar a pasta. Tente novamente.",
     "page_subtitle": "Visualize e gerencie suas mídias por pasta",
-    "search_placeholder": "Buscar pasta...",
-    "filter_all": "Todas",
     "auto_desc": "Verifica periodicamente novas capturas e gravações de tela e as organiza automaticamente em pastas por aplicativo",
-    "folder_action_clear": "Limpar pasta"
+    "folder_action_clear": "Limpar pasta",
+    "search_placeholder_tags": "Buscar pastas ou tags...",
+    "back": "Voltar",
+    "empty_screenshots_folder": "Nenhuma captura nesta pasta.",
+    "empty_recordings_folder": "Nenhuma gravação nesta pasta.",
+    "info_folders": "pastas",
+    "info_tagged": "com tags",
+    "info_pending": "pendentes",
+    "info_skipped": "ignoradas",
+    "search_section_folders": "Pastas",
+    "search_section_screenshots": "Capturas de tela",
+    "search_section_recordings": "Gravações",
+    "search_empty": "Nenhum resultado encontrado"
   },
   "cleaner": {
     "no_active_folders": "Nenhuma pasta com limpeza ativa",
@@ -84,7 +90,9 @@
     "count_screenshots": "pasta com limpeza de capturas de tela",
     "count_screenshots_plural": "pastas com limpeza de capturas de tela",
     "count_recordings": "pasta com limpeza de gravações de tela",
-    "count_recordings_plural": "pastas com limpeza de gravações de tela"
+    "count_recordings_plural": "pastas com limpeza de gravações de tela",
+    "empty_title": "Nenhuma pasta organizada",
+    "empty_subtitle": "Organize suas capturas e gravações primeiro para que possam ser configuradas para limpeza automática."
   },
   "stats": {
     "chart_screenshots": "Capturas por Dia",
@@ -99,11 +107,9 @@
     "empty_recordings": "Nenhuma gravação de tela encontrada para organizar.",
     "empty_expired": "Nenhum arquivo antigo encontrado para limpar.",
     "no_cleaner_folders": "Nenhuma pasta configurada para limpeza.",
-    "cancelled": "Processo cancelado.",
     "cancelling": "Cancelando processo...",
     "step_done": "Processo concluído!",
     "finished": "Processo finalizado com sucesso!",
-    "organize_done": "{{count}} {{file}} organizados.",
     "cleanup_done": "{{count}} {{file}} {{removed}}.",
     "notify_screenshots_done": "{{count}} capturas de tela organizadas.",
     "notify_recordings_done": "{{count}} gravações de tela organizadas.",
@@ -124,7 +130,10 @@
     "step_load_rules": "Carregando regras de limpeza",
     "step_find_expired": "Localizando arquivos antigos",
     "step_delete_expired": "Removendo arquivos antigos",
-    "step_save_cleanup": "Salvando resumo da limpeza"
+    "step_save_cleanup": "Salvando resumo da limpeza",
+    "done": "Processo Concluído!",
+    "title": "Processando",
+    "starting": "Iniciando processo..."
   },
   "settings": {
     "reset_success": "Configurações restauradas com sucesso!",
@@ -186,17 +195,56 @@
     "settings": "Configurações"
   },
   "dialog": {
-    "process_title": "Processando",
-    "process_starting": "Iniciando processo...",
-    "process_done": "Processo Concluído!",
     "confirmation_title": "Confirmação",
     "confirmation_message": "Tem certeza de que deseja continuar? Esta ação não pode ser desfeita.",
     "cancel": "Cancelar",
-    "confirm": "Confirmar",
-    "close": "Fechar"
+    "confirm": "Confirmar"
   },
   "features": {
     "auto_organizer": "Organização Automática",
     "auto_cleaner": "Limpeza Automática"
+  },
+  "tagging": {
+    "dialog_title": "Gerar Tags com IA",
+    "stats_pending": "Pendentes",
+    "stats_tagged": "Com Tags",
+    "stats_skipped": "Ignoradas",
+    "skip": "Ignorar",
+    "generate": "Gerar Tags",
+    "skip_all": "Ignorar Todas",
+    "generate_all": "Gerar Tags em Todas",
+    "all_done": "Todas as mídias foram analisadas!",
+    "error_quota_exceeded": "Cota diária do Gemini atingida",
+    "error_rate_limit": "Muitas requisições, aguarde um momento",
+    "error_overloaded": "Gemini com alta demanda, tente em breve",
+    "error_invalid_key": "API key inválida, verifique nas configurações",
+    "error_bad_request": "Erro ao processar imagem",
+    "error_server": "Erro no servidor Gemini, tente novamente",
+    "error_network": "Sem conexão para acessar o Gemini",
+    "loading": "Carregando mídias...",
+    "no_tags": "Sem tags",
+    "stop": "Parar",
+    "batch_progress": "Processando {done} de {total}...",
+    "dialog_description": "A IA analisa cada mídia e gera palavras-chave automaticamente para facilitar a busca."
+  },
+  "media_detail": {
+    "screenshot_title": "Detalhes da Captura",
+    "recording_title": "Detalhes da Gravação",
+    "filename_label": "Nome do arquivo"
+  },
+  "gemini": {
+    "section_title": "Gemini AI",
+    "dialog_title": "Configuração do Gemini AI",
+    "dialog_subtitle": "Configure o modelo e as chaves de API",
+    "model_label": "Modelo",
+    "api_key_label": "Chaves de API",
+    "api_key_placeholder": "Insira sua chave de API do Gemini",
+    "no_keys": "Nenhuma chave de API adicionada",
+    "add_key": "Adicionar chave",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "saved": "Configurações do Gemini salvas!",
+    "desc": "Configure o modelo Gemini AI para tagging automático de capturas de tela",
+    "api_key_required": "Configure sua chave de API do Gemini AI para usar a geração de tags automática."
   }
 }

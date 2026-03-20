@@ -10,23 +10,17 @@
   gap: var(--space-xs);
   font-size: var(--font-sm);
   color: hsl(var(--muted-foreground));
+  text-transform: capitalize;
   font-weight: 500;
   padding: var(--space-xs) var(--space-md);
   border-radius: var(--radius-md);
-  text-transform: capitalize;
-}
-
-.stats-media-type-button.active[data-media-type="screenshots"] {
-  background: hsl(var(--gradient-start) / 0.8);
-}
-
-.stats-media-type-button.active[data-media-type="recordings"] {
-  background: hsl(var(--gradient-end) / 0.8);
+  transition: all 0.2s ease;
 }
 
 .stats-media-type-button.active {
-  border-color: transparent;
   color: hsl(var(--accent-gradient-foreground));
+  border-color: transparent;
+  background-image: var(--accent-gradient);
 }
 
 .stats-media-type-button svg {

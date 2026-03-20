@@ -16,7 +16,7 @@ function renderUI() {
     paginator = PaginationManager.create({
       container: list,
       renderItem: (folder, i) => CleanerView.render.folderNode(folder, i),
-      emptyState: () => null
+      emptyState: () => CleanerView.templates.emptyState()
     });
   }
 

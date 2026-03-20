@@ -57,15 +57,6 @@ function filterNewPackages(allPackages, existingApps) {
   return allPackages.filter(pkg => !existingPkgs.has(pkg));
 }
 
-async function pathExists(fullPath) {
-  try {
-    return await TaskQueue.add("path_exists", [fullPath], "shell");
-  } catch (error) {
-    Logger.error(`[AppMonitor] Error checking path '${fullPath}':`, error);
-    return false;
-  }
-}
-
 async function renameOnDisk(basePath, oldName, newName) {
   return TaskQueue.add("rename_folder", [basePath, oldName, newName], "shell");
 }
@@ -76,18 +67,15 @@ async function renameFolderForMediaType(
   mediaTypeName,
   basePath
 ) {
-  const fullPath = `${basePath}/${oldName}`;
-  if (!(await pathExists(fullPath)))
-    return { attempted: false, success: false, timestamp: null };
-
   try {
     Logger.info(
       `[AppMonitor] Renaming ${mediaTypeName} folder: '${oldName}' → '${newName}'.`
     );
     const renameResult = await renameOnDisk(basePath, oldName, newName);
+    const renamed = renameResult?.renamed ?? false;
     return {
-      attempted: true,
-      success: renameResult?.renamed ?? false,
+      attempted: renamed,
+      success: renamed,
       timestamp: renameResult?.timestamp ?? null
     };
   } catch (error) {
@@ -123,7 +111,10 @@ function notifyRenameResult(appName, [ssResult, srResult]) {
 
 function applyTimestampToMedia(folder, result, key) {
   if (result.timestamp && folder[key]) {
-    return { ...folder[key], mtime: result.timestamp };
+    return {
+      ...folder[key],
+      mtime: result.timestamp
+    };
   }
   return folder[key];
 }
@@ -145,37 +136,28 @@ function updateFolderInState(oldName, newName, ssResult, srResult) {
   AppState.setFolders(updated);
 }
 
+async function applyFolderRename(oldName, newName) {
+  const results = await renameMediaFolders(oldName, newName);
+  const [ssResult, srResult] = results;
+  if (ssResult.success || srResult.success)
+    updateFolderInState(oldName, newName, ssResult, srResult);
+  notifyRenameResult(newName, results);
+}
+
 async function processFolder(folderName, packageMap) {
   if (!packageMap.has(folderName)) return;
   const app = packageMap.get(folderName);
   const newName = Utils.sanitizeFolderName(app.name);
   if (folderName === newName) return;
-
-  const results = await renameMediaFolders(folderName, newName);
-  const [ssResult, srResult] = results;
-  if (ssResult.success || srResult.success)
-    updateFolderInState(folderName, newName, ssResult, srResult);
-  notifyRenameResult(newName, results);
+  await applyFolderRename(folderName, newName);
 }
 
-async function fetchMediaFolders() {
-  const [screenshotFolders, recordingFolders] = await Promise.allSettled([
-    TaskQueue.add("get_subfolders", [ENV.PATHS.ORGANIZED_SCREENSHOTS], "shell"),
-    TaskQueue.add("get_subfolders", [ENV.PATHS.ORGANIZED_RECORDINGS], "shell")
-  ]);
-  return {
-    screenshotFolders: resolveSettledValue(screenshotFolders),
-    recordingFolders: resolveSettledValue(recordingFolders)
-  };
-}
-
-async function renameFoldersForNewApps(newApps) {
+async function renameFoldersForNewApps(newApps, mediaFolders) {
   if (!newApps?.length) return;
   Logger.debug(
     `[AppMonitor] Checking renames for ${newApps.length} new app(s).`
   );
   try {
-    const mediaFolders = await fetchMediaFolders();
     const diskFolderNames = getUniqueFolderNames(mediaFolders);
     const packageMap = createPackageMap(newApps);
     await Promise.all(
@@ -187,7 +169,13 @@ async function renameFoldersForNewApps(newApps) {
   }
 }
 
-async function updateAppsData(newApps) {
+async function persistNewApps(appsToAdd, mediaFolders) {
+  await renameFoldersForNewApps(appsToAdd, mediaFolders);
+  Toast.success(I18n.t("monitor.apps_updated"));
+  AppState.setApps([...AppState.getApps(), ...appsToAdd]);
+}
+
+async function updateAppsData(newApps, mediaFolders) {
   if (!newApps?.length) {
     Logger.info("[AppMonitor] No app details to add.");
     return;
@@ -199,15 +187,13 @@ async function updateAppsData(newApps) {
       Logger.info("[AppMonitor] All new apps already exist in state.");
       return;
     }
-    await renameFoldersForNewApps(appsToAdd);
-    Toast.success(I18n.t("monitor.apps_updated"));
-    AppState.setApps([...existingApps, ...appsToAdd]);
+    await persistNewApps(appsToAdd, mediaFolders);
   } catch (error) {
     Logger.error("[AppMonitor] Failed to add new apps to state:", error);
   }
 }
 
-async function processNewPackages(allPackages, existingApps) {
+async function processNewPackages(allPackages, existingApps, mediaFolders) {
   const newPackages = filterNewPackages(allPackages, existingApps);
   if (!newPackages.length) {
     Logger.debug("[AppMonitor] No new packages detected.");
@@ -221,24 +207,40 @@ async function processNewPackages(allPackages, existingApps) {
     newPackages,
     "app"
   );
-  await updateAppsData(appDetails);
+  await updateAppsData(appDetails, mediaFolders);
+}
+
+async function fetchAppSyncData() {
+  const appsPath = ENV.getFilePath("APPS");
+  const [checkResult, screenshotFolders, recordingFolders] =
+    await Promise.allSettled([
+      TaskQueue.add("check_installed_apps", { appsPath }, "app"),
+      TaskQueue.add(
+        "get_subfolders",
+        [ENV.PATHS.ORGANIZED_SCREENSHOTS],
+        "shell"
+      ),
+      TaskQueue.add("get_subfolders", [ENV.PATHS.ORGANIZED_RECORDINGS], "shell")
+    ]);
+  return {
+    result: checkResult.status === "fulfilled" ? checkResult.value : null,
+    mediaFolders: {
+      screenshotFolders: resolveSettledValue(screenshotFolders),
+      recordingFolders: resolveSettledValue(recordingFolders)
+    }
+  };
 }
 
 async function loadInstalledApps() {
   Logger.debug("[AppMonitor] Checking for newly installed apps.");
   try {
-    const appsPath = ENV.getFilePath("APPS");
-    const result = await TaskQueue.add(
-      "check_installed_apps",
-      { appsPath },
-      "app"
-    );
+    const { result, mediaFolders } = await fetchAppSyncData();
     if (!result?.changed) {
       Logger.debug("[AppMonitor] No new apps detected.");
       return;
     }
     Logger.info("[AppMonitor] Changes detected. Processing...", result);
-    await processNewPackages(result.packages, AppState.getApps());
+    await processNewPackages(result.packages, AppState.getApps(), mediaFolders);
   } catch (error) {
     Logger.error("[AppMonitor] Failed to sync apps:", error);
   } finally {

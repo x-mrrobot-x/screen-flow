@@ -17,18 +17,25 @@ function sendCompletionNotification(processType, stats) {
   ENV.sendNotification(title, content);
 }
 
-async function onDone(processType, stats) {
-  await AppState.flushPersist();
-  sendCompletionNotification(processType, stats);
+function buildCallbacks(processType) {
+  return {
+    onDone: async stats => {
+      await AppState.flushPersist();
+      sendCompletionNotification(processType, stats);
+    },
+    onError: (error, step) => {
+      Logger.error(
+        "[Runner] Error in step:",
+        step?.id,
+        error?.message ?? String(error)
+      );
+      TaskQueue.cancelAll();
+    }
+  };
 }
 
-function onError(error, step) {
-  Logger.error(
-    "[Runner] Error in step:",
-    step?.id,
-    error?.message ?? String(error)
-  );
-  TaskQueue.cancelAll();
+function buildJsExecutor() {
+  return (funcName, args) => ProcessModel[funcName](...args);
 }
 
 async function checkCleanupPreConditions(processType) {
@@ -52,10 +59,17 @@ async function run() {
     const canProceed = await checkCleanupPreConditions(processType);
     if (!canProceed) return;
 
+    const processData = ProcessConfig.PROCESS_TYPES[processType];
+    if (!processData) {
+      Logger.error(`[Runner] Unknown process type: "${processType}"`);
+      return;
+    }
+
     await ProcessEngine.run(
-      processType,
-      { onDone, onError },
-      { execution: "automatic" }
+      processData.steps,
+      buildCallbacks(processType),
+      { execution: "automatic" },
+      buildJsExecutor()
     );
   } catch (err) {
     Logger.error("[Runner] Critical error:", String(err));

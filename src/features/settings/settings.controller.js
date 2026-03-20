@@ -1,12 +1,13 @@
 import SettingsModel from "./settings.model.js";
 import SettingsView from "./settings.view.js";
+import GeminiController from "./gemini/gemini.controller.js";
 import EventBus from "../../core/platform/event-bus.js";
 import I18n from "../../core/services/i18n.js";
 import Toast from "../../core/ui/toast.js";
 import ConfirmationDialog from "../../core/ui/confirmation-dialog.js";
 import Logger from "../../core/platform/logger.js";
-import ENV from "../../core/platform/env.js";
 import TaskQueue from "../../core/platform/task-queue.js";
+import ThumbnailCache from "../../core/ui/thumbnail-cache.js";
 import SubfolderMonitor from "../../core/services/subfolder-monitor.js";
 
 let isInitialized = false;
@@ -60,6 +61,7 @@ const handlers = {
       },
       () => {
         const ok = SettingsModel.deleteAllData();
+        ThumbnailCache.clearAll().catch(() => {});
         Toast[ok ? "success" : "error"](
           ok
             ? I18n.t("settings.delete_success")
@@ -81,31 +83,42 @@ const handlers = {
       Toast.error(I18n.t("settings.destination_error"));
     }
   },
+  onGeminiConfigClick: () => GeminiController.open(),
   onStateChange: data => {
     if (data?.key === "settings") renderAll();
   }
 };
 
 function attachEvents() {
-  const { tabContent, resetBtn, deleteBtn, languageSelect, destinationBtn } =
-    SettingsView.getElements();
+  const {
+    tabContent,
+    resetBtn,
+    deleteBtn,
+    languageSelect,
+    destinationBtn,
+    geminiConfigBtn
+  } = SettingsView.getElements();
+
   const events = [
     [tabContent, "click", handlers.onThemeClick],
     [tabContent, "change", handlers.onSwitchChange],
     [languageSelect, "change", handlers.onLanguageChange],
     [resetBtn, "click", handlers.onReset],
     [deleteBtn, "click", handlers.onDelete],
-    [destinationBtn, "click", handlers.onDestinationClick]
+    [destinationBtn, "click", handlers.onDestinationClick],
+    [geminiConfigBtn, "click", handlers.onGeminiConfigClick]
   ];
   events.forEach(([el, event, handler]) => {
     if (el) el.addEventListener(event, handler);
   });
+
   EventBus.on("appstate:changed", handlers.onStateChange);
 }
 
 function init() {
   if (isInitialized) return;
   SettingsView.init();
+  GeminiController.init();
   renderAll();
   attachEvents();
   isInitialized = true;

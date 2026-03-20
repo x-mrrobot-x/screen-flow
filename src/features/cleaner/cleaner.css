@@ -50,7 +50,7 @@
 
 .cleaner-folder-options {
   margin-top: var(--space-sm);
-  border-top: 1px solid hsl(var(--border));
+  border-top: 0.1rem solid hsl(var(--border));
 }
 
 .cleaner-group {
@@ -110,4 +110,45 @@
 
 .dot-recording {
   background-color: hsl(var(--accent) / 0.6);
+}
+
+/* ── Empty state ── */
+.cleaner-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-lg);
+  min-height: 30rem;
+  margin: 0 auto;
+  border-radius: var(--radius-lg);
+}
+
+.cleaner-empty-icon-wrapper {
+  padding: var(--space-sm);
+  border: 0.05rem solid hsl(var(--border));
+  margin-bottom: var(--space-lg);
+  border-radius: var(--radius-lg);
+  background: hsl(var(--card));
+  box-shadow: 0 0.4rem 1.2rem hsl(var(--border) / 0.15);
+}
+
+.cleaner-empty-icon-wrapper svg {
+  width: var(--icon-xl);
+  height: var(--icon-xl);
+  color: hsl(var(--muted-foreground));
+}
+
+.cleaner-empty-title {
+  font-size: var(--font-lg);
+  font-weight: 600;
+  color: hsl(var(--foreground));
+  margin-bottom: var(--space-xs);
+}
+
+.cleaner-empty-subtitle {
+  font-size: var(--font-sm);
+  color: hsl(var(--muted-foreground));
+  max-width: 32rem;
 }

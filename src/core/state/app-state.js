@@ -21,11 +21,11 @@ function debouncedPersist(dataKey, data, delay) {
 }
 
 const persist = {
-  folders: () => debouncedPersist("FOLDERS", folders, 1000),
-  settings: () => debouncedPersist("SETTINGS", settings, 500),
-  stats: () => debouncedPersist("STATS", stats, 500),
-  activities: () => debouncedPersist("ACTIVITIES", activities, 1000),
-  apps: () => debouncedPersist("APPS", apps, 1000)
+  folders: () => debouncedPersist("FOLDERS", folders, 300),
+  settings: () => debouncedPersist("SETTINGS", settings, 300),
+  stats: () => debouncedPersist("STATS", stats, 300),
+  activities: () => debouncedPersist("ACTIVITIES", activities, 300),
+  apps: () => debouncedPersist("APPS", apps, 300)
 };
 
 function persistAll() {

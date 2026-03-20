@@ -1,12 +1,31 @@
 import DOM from "../../lib/dom.js";
 import Icons from "../../core/ui/icons.js";
 import I18n from "../../core/services/i18n.js";
-import Utils from "../../lib/utils.js";
 import Format from "../../core/ui/format.js";
-import AppState from "../../core/state/app-state.js";
 
 let elements = null;
 const charts = {};
+
+const CHART_CONFIG = {
+  get LABEL() {
+    return {
+      screenshots: I18n.t("common.screenshots_label"),
+      recordings: I18n.t("common.recordings_label")
+    };
+  },
+  COLOR: {
+    screenshots: "hsl(217 91% 65%)",
+    recordings: "hsl(217 91% 65%)"
+  },
+  COLOR_PALETTE: [
+    "hsl(210, 60%, 45%)",
+    "hsl(160, 60%, 45%)",
+    "hsl(320, 60%, 45%)",
+    "hsl(40, 60%, 45%)",
+    "hsl(190, 60%, 45%)",
+    "hsl(300, 60%, 45%)"
+  ]
+};
 
 function queryElements() {
   elements = {
@@ -52,6 +71,7 @@ const templates = {
         <p>${activity.description}</p>
       </div>
     </li>`,
+
   activityList: activities =>
     activities
       .slice(0, 5)
@@ -64,7 +84,7 @@ const render = {
     elements.activityList.innerHTML = templates.activityList(activities);
   },
 
-  weeklyChart: (data, config) => {
+  weeklyChart: data => {
     charts.weekly?.destroy();
     const colors = getThemeColors();
     charts.weekly = new Chart(elements.weeklyChart, {
@@ -73,9 +93,9 @@ const render = {
         labels: data.weeklyData.map(d => d.day),
         datasets: [
           {
-            label: config.LABEL[data.activeMediaType],
+            label: CHART_CONFIG.LABEL[data.activeMediaType],
             data: data.weeklyData.map(d => d.value),
-            backgroundColor: config.COLOR[data.activeMediaType],
+            backgroundColor: CHART_CONFIG.COLOR[data.activeMediaType],
             borderRadius: 8
           }
         ]
@@ -97,31 +117,26 @@ const render = {
         scales: {
           x: {
             grid: { display: false },
-            ticks: {
-              color: colors.text,
-              font: { size: 11 }
-            }
+            ticks: { color: colors.text, font: { size: 11 } }
           },
           y: {
             beginAtZero: true,
             grid: { color: colors.grid },
-            ticks: {
-              color: colors.text,
-              font: { size: 11 }
-            }
+            ticks: { color: colors.text, font: { size: 11 } }
           }
         }
       }
     });
   },
 
-  foldersChart: (data, config) => {
+  foldersChart: data => {
     charts.folders?.destroy();
     const colors = getThemeColors();
     const topFolders = data.topFolders.map(({ name, count }, index) => ({
       name,
       count,
-      color: config.COLOR_PALETTE[index % config.COLOR_PALETTE.length]
+      color:
+        CHART_CONFIG.COLOR_PALETTE[index % CHART_CONFIG.COLOR_PALETTE.length]
     }));
     charts.folders = new Chart(elements.foldersChart, {
       type: "bar",
@@ -145,11 +160,7 @@ const render = {
         responsive: true,
         maintainAspectRatio: false,
         animations: {
-          x: {
-            duration: 1500,
-            easing: "easeOutQuart",
-            from: 0
-          },
+          x: { duration: 1500, easing: "easeOutQuart", from: 0 },
           y: { duration: 0 }
         },
         plugins: { legend: { display: false } },
@@ -157,28 +168,22 @@ const render = {
           x: {
             beginAtZero: true,
             grid: { display: false },
-            ticks: {
-              color: colors.text,
-              font: { size: 11 }
-            }
+            ticks: { color: colors.text, font: { size: 11 } }
           },
           y: {
             grid: { color: colors.grid },
-            ticks: {
-              color: colors.text,
-              font: { size: 11 }
-            }
+            ticks: { color: colors.text, font: { size: 11 } }
           }
         }
       }
     });
   },
 
-  all: (data, config) => {
+  all: (data, activities) => {
     update.mediaTypeButtons(data.activeMediaType);
-    render.weeklyChart(data, config);
-    render.foldersChart(data, config);
-    render.activityList(AppState.getActivities());
+    render.weeklyChart(data);
+    render.foldersChart(data);
+    render.activityList(activities);
   }
 };
 

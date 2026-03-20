@@ -138,10 +138,10 @@ function WebEnvironment() {
   MockEnv.init();
 
   const PREFIX = "@screenflow:";
-  let _taskResultHandler = null;
+  let taskResultHandler = null;
 
   function setTaskResultHandler(fn) {
-    _taskResultHandler = fn;
+    taskResultHandler = fn;
   }
 
   function resolveIconPath(pkg) {
@@ -196,8 +196,8 @@ function WebEnvironment() {
   }
 
   function notifyTaskResult(id, status, payload) {
-    if (_taskResultHandler) {
-      _taskResultHandler(JSON.stringify({ id, status, payload }));
+    if (taskResultHandler) {
+      taskResultHandler(JSON.stringify({ id, status, payload }));
     }
   }
 

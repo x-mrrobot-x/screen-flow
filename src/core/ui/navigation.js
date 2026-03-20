@@ -43,10 +43,28 @@ function activateTab(tabId) {
   EventBus.emit("navigation:changed", { tab: tabId });
 }
 
+function highlightElement(selector) {
+  const el = DOM.qs(selector);
+  if (!el) return;
+  el.scrollIntoView({
+    behavior: "smooth",
+    block: "center"
+  });
+  el.classList.remove("animate-card-highlight");
+  void el.offsetWidth;
+  el.classList.add("animate-card-highlight");
+  setTimeout(() => el.classList.remove("animate-card-highlight"), 3000);
+}
+
 function navigateTo(tabId) {
   deactivateCurrent();
   activateTab(tabId);
   scrollToTop();
+}
+
+function navigateToAndHighlight(tabId, elementId) {
+  navigateTo(tabId);
+  setTimeout(() => highlightElement(elementId), 300);
 }
 
 function handleNavClick(e) {
@@ -66,6 +84,7 @@ function init() {
 export default {
   init,
   navigateTo,
+  navigateToAndHighlight,
   scrollToTop,
   registerLazy
 };

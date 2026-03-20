@@ -74,13 +74,13 @@
 
 .dashboard-info-icon {
   padding: var(--space-xs);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs);
   flex-shrink: 0;
 }
 
 .dashboard-info-icon svg {
-  width: var(--icon-md);
-  height: var(--icon-md);
+  width: var(--icon-sm);
+  height: var(--icon-sm);
 }
 
 .dashboard-info-title {

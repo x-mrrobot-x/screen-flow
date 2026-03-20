@@ -1,3 +1,5 @@
+@import url("./gemini/gemini.css");
+
 .settings-section {
   margin-bottom: var(--space-lg);
 }

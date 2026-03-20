@@ -2,9 +2,6 @@ import AppState from "../../core/state/app-state.js";
 import TaskQueue from "../../core/platform/task-queue.js";
 import Logger from "../../core/platform/logger.js";
 import ENV from "../../core/platform/env.js";
-import I18n from "../../core/services/i18n.js";
-import Format from "../../core/ui/format.js";
-import Utils from "../../lib/utils.js";
 
 function getTopOrganizerApp() {
   const folders = AppState.getFolders();
@@ -21,67 +18,77 @@ function getTopOrganizerApp() {
   };
 }
 
-async function getToOrganizeFileCounts() {
+async function fetchParallelCounts(screenshotsTask, recordingsTask, errorMsg) {
   try {
     const [screenshotsResult, recordingsResult] = await Promise.all([
-      TaskQueue.add(
-        "count_media_items",
-        ["jpg", ENV.PATHS.SOURCE_SCREENSHOTS],
-        "shell"
-      ),
-      TaskQueue.add(
-        "count_media_items",
-        ["mp4", ENV.PATHS.SOURCE_RECORDINGS],
-        "shell"
-      )
+      screenshotsTask,
+      recordingsTask
     ]);
     return {
       screenshots: Number(screenshotsResult) || 0,
       recordings: Number(recordingsResult) || 0
     };
   } catch (error) {
-    Logger.error("Failed to update pending files count:", error);
-    return {
-      screenshots: 0,
-      recordings: 0
-    };
+    Logger.error(errorMsg, error);
+    return { screenshots: 0, recordings: 0 };
   }
 }
 
+async function getToOrganizeFileCounts() {
+  return fetchParallelCounts(
+    TaskQueue.add(
+      "count_media_items",
+      ["jpg", ENV.PATHS.SOURCE_SCREENSHOTS],
+      "shell"
+    ),
+    TaskQueue.add(
+      "count_media_items",
+      ["mp4", ENV.PATHS.SOURCE_RECORDINGS],
+      "shell"
+    ),
+    "Failed to update pending files count:"
+  );
+}
+
 async function getOrganizedFolderCounts() {
-  try {
-    const [screenshotsFolderCount, recordingsFolderCount] = await Promise.all([
-      TaskQueue.add(
-        "count_subfolders",
-        [ENV.PATHS.ORGANIZED_SCREENSHOTS],
-        "shell"
-      ),
-      TaskQueue.add(
-        "count_subfolders",
-        [ENV.PATHS.ORGANIZED_RECORDINGS],
-        "shell"
-      )
-    ]);
-    return {
-      screenshots: Number(screenshotsFolderCount) || 0,
-      recordings: Number(recordingsFolderCount) || 0
-    };
-  } catch (error) {
-    Logger.error("Failed to update folders created count:", error);
-    return {
-      screenshots: 0,
-      recordings: 0
-    };
-  }
+  return fetchParallelCounts(
+    TaskQueue.add(
+      "count_subfolders",
+      [ENV.PATHS.ORGANIZED_SCREENSHOTS],
+      "shell"
+    ),
+    TaskQueue.add(
+      "count_subfolders",
+      [ENV.PATHS.ORGANIZED_RECORDINGS],
+      "shell"
+    ),
+    "Failed to update folders created count:"
+  );
+}
+
+function resolveTopApp() {
+  return (
+    getTopOrganizerApp() ?? {
+      name: null,
+      count: 0,
+      pkg: "default.png"
+    }
+  );
+}
+
+function getAppSettings() {
+  return {
+    autoOrganizer: AppState.getSetting("autoOrganizer") ?? false,
+    autoCleaner: AppState.getSetting("autoCleaner") ?? false
+  };
+}
+
+function setStats(stats) {
+  AppState.setStats(stats);
 }
 
 function getState() {
   const stats = AppState.getStats();
-  const mostCapturedApp = getTopOrganizerApp() || {
-    name: I18n.t("common.none"),
-    count: 0,
-    pkg: "default.png"
-  };
   return {
     organizedFiles: stats.organizedFiles || 0,
     removedFiles: stats.cleanedFiles || 0,
@@ -93,24 +100,22 @@ function getState() {
       screenshots: 0,
       recordings: 0
     },
-    lastOrganization: {
-      screenshots: Format.formatTimestamp(stats.lastOrganization?.screenshots),
-      recordings: Format.formatTimestamp(stats.lastOrganization?.recordings)
+    lastOrganization: stats.lastOrganization || {
+      screenshots: null,
+      recordings: null
     },
-    lastClean: {
-      screenshots: Format.formatTimestamp(stats.lastClean?.screenshots),
-      recordings: Format.formatTimestamp(stats.lastClean?.recordings)
+    lastClean: stats.lastClean || {
+      screenshots: null,
+      recordings: null
     },
-    mostCapturedApp,
-    settings: {
-      autoOrganizer: AppState.getSetting("autoOrganizer") ?? false,
-      autoCleaner: AppState.getSetting("autoCleaner") ?? false
-    }
+    mostCapturedApp: resolveTopApp(),
+    settings: getAppSettings()
   };
 }
 
 export default {
   getState,
   getToOrganizeFileCounts,
-  getOrganizedFolderCounts
+  getOrganizedFolderCounts,
+  setStats
 };

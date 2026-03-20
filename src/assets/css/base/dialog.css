@@ -3,7 +3,7 @@
   position: fixed;
   top: 50%;
   left: 50%;
-  display: flex;
+  display: none;
   flex-direction: column;
   color: inherit;
   width: 90%;
@@ -16,21 +16,43 @@
   box-shadow: 0 2rem 4rem hsl(0 0% 0% / 0.24);
   transform: translate(-50%, -50%) scale(0.85);
   transition:
-    transform 0.2s,
-    opacity 0.2s;
+    transform 0.25s var(--transition-spring),
+    opacity 0.25s ease;
   overflow: hidden;
   z-index: 1000;
 }
 
-.dialog[open] {
+.dialog.is-open {
   pointer-events: auto;
   opacity: 1;
   transform: translate(-50%, -50%) scale(1);
 }
 
-.dialog::backdrop {
+.dialog.is-closing {
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.85);
+}
+
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: hsl(0 0% 0% / 0);
+  backdrop-filter: blur(0);
+  transition:
+    background 0.25s ease,
+    backdrop-filter 0.25s ease;
+  z-index: 999;
+}
+
+.dialog-overlay.is-open {
   background: hsl(0 0% 0% / 0.4);
   backdrop-filter: blur(0.1rem);
+}
+
+.dialog-overlay.is-closing {
+  background: hsl(0 0% 0% / 0);
+  backdrop-filter: blur(0);
 }
 
 .dialog-header {
@@ -40,7 +62,32 @@
   gap: var(--space-md);
   padding: var(--space-md);
   padding-right: var(--space-sm);
-  border-bottom: 1px solid hsl(var(--border));
+  border-bottom: 0.1rem solid hsl(var(--border));
+}
+
+.dialog-header-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.2rem;
+  height: 3.2rem;
+  border-radius: var(--radius-xs);
+  background: var(--accent-gradient);
+  flex-shrink: 0;
+}
+
+.dialog-header-icon svg {
+  width: 1.8rem;
+  height: 1.8rem;
+  color: var(--foreground);
+}
+
+.dialog-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  flex: 1;
+  min-width: 0;
 }
 
 .dialog-title {
@@ -48,14 +95,20 @@
   font-weight: 700;
 }
 
+.dialog-subtitle {
+  font-size: var(--font-xs);
+  color: hsl(var(--muted-foreground));
+  margin: 0;
+}
+
 .dialog-close {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-xxs);
+  color: hsl(var(--muted-foreground));
+  padding: var(--space-xs);
   border-radius: var(--radius-full);
   background: transparent;
-  color: hsl(var(--muted-foreground));
   transition: all 0.2s ease;
 }
 
@@ -65,8 +118,8 @@
 }
 
 .dialog-close svg {
-  width: var(--icon-md);
-  height: var(--icon-md);
+  width: var(--icon-sm);
+  height: var(--icon-sm);
 }
 
 .dialog-body {
@@ -82,5 +135,6 @@
   display: flex;
   justify-content: flex-end;
   gap: var(--space-sm);
-  padding: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  border-top: 0.05rem solid hsl(var(--border));
 }

@@ -58,9 +58,16 @@ function buildUpdatedFolder(existing, name, pkg, statsKey, count, timestamp) {
   const mediaEntry = {
     count,
     mtime: timestamp,
-    cleaner: existing?.[statsKey]?.cleaner ?? { on: false, days: 7 }
+    cleaner: existing?.[statsKey]?.cleaner ?? {
+      on: false,
+      days: 7
+    }
   };
-  if (existing) return { ...existing, [statsKey]: mediaEntry };
+  if (existing)
+    return {
+      ...existing,
+      [statsKey]: mediaEntry
+    };
   return {
     id: Math.random().toString(36).substring(2),
     name,
@@ -72,13 +79,12 @@ function buildUpdatedFolder(existing, name, pkg, statsKey, count, timestamp) {
 function updateFoldersFromScan(
   scriptOutput,
   type,
-  existingFolders,
-  folderTimestamps
+  folderMap,
+  folderTimestamps,
+  appNameToPkg
 ) {
-  if (!scriptOutput?.length) return existingFolders;
+  if (!scriptOutput?.length) return false;
   const statsKey = getStatsKey(type);
-  const appNameToPkg = createAppPackageMap(AppState.getApps());
-  const folderMap = createFolderMap(existingFolders);
 
   for (const line of scriptOutput) {
     const parsed = parseFolderLine(line);
@@ -98,25 +104,7 @@ function updateFoldersFromScan(
     folderMap.set(name, updated);
   }
 
-  return Array.from(folderMap.values());
-}
-
-function updateFoldersData(scriptOutput, type, folderTimestamps) {
-  try {
-    const existingFolders = AppState.getFolders();
-    const updatedFolders = updateFoldersFromScan(
-      scriptOutput,
-      type,
-      existingFolders,
-      folderTimestamps
-    );
-    AppState.setFolders(updatedFolders);
-  } catch (error) {
-    Logger.error(
-      `[SubfolderMonitor] Failed to process data for type: ${type}`,
-      error
-    );
-  }
+  return true;
 }
 
 function isFolderStale(folder, statsKey, diskTimestamp) {
@@ -144,34 +132,32 @@ async function fetchFolderCounts(path, foldersToUpdate) {
   );
 }
 
-async function processFolderType(type, path) {
+async function processFolderType(type, path, stateFolderMap, statsKey) {
   try {
     const subfolderList = await TaskQueue.add(
       "get_subfolders",
       [path],
       "shell"
     );
-    if (!subfolderList?.length) return new Map();
+    if (!subfolderList?.length)
+      return { diskFolders: new Map(), countsResult: [] };
 
     const diskFolders = parseDiskFolders(subfolderList);
-    const stateFolderMap = createFolderMap(AppState.getFolders());
-    const statsKey = getStatsKey(type);
     const foldersToUpdate = findFoldersToUpdate(
       diskFolders,
       stateFolderMap,
       statsKey
     );
 
+    let countsResult = [];
     if (foldersToUpdate.length > 0) {
-      const countsResult = await fetchFolderCounts(path, foldersToUpdate);
-      if (countsResult?.length)
-        updateFoldersData(countsResult, type, diskFolders);
+      countsResult = (await fetchFolderCounts(path, foldersToUpdate)) ?? [];
     }
 
-    return diskFolders;
+    return { diskFolders, countsResult };
   } catch (error) {
     Logger.error(`[SubfolderMonitor] Error processing '${type}':`, error);
-    return new Map();
+    return { diskFolders: new Map(), countsResult: [] };
   }
 }
 
@@ -214,24 +200,49 @@ function syncFolders(foldersInState, ssOnDisk, srOnDisk) {
 
 async function loadFoldersData() {
   try {
-    const ssOnDisk = await processFolderType(
+    const existingFolders = AppState.getFolders();
+    const stateFolderMap = createFolderMap(existingFolders);
+    const appNameToPkg = createAppPackageMap(AppState.getApps());
+
+    const [ssResult, srResult] = await Promise.all([
+      processFolderType(
+        "screenshots",
+        ENV.PATHS.ORGANIZED_SCREENSHOTS,
+        stateFolderMap,
+        "ss"
+      ),
+      processFolderType(
+        "screenrecordings",
+        ENV.PATHS.ORGANIZED_RECORDINGS,
+        stateFolderMap,
+        "sr"
+      )
+    ]);
+
+    const folderMap = createFolderMap(existingFolders);
+    const ssUpdated = updateFoldersFromScan(
+      ssResult.countsResult,
       "screenshots",
-      ENV.PATHS.ORGANIZED_SCREENSHOTS
+      folderMap,
+      ssResult.diskFolders,
+      appNameToPkg
     );
-    const srOnDisk = await processFolderType(
+    const srUpdated = updateFoldersFromScan(
+      srResult.countsResult,
       "screenrecordings",
-      ENV.PATHS.ORGANIZED_RECORDINGS
+      folderMap,
+      srResult.diskFolders,
+      appNameToPkg
     );
 
-    const foldersInState = AppState.getFolders();
-    if (!foldersInState.length) return;
-
+    const mergedFolders = Array.from(folderMap.values());
     const { finalFolders, hasChanges } = syncFolders(
-      foldersInState,
-      ssOnDisk,
-      srOnDisk
+      mergedFolders,
+      ssResult.diskFolders,
+      srResult.diskFolders
     );
-    if (hasChanges) AppState.setFolders(finalFolders);
+
+    if (ssUpdated || srUpdated || hasChanges) AppState.setFolders(finalFolders);
   } catch (error) {
     Logger.error("[SubfolderMonitor] Error during scan cycle:", error);
   }
