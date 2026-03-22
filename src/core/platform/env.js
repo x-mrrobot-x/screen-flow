@@ -275,7 +275,7 @@ function WebEnvironment() {
 }
 
 function TaskerEnvironment() {
-  const WORK_DIR = `${tk.local("%work_dir")}/`;
+  const WORK_DIR = `${tk.local("%so_work_dir")}/`;
   const SCENE_NAME = TASKER.SCENES.MAIN;
 
   function resolveIconPath(pkg) {
