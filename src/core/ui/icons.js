@@ -2,12 +2,12 @@ import DOM from "../../lib/dom.js";
 import Logger from "../platform/logger.js";
 import ENV from "../platform/env.js";
 import IconsLib from "../../lib/icons-library.js";
+import DEFAULT_ICON from "../../assets/icons/default.webp";
 
 const {
   ICON_DEFAULT_ATTRS,
   ICON_FONTAWESOME_ATTRS,
   ICON_FONTAWESOME_LIST,
-  DEFAULT_ICON_PATH,
   ICON_SVGS
 } = IconsLib;
 
@@ -90,14 +90,14 @@ function isAppIconImage(target) {
 }
 
 function isAlreadyDefaultIcon(target) {
-  return target.src.includes(DEFAULT_ICON_PATH);
+  return target.src === DEFAULT_ICON;
 }
 
 function handleIconError(event) {
   const { target } = event;
   if (!isAppIconImage(target)) return;
   if (isAlreadyDefaultIcon(target)) return;
-  target.src = `${ENV.WORK_DIR}${DEFAULT_ICON_PATH}`;
+  target.src = DEFAULT_ICON;
 }
 
 function attachEvents() {

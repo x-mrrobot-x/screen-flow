@@ -1,7 +1,6 @@
 import Defaults from "../../lib/defaults.js";
 import Utils from "../../lib/utils.js";
 import Logger from "./logger.js";
-import MockEnv from "../../data/mock-env.js";
 
 const { DEFAULT_SETTINGS, DEFAULT_STATS } = Defaults;
 
@@ -135,7 +134,9 @@ function getDefault(key) {
 }
 
 function WebEnvironment() {
-  MockEnv.init();
+  if (import.meta.env.DEV) {
+    import("../../data/mock-env.js").then(m => m.default.init());
+  }
 
   const PREFIX = "@screenflow:";
   let taskResultHandler = null;
@@ -202,7 +203,9 @@ function WebEnvironment() {
   }
 
   async function processMockTask(id, realCommand, taskParams, type) {
+    if (!import.meta.env.DEV) return;
     try {
+      const { default: MockEnv } = await import("../../data/mock-env.js");
       const payload = await MockEnv.processTask(realCommand, taskParams, type);
       notifyTaskResult(id, "success", payload);
     } catch (error) {

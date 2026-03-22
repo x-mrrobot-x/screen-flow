@@ -2,66 +2,72 @@ import { defineConfig } from "vite";
 import { resolve } from "path";
 import { viteStaticCopy } from "vite-plugin-static-copy";
 import { viteSingleFile } from "vite-plugin-singlefile";
+import { minify } from "html-minifier-terser";
+
+const minifyHtml = () => ({
+  name: "minify-html",
+  enforce: "post",
+  apply: "build",
+  async generateBundle(_, bundle) {
+    for (const [name, file] of Object.entries(bundle)) {
+      if (file.type === "asset" && name.endsWith(".html")) {
+        file.source = await minify(file.source.toString(), {
+          collapseWhitespace: true,
+          removeComments: true,
+          minifyCSS: true,
+          minifyJS: true
+        });
+      }
+    }
+  }
+});
+
+const renameHtml = (from, to) => ({
+  name: "rename-html",
+  enforce: "post",
+  apply: "build",
+  generateBundle(_, bundle) {
+    if (bundle[from]) {
+      bundle[to] = { ...bundle[from], fileName: to };
+      delete bundle[from];
+    }
+  }
+});
 
 export default defineConfig(({ mode }) => {
-  if (mode === "tasker") {
-    return {
-      build: {
-        outDir: "dist/tasker",
-        emptyOutDir: true,
-        assetsInlineLimit: 100000000,
-        rollupOptions: {
-          input: {
-            "auto-process": resolve(__dirname, "tasker/auto-process.html")
-          },
-          output: {
-            entryFileNames: "runner.js"
-          }
-        }
-      },
-      plugins: [
-        viteSingleFile({
-          useRecommendedBuildConfig: false,
-          inlinePattern: ["**"]
-        })
-      ]
-    };
-  }
+  const isTasker = mode === "tasker";
 
-  // Default: main build
   return {
     build: {
-      outDir: "dist",
+      outDir: isTasker ? "dist/tasker" : "dist",
       emptyOutDir: true,
-      assetsInlineLimit: 0,
+      assetsInlineLimit: 100_000_000,
       rollupOptions: {
-        input: {
-          main: resolve(__dirname, "index.html")
-        },
-        output: {
-          entryFileNames: "src/assets/js/app.js",
-          chunkFileNames: "src/assets/js/[name].js",
-          assetFileNames: assetInfo => {
-            if (assetInfo.name?.endsWith(".css"))
-              return "src/assets/css/app.css";
-
-            if (/.(png|jpg|gif|svg|ico|webp)$/i.test(assetInfo.name ?? ""))
-              return "src/assets/img/[name][extname]";
-
-            return "src/assets/[name][extname]";
-          }
-        }
+        input: resolve(
+          __dirname,
+          isTasker ? "tasker/auto-process.html" : "index.html"
+        ),
+        output: { inlineDynamicImports: !isTasker }
       }
     },
     plugins: [
-      viteStaticCopy({
-        targets: [
-          { src: "src/i18n", dest: "src" },
-          { src: "src/assets/icons", dest: "src/assets" },
-          { src: "src/assets/brand", dest: "src/assets" },
-          { src: "src/features/dashboard/process/script.sh", dest: "src" }
-        ]
-      })
-    ]
+      viteSingleFile({ useRecommendedBuildConfig: true }),
+      isTasker &&
+        renameHtml("tasker/auto-process.html", "auto-process/index.html"),
+      minifyHtml(),
+      !isTasker &&
+        viteStaticCopy({
+          targets: [
+            {
+              src: "src/i18n",
+              dest: "src"
+            },
+            {
+              src: "src/features/dashboard/process/script.sh",
+              dest: "src"
+            }
+          ]
+        })
+    ].filter(Boolean)
   };
 });
