@@ -46,6 +46,7 @@
 .cleaner-switch-label {
   color: hsl(var(--muted-foreground));
   font-size: var(--font-sm);
+  text-transform: capitalize;
 }
 
 .cleaner-folder-options {

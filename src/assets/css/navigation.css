@@ -69,9 +69,11 @@
 
 .nav-label {
   font-size: var(--font-xs);
-  font-weight: 500;
+  font-weight: 600;
   color: hsl(var(--muted-foreground));
   transition: color 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
 }
 
 .nav-button.active .nav-label {

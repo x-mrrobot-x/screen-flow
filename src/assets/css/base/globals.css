@@ -84,8 +84,10 @@ input::placeholder {
 }
 
 .page-title {
-  font-size: var(--font-xl);
+  font-size: var(--font-lg);
   font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
 .page-subtitle {
