@@ -42,7 +42,12 @@ function updateHeaderHeight() {
 }
 
 function updateFooterHeight() {
-  if (elements.footer) setCssVar("--footer-height", getHeight(elements.footer));
+  const isSidebar = window.matchMedia("(min-width: 1024px)").matches;
+  if (isSidebar) {
+    setCssVar("--footer-height", 0);
+  } else if (elements.footer) {
+    setCssVar("--footer-height", getHeight(elements.footer));
+  }
 }
 
 function updateMetrics() {

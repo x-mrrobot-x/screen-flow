@@ -25,6 +25,8 @@ ENV.setTaskResultHandler(result => TaskQueue.onResult(result));
 ENV.setSettingsGetter(key => AppState.getSetting(key));
 
 if (import.meta.env.DEV) {
+  await import("./assets/css/responsive.css");
+
   const { default: eruda } = await import("eruda");
   eruda.init();
 }
