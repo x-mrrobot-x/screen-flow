@@ -163,7 +163,7 @@
     "delete_success": "Data deleted successfully!",
     "delete_error": "An error occurred while deleting data.",
     "delete_message": "Are you sure you want to delete all app data? This action cannot be undone.",
-    "page_subtitle": "Customize your ScreenFlow experience",
+    "page_subtitle": "Customize your Tagly experience",
     "section_theme": "Theme",
     "theme_light": "Light",
     "theme_dark": "Dark",

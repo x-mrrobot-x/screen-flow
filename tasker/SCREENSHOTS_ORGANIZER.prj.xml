@@ -126,7 +126,7 @@
 			<pvit>pj</pvit>
 			<pvn>%work_dir</pvn>
 			<pvt>d</pvt>
-			<pvv>/storage/0BF9-13F1/1 - Dev/1 - Projetos/1 - Tasker/ScreenFlow/dist</pvv>
+			<pvv>/storage/0BF9-13F1/1 - Dev/1 - Projetos/1 - Tasker/Tagly/dist</pvv>
 			<strout>false</strout>
 		</ProfileVariable>
 		<ProfileVariable sr="pv3">
@@ -140,7 +140,7 @@
 			<pvit>pj</pvit>
 			<pvn>%so_work_dir</pvn>
 			<pvt>d</pvt>
-			<pvv>/sdcard/Tasker/data/ScreenFlow</pvv>
+			<pvv>/sdcard/Tasker/data/Tagly</pvv>
 			<strout>false</strout>
 		</ProfileVariable>
 	</Project>
@@ -1509,7 +1509,7 @@ Unique package name for the app&lt;/_array_net.dinglisch.android.tasker.RELEVANT
 					<net.dinglisch.android.tasker.RELEVANT_VARIABLES-type>[Ljava.lang.String;</net.dinglisch.android.tasker.RELEVANT_VARIABLES-type>
 				</Vals>
 			</Bundle>
-			<Str sr="arg1" ve="3">%title=Screen Flow - %par1
+			<Str sr="arg1" ve="3">%title=Tagly - %par1
 %content=%par2</Str>
 			<Str sr="arg2" ve="3"/>
 			<Str sr="arg3" ve="3"/>
@@ -1821,7 +1821,7 @@ The size of the response in bytes&lt;/_array_net.dinglisch.android.tasker.RELEVA
 			<Int sr="arg10" val="1"/>
 			<Int sr="arg11" val="0"/>
 			<Int sr="arg12" val="1"/>
-			<Str sr="arg2" ve="3">https://api.github.com/repos/x-mrrobot-x/screen-flow/releases/latest</Str>
+			<Str sr="arg2" ve="3">https://api.github.com/repos/x-mrrobot-x/tagly/releases/latest</Str>
 			<Str sr="arg3" ve="3"/>
 			<Str sr="arg4" ve="3"/>
 			<Str sr="arg5" ve="3"/>
@@ -1876,14 +1876,14 @@ Can also be accessed as an array&lt;/_array_net.dinglisch.android.tasker.RELEVAN
 		</Action>
 		<Action sr="act5" ve="7">
 			<code>523</code>
-			<Str sr="arg0" ve="3">Screen Flow • UI Update Available</Str>
+			<Str sr="arg0" ve="3">Tagly • UI Update Available</Str>
 			<Str sr="arg1" ve="3">New interface update available: %release_version</Str>
 			<Str sr="arg10" ve="3"/>
 			<Str sr="arg11" ve="3">super_tasker_notifications_created_by_me_the_developer</Str>
 			<Str sr="arg12" ve="3"/>
 			<Int sr="arg13" val="0"/>
 			<Str sr="arg14" ve="3"/>
-			<Str sr="arg15" ve="3">screenflow</Str>
+			<Str sr="arg15" ve="3">tagly</Str>
 			<Img sr="arg2" ve="2">
 				<nme>mw_navigation_arrow_downward</nme>
 			</Img>
@@ -1905,7 +1905,7 @@ Can also be accessed as an array&lt;/_array_net.dinglisch.android.tasker.RELEVAN
 				<label>Taskernet</label>
 				<Action sr="action" ve="7">
 					<code>104</code>
-					<Str sr="arg0" ve="3">https://taskernet.com/shares/?user=AS35m8k%2FEQCE%2BJiPvkN1cJcjBE7Yh%2B%2Fa8zZeifxINYS7E94XnS26HrYYgsweBVnbf2VB9WJdrS5k&amp;id=Project%3ASCREEN+FLOW</Str>
+					<Str sr="arg0" ve="3">https://taskernet.com/shares/?user=AS35m8k%2FEQCE%2BJiPvkN1cJcjBE7Yh%2B%2Fa8zZeifxINYS7E94XnS26HrYYgsweBVnbf2VB9WJdrS5k&amp;id=Project%3ATAGLY</Str>
 					<App sr="arg1"/>
 					<Int sr="arg2" val="0"/>
 					<Str sr="arg3" ve="3"/>
@@ -1918,14 +1918,14 @@ Can also be accessed as an array&lt;/_array_net.dinglisch.android.tasker.RELEVAN
 		</Action>
 		<Action sr="act6" ve="7">
 			<code>523</code>
-			<Str sr="arg0" ve="3">Screen Flow • Project Update Available</Str>
+			<Str sr="arg0" ve="3">Tagly • Project Update Available</Str>
 			<Str sr="arg1" ve="3">New project update available: %release_version</Str>
 			<Str sr="arg10" ve="3"/>
 			<Str sr="arg11" ve="3">super_tasker_notifications_created_by_me_the_developer</Str>
 			<Str sr="arg12" ve="3"/>
 			<Int sr="arg13" val="0"/>
 			<Str sr="arg14" ve="3"/>
-			<Str sr="arg15" ve="3">screenflow</Str>
+			<Str sr="arg15" ve="3">tagly</Str>
 			<Img sr="arg2" ve="2">
 				<nme>mw_navigation_arrow_downward</nme>
 			</Img>
@@ -1947,7 +1947,7 @@ Can also be accessed as an array&lt;/_array_net.dinglisch.android.tasker.RELEVAN
 				<label>Taskernet</label>
 				<Action sr="action" ve="7">
 					<code>104</code>
-					<Str sr="arg0" ve="3">https://taskernet.com/shares/?user=AS35m8k%2FEQCE%2BJiPvkN1cJcjBE7Yh%2B%2Fa8zZeifxINYS7E94XnS26HrYYgsweBVnbf2VB9WJdrS5k&amp;id=Project%3ASCREEN+FLOW</Str>
+					<Str sr="arg0" ve="3">https://taskernet.com/shares/?user=AS35m8k%2FEQCE%2BJiPvkN1cJcjBE7Yh%2B%2Fa8zZeifxINYS7E94XnS26HrYYgsweBVnbf2VB9WJdrS5k&amp;id=Project%3ATAGLY</Str>
 					<App sr="arg1"/>
 					<Int sr="arg2" val="0"/>
 					<Str sr="arg3" ve="3"/>
@@ -2423,7 +2423,7 @@ These Files Are Required To Setup The Webview Interface&lt;/h4&gt;</label>
 		<Action sr="act2" ve="7">
 			<code>547</code>
 			<Str sr="arg0" ve="3">%zip_dest_path</Str>
-			<Str sr="arg1" ve="3">%so_work_dir/screenflow-dependencies.zip</Str>
+			<Str sr="arg1" ve="3">%so_work_dir/tagly-dependencies.zip</Str>
 			<Int sr="arg2" val="0"/>
 			<Int sr="arg3" val="0"/>
 			<Int sr="arg4" val="0"/>
@@ -2472,7 +2472,7 @@ The size of the response in bytes&lt;/_array_net.dinglisch.android.tasker.RELEVA
 			<Int sr="arg10" val="1"/>
 			<Int sr="arg11" val="0"/>
 			<Int sr="arg12" val="1"/>
-			<Str sr="arg2" ve="3">https://github.com/x-mrrobot-x/screen-flow/releases/download/%project_version/screenflow-bundle-%project_version.zip</Str>
+			<Str sr="arg2" ve="3">https://github.com/x-mrrobot-x/tagly/releases/download/%project_version/tagly-bundle-%project_version.zip</Str>
 			<Str sr="arg3" ve="3"/>
 			<Str sr="arg4" ve="3"/>
 			<Str sr="arg5" ve="3"/>

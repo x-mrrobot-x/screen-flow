@@ -138,7 +138,7 @@ function WebEnvironment() {
     import("../../data/mock-env.js").then(m => m.default.init());
   }
 
-  const PREFIX = "@screenflow:";
+  const PREFIX = "@tagly:";
   let taskResultHandler = null;
 
   function setTaskResultHandler(fn) {
