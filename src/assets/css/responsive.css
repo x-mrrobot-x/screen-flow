@@ -88,7 +88,7 @@
   }
 
   .nav-container::before {
-    content: "ScreenFlow";
+    content: "Tagly";
     display: block;
     font-size: var(--font-xl);
     font-weight: 700;

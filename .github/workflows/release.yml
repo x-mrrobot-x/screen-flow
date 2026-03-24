@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      PROJECT_NAME: "Screen Flow"
+      PROJECT_NAME: "Tagly"
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
 
     permissions:
@@ -47,7 +47,7 @@ jobs:
 
           echo "CATEGORY=$CATEGORY" >> $GITHUB_ENV
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "ZIP_NAME=screenflow-$VERSION-$CATEGORY.zip" >> $GITHUB_ENV
+          echo "ZIP_NAME=tagly-$VERSION-$CATEGORY.zip" >> $GITHUB_ENV
 
       - name: Setup Node.js
         uses: actions/setup-node@v4

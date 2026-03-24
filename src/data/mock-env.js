@@ -71,7 +71,7 @@ const MOCK_VARIABLES = {
   process_type: "organize_screenshots"
 };
 
-const STORAGE_PREFIX = "@screenflow:";
+const STORAGE_PREFIX = "@tagly:";
 
 function getVariable(name) {
   return MOCK_VARIABLES[name] || null;

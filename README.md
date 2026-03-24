@@ -1,4 +1,4 @@
-# ScreenFlow
+# Tagly
 
 Organizador automático de capturas e gravações de tela para Android — agrupa mídias por aplicativo de origem e automatiza a limpeza de arquivos antigos com regras configuráveis por pasta e tipo de mídia.
 
@@ -18,7 +18,7 @@ Organizador automático de capturas e gravações de tela para Android — agrup
 ## Demonstração
 
 <div align="center">
-  <img src=".github/assets/preview.jpg" alt="Prévia do ScreenFlow" width="320" style="border-radius: 10px">
+  <img src=".github/assets/preview.jpg" alt="Prévia do Tagly" width="320" style="border-radius: 10px">
 </div>
 
 ---
@@ -96,14 +96,14 @@ Organizador automático de capturas e gravações de tela para Android — agrup
 1. Baixe o arquivo XML da [última release](../../releases/latest)
 2. Abra o Tasker e importe o arquivo XML do projeto
 3. Conceda as permissões necessárias (acesso ao armazenamento)
-4. Execute a tarefa principal para abrir o ScreenFlow
+4. Execute a tarefa principal para abrir o Tagly
 
 ### Desenvolvimento local
 
 1. Clone o repositório:
    ```bash
-   git clone https://github.com/seu-usuario/screenflow.git
-   cd screenflow
+   git clone https://github.com/seu-usuario/tagly.git
+   cd tagly
    ```
 2. Abra o arquivo `index.html` diretamente em qualquer navegador
 
@@ -115,13 +115,13 @@ Organizador automático de capturas e gravações de tela para Android — agrup
 
 ### Em produção
 
-Após importar o projeto no Tasker, execute a tarefa principal **ScreenFlow** para abrir a interface. As automações de organização e limpeza são acionadas automaticamente conforme as regras configuradas.
+Após importar o projeto no Tasker, execute a tarefa principal **Tagly** para abrir a interface. As automações de organização e limpeza são acionadas automaticamente conforme as regras configuradas.
 
 ### Em desenvolvimento
 
 Abra `index.html` no navegador. O sistema detecta automaticamente a ausência do `tk` global e ativa o **modo Web**, onde:
 
-- Dados são lidos/escritos no `localStorage` com o prefixo `@screenflow:`
+- Dados são lidos/escritos no `localStorage` com o prefixo `@tagly:`
 - Operações de arquivo são simuladas pelo `MockEnv` com dados de exemplo
 - Toda a interface funciona normalmente sem o Tasker
 
@@ -129,7 +129,7 @@ Abra `index.html` no navegador. O sistema detecta automaticamente a ausência do
 
 ## Configuração
 
-O ScreenFlow não usa variáveis de ambiente externas. Todas as configurações são gerenciadas dentro da própria interface, na aba **Configurações**, e persistidas via `AppState`.
+O Tagly não usa variáveis de ambiente externas. Todas as configurações são gerenciadas dentro da própria interface, na aba **Configurações**, e persistidas via `AppState`.
 
 ### Camada de Ambiente (ENV)
 
@@ -150,7 +150,7 @@ A abstração `ENV` resolve automaticamente o ambiente de execução:
 O projeto segue uma arquitetura **MVC por funcionalidade** — cada tela é composta por arquivos `model`, `view` e `controller`. Todos os módulos são encapsulados em **IIFEs**, sem uso de bundlers ou transpiladores.
 
 ```
-ScreenFlow/
+Tagly/
 ├── index.html                        # Entry point da aplicação
 ├── src/
 │   ├── app.js                        # Inicialização e bootstrap da aplicação
@@ -199,7 +199,7 @@ ScreenFlow/
 
 | Tarefa                 | Descrição                                        |
 | ---------------------- | ------------------------------------------------ |
-| `ScreenFlow`           | Abre a interface principal                       |
+| `Tagly`           | Abre a interface principal                       |
 | `Organize Screenshots` | Varre e organiza capturas de tela                |
 | `Organize Recordings`  | Varre e organiza gravações de tela               |
 | `Auto Clean`           | Executa limpeza com base nas regras configuradas |

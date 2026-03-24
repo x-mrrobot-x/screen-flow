@@ -8,17 +8,17 @@ const isWeb = typeof tk === "undefined";
 
 const TASKER = {
   SCENES: {
-    MAIN: "SO - SCREENSHOTS ORGANIZER",
-    AUTO_PROCESS: "SO - AUTO PROCESS"
+    MAIN: "TG - TAGLY",
+    AUTO_PROCESS: "TG - AUTO PROCESS"
   },
   WEBVIEWS: {
     MAIN: "APP",
     AUTO_PROCESS: "AUTO PROCESS"
   },
   TASKS: {
-    QUEUE: "SO 07 - TASK QUEUE",
-    STOP_QUEUE: "SO 09 - STOP TASK QUEUE",
-    NOTIFY: "SO 10 - NOTIFY"
+    QUEUE: "TG 06 - HANDLE TASK QUEUE",
+    STOP_QUEUE: "TG 08 - KILL TASK QUEUE",
+    NOTIFY: "TG 09 - SEND NOTIFICATION"
   }
 };
 
@@ -138,7 +138,7 @@ function WebEnvironment() {
     import("../../data/mock-env.js").then(m => m.default.init());
   }
 
-  const PREFIX = "@screenflow:";
+  const PREFIX = "@tagly:";
   let taskResultHandler = null;
 
   function setTaskResultHandler(fn) {
@@ -275,7 +275,7 @@ function WebEnvironment() {
 }
 
 function TaskerEnvironment() {
-  const WORK_DIR = `${tk.local("%so_work_dir")}/`;
+  const WORK_DIR = `${tk.local("%tg_work_dir")}/`;
   const SCENE_NAME = TASKER.SCENES.MAIN;
 
   function resolveIconPath(pkg) {

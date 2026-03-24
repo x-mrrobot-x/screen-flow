@@ -1,4 +1,4 @@
-const DB_NAME = "screenflow-thumbs";
+const DB_NAME = "tagly-thumbs";
 const DB_VERSION = 1;
 const STORE = "thumbnails";
 const TTL = 7 * 24 * 60 * 60 * 1000;
