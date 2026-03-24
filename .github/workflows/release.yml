@@ -3,8 +3,7 @@ name: Create Release
 on:
   push:
     tags:
-      - "ui-v*"
-      - "core-v*"
+      - "v*"
 
 jobs:
   release:
@@ -25,22 +24,30 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          fetch-tags: true
 
-      - name: Extract type and version
+      - name: Extract category and version
         run: |
+          git fetch --tags --force
+
           TAG=${GITHUB_REF#refs/tags/}
+          VERSION=$TAG
 
-          TYPE=$(echo $TAG | cut -d '-' -f1)
-          VERSION=$(echo $TAG | cut -d '-' -f2)
+          CATEGORY=$(git cat-file -p "$TAG" \
+            | sed -n '1,/^$/d;p' \
+            | tr -d '\n\r' \
+            | tr '[:upper:]' '[:lower:]')
 
-          if [[ "$TYPE" != "ui" && "$TYPE" != "core" ]]; then
-            echo "❌ Tipo inválido! Use ui-vX.X.X ou core-vX.X.X"
+          echo "Detected category: '$CATEGORY'"
+
+          if [[ "$CATEGORY" != "ui" && "$CATEGORY" != "core" ]]; then
+            echo "❌ Categoria inválida! Use 'ui' ou 'core' na anotação da tag"
             exit 1
           fi
 
-          echo "TYPE=$TYPE" >> $GITHUB_ENV
+          echo "CATEGORY=$CATEGORY" >> $GITHUB_ENV
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "ZIP_NAME=screenflow-$TYPE-$VERSION.zip" >> $GITHUB_ENV
+          echo "ZIP_NAME=screenflow-$VERSION-$CATEGORY.zip" >> $GITHUB_ENV
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -77,7 +84,10 @@ jobs:
                   }]
                 }")
 
-              improved=$(echo "$response" | grep -o '"text"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/"text"[[:space:]]*:[[:space:]]*"//g' | sed 's/"$//g' | head -1)
+              improved=$(echo "$response" | grep -o '"text"[[:space:]]*:[[:space:]]*"[^"]*"' \
+                | sed 's/"text"[[:space:]]*:[[:space:]]*"//g' \
+                | sed 's/"$//g' \
+                | head -1)
 
               if [ -n "$improved" ] && [ "$improved" != "null" ]; then
                 echo "$improved"
@@ -123,11 +133,17 @@ jobs:
           ASSETS="${{ env.ZIP_NAME }}"
 
           xml_file=$(find . -name "*.xml" -type f | head -1)
+
           if [ -n "$xml_file" ]; then
-            ASSETS="$ASSETS $xml_file"
+            NEW_XML_NAME="${PROJECT_NAME}-${VERSION}.prj.xml"
+            SAFE_NAME=$(echo "$NEW_XML_NAME" | tr ' ' '-' | tr '[:upper:]' '[:lower:]')
+
+            cp "$xml_file" "$SAFE_NAME"
+
+            ASSETS="$ASSETS $SAFE_NAME"
           fi
 
           gh release create ${{ github.ref_name }} \
-            --title "🚀 [${TYPE^^}] ${PROJECT_NAME} ${VERSION}" \
+            --title "🚀 [${CATEGORY^^}] ${PROJECT_NAME} ${VERSION}" \
             --notes-file release_notes.md \
             $ASSETS
