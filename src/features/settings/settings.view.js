@@ -1,5 +1,6 @@
 import DOM from "../../lib/dom.js";
 import I18n from "../../core/services/i18n.js";
+import ENV from "../../core/platform/env.js";
 
 let elements = null;
 
@@ -56,13 +57,8 @@ const update = {
   destinationPath: path => {
     const el = elements.destinationPathEl;
     if (!el) return;
-    if (path) {
-      el.removeAttribute("data-i18n");
-      el.textContent = path;
-    } else {
-      el.setAttribute("data-i18n", "settings.destination_default");
-      el.textContent = I18n.t("settings.destination_default");
-    }
+    el.removeAttribute("data-i18n");
+    el.textContent = path || ENV.PATHS.DESTINATION_BASE;
   },
   setting: (key, value) => {
     const switchEl = DOM.qs(

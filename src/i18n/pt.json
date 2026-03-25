@@ -158,7 +158,6 @@
     "notify_pending_desc": "Notifica periodicamente quando há capturas ou gravações de tela aguardando organização",
     "section_files": "Arquivos",
     "destination_title": "Pasta de Destino",
-    "destination_default": "Usando diretório padrão do sistema",
     "destination_error": "Falha ao selecionar a pasta de destino.",
     "section_schedule": "Agendamento",
     "schedule_title": "Horário de Execução",

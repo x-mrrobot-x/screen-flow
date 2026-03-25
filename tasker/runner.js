@@ -128,11 +128,6 @@ async function run() {
   }
 }
 
-function setupEnvironment() {
-  ENV.SCENE_NAME = ENV.TASKER.SCENES.AUTO_PROCESS;
-  ENV.WEBVIEW_NAME = ENV.TASKER.WEBVIEWS.AUTO_PROCESS;
-}
-
 function setupGlobalHandlers() {
   window.App = {
     handleTaskResult: json => TaskQueue.onResult(json)
@@ -140,7 +135,6 @@ function setupGlobalHandlers() {
 }
 
 function init() {
-  setupEnvironment();
   setupGlobalHandlers();
   run();
 }

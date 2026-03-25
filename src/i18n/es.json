@@ -158,7 +158,6 @@
     "notify_pending_desc": "Notifica periódicamente cuando hay capturas o grabaciones de pantalla esperando organización",
     "section_files": "Archivos",
     "destination_title": "Carpeta de Destino",
-    "destination_default": "Usando directorio predeterminado del sistema",
     "destination_error": "Error al seleccionar la carpeta de destino.",
     "section_schedule": "Programación",
     "schedule_title": "Hora de Ejecución",

@@ -4,17 +4,8 @@ import Logger from "./logger.js";
 
 const { DEFAULT_SETTINGS, DEFAULT_STATS } = Defaults;
 
-const isWeb = typeof tk === "undefined";
-
 const TASKER = {
-  SCENES: {
-    MAIN: "TG - TAGLY",
-    AUTO_PROCESS: "TG - AUTO PROCESS"
-  },
-  WEBVIEWS: {
-    MAIN: "APP",
-    AUTO_PROCESS: "AUTO PROCESS"
-  },
+  SCENE_NAME: "TG - TAGLY",
   TASKS: {
     QUEUE: "TG 06 - HANDLE TASK QUEUE",
     STOP_QUEUE: "TG 08 - KILL TASK QUEUE",
@@ -22,21 +13,8 @@ const TASKER = {
   }
 };
 
-const DEFAULT_BASE = "/storage/emulated/0/OrganizedMedia";
-
-let settingsGetter = null;
-
-function setSettingsGetter(fn) {
-  settingsGetter = fn;
-}
-
-function resolveDestination(subfolder) {
-  const custom = settingsGetter ? settingsGetter("customDestination") : null;
-  const base = custom || DEFAULT_BASE;
-  return `${base}/${subfolder}`;
-}
-
 const PATHS = {
+  DESTINATION_BASE: "/storage/emulated/0/OrganizedMedia",
   SOURCE_SCREENSHOTS: "/storage/emulated/0/DCIM/Screenshots",
   SOURCE_RECORDINGS: "/storage/emulated/0/DCIM/ScreenRecorder",
   get ORGANIZED_SCREENSHOTS() {
@@ -121,6 +99,19 @@ const STORAGE = {
     }
   }
 };
+
+const isWeb = typeof tk === "undefined";
+let settingsGetter = null;
+
+function setSettingsGetter(fn) {
+  settingsGetter = fn;
+}
+
+function resolveDestination(subfolder) {
+  const custom = settingsGetter ? settingsGetter("customDestination") : null;
+  const base = custom || PATHS.DESTINATION_BASE;
+  return `${base}/${subfolder}`;
+}
 
 function resolvePath(path, params = {}) {
   return path.replace(/\{(\w+)\}/g, (_, key) => params[key] ?? _);
@@ -254,8 +245,6 @@ function WebEnvironment() {
   return {
     isWeb: true,
     WORK_DIR: "",
-    SCENE_NAME: TASKER.SCENES.MAIN,
-    WEBVIEW_NAME: TASKER.WEBVIEWS.MAIN,
     TASKER,
     PATHS,
     getDefault,
@@ -276,7 +265,6 @@ function WebEnvironment() {
 
 function TaskerEnvironment() {
   const WORK_DIR = `${tk.local("%tg_work_dir")}/`;
-  const SCENE_NAME = TASKER.SCENES.MAIN;
 
   function resolveIconPath(pkg) {
     return `content://net.dinglisch.android.taskerm.iconprovider//app/${pkg}`;
@@ -390,7 +378,7 @@ function TaskerEnvironment() {
   }
 
   function exit() {
-    tk.destroyScene(this.SCENE_NAME);
+    tk.destroyScene(TASKER.SCENE_NAME);
   }
 
   function sendNotification(title, content) {
@@ -402,8 +390,6 @@ function TaskerEnvironment() {
   return {
     isWeb: false,
     WORK_DIR,
-    SCENE_NAME,
-    WEBVIEW_NAME: TASKER.WEBVIEWS.MAIN,
     TASKER,
     PATHS,
     getDefault,

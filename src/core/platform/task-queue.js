@@ -28,9 +28,7 @@ function buildBaseParams(task) {
     commandName: task.action,
     params: task.params,
     type: task.type,
-    fullCommand: null,
-    scene: ENV.SCENE_NAME,
-    webview: ENV.WEBVIEW_NAME
+    fullCommand: null
   };
 }
 
