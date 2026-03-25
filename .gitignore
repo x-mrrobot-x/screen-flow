@@ -2,4 +2,4 @@ src/data/*.json
 
 dist/
 
-tagly*
+tagly.zip
