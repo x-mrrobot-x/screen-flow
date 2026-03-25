@@ -186,7 +186,7 @@ const PROCESS_TYPES = {
           {
             ss_removed: ctx.find_all_expired.screenshots.length,
             sr_removed: ctx.find_all_expired.recordings.length,
-            total_removed: ctx.find_all_expired.all.length
+            total_removed: ctx.delete_all_expired?.deleted ?? 0
           },
           ctx.executionMode
         ]

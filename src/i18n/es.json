@@ -113,6 +113,7 @@
     "cleanup_done": "{{count}} {{file}} {{removed}}.",
     "notify_screenshots_done": "{{count}} capturas de pantalla organizadas.",
     "notify_recordings_done": "{{count}} grabaciones de pantalla organizadas.",
+    "notify_organizer_combined": "{{ss}} capturas de pantalla y {{sr}} grabaciones organizadas.",
     "organize_done_label": "¡Organización Completada!",
     "cleanup_done_label": "¡Limpieza Completada!",
     "step_error": "Error en: {{label}}",

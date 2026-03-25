@@ -8,21 +8,10 @@ import ProcessModel from "../src/features/dashboard/process/process.model.js";
 import Logger from "../src/core/platform/logger.js";
 import Format from "../src/core/ui/format.js";
 
-function sendCompletionNotification(processType, stats) {
-  const processData = ProcessConfig.PROCESS_TYPES[processType];
-  const notifKey = processData?.notificationKey;
-  if (!notifKey || !AppState.getSetting(notifKey)) return;
-  const title = I18n.t(processData.notificationTitleKey);
-  const content = Format.buildCompletionText(processType, stats);
-  ENV.sendNotification(title, content);
-}
+// ─── Engine Helpers ───
 
 function buildCallbacks(processType) {
   return {
-    onDone: async stats => {
-      await AppState.flushPersist();
-      sendCompletionNotification(processType, stats);
-    },
     onError: (error, step) => {
       Logger.error(
         "[Runner] Error in step:",
@@ -38,39 +27,100 @@ function buildJsExecutor() {
   return (funcName, args) => ProcessModel[funcName](...args);
 }
 
-async function checkCleanupPreConditions(processType) {
-  if (processType !== "cleanup_old_files") return true;
-  return ProcessModel.hasCleanerConfigs();
+// ─── Process Execution ───
+
+function getProcessData(processType) {
+  const processData = ProcessConfig.PROCESS_TYPES[processType];
+  if (!processData) {
+    Logger.error(`[Runner] Unknown process type: "${processType}"`);
+    return null;
+  }
+  return processData;
+}
+
+async function executeProcess(processData, processType) {
+  let stats = null;
+  await ProcessEngine.run(
+    processData.steps,
+    {
+      ...buildCallbacks(processType),
+      onDone: async s => {
+        stats = s;
+      }
+    },
+    { execution: "automatic" },
+    buildJsExecutor()
+  );
+  return stats;
+}
+
+async function runProcess(processType) {
+  const processData = getProcessData(processType);
+  if (!processData) return null;
+
+  const stats = await executeProcess(processData, processType);
+  await AppState.flushPersist();
+  return stats;
+}
+
+// ─── Notifications ───
+
+function sendOrganizerNotification(ssStats, srStats) {
+  if (!AppState.getSetting("notifyOrganizationResult")) return;
+  if ((ssStats?.moved || 0) + (srStats?.moved || 0) < 1) return;
+
+  ENV.sendNotification(
+    I18n.t("nav.organizer"),
+    Format.buildOrganizerNotification(ssStats, srStats)
+  );
+}
+
+function sendCleanerNotification(stats) {
+  if (!AppState.getSetting("notifyCleanupResult")) return;
+  if ((stats?.total_removed || 0) < 1) return;
+
+  ENV.sendNotification(
+    I18n.t("nav.cleaner"),
+    Format.buildCompletionText("cleanup_old_files", stats)
+  );
+}
+
+// ─── Feature Runners ───
+
+async function runOrganizerProcesses() {
+  const ssStats = await runProcess("organize_screenshots");
+  const srStats = await runProcess("organize_recordings");
+  sendOrganizerNotification(ssStats, srStats);
+}
+
+async function runCleanerProcess() {
+  const canProceed = await ProcessModel.hasCleanerConfigs();
+  if (!canProceed) return;
+
+  const stats = await runProcess("cleanup_old_files");
+  sendCleanerNotification(stats);
+}
+
+// ─── Bootstrap ───
+
+async function initServices() {
+  AppState.init();
+  ENV.setSettingsGetter(key => AppState.getSetting(key));
+  await I18n.init();
+}
+
+async function runEnabledProcesses() {
+  const autoOrganizer = AppState.getSetting("autoOrganizer");
+  const autoCleaner = AppState.getSetting("autoCleaner");
+
+  if (autoOrganizer) await runOrganizerProcesses();
+  if (autoCleaner) await runCleanerProcess();
 }
 
 async function run() {
-  const processType = ENV.getVariable("process_type");
-  if (!processType) {
-    Logger.error("[Runner] %process_type not defined or empty.");
-    ENV.exit();
-    return;
-  }
-
   try {
-    AppState.init();
-    ENV.setSettingsGetter(key => AppState.getSetting(key));
-    await I18n.init();
-
-    const canProceed = await checkCleanupPreConditions(processType);
-    if (!canProceed) return;
-
-    const processData = ProcessConfig.PROCESS_TYPES[processType];
-    if (!processData) {
-      Logger.error(`[Runner] Unknown process type: "${processType}"`);
-      return;
-    }
-
-    await ProcessEngine.run(
-      processData.steps,
-      buildCallbacks(processType),
-      { execution: "automatic" },
-      buildJsExecutor()
-    );
+    await initServices();
+    await runEnabledProcesses();
   } catch (err) {
     Logger.error("[Runner] Critical error:", String(err));
   } finally {

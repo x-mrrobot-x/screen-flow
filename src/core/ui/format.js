@@ -54,6 +54,16 @@ function buildCleanupText(count) {
   });
 }
 
+function buildOrganizerNotification(ssStats, srStats) {
+  const ss = ssStats?.moved || 0;
+  const sr = srStats?.moved || 0;
+  if (ss > 0 && sr === 0)
+    return I18n.t("process.notify_screenshots_done", { count: ss });
+  if (sr > 0 && ss === 0)
+    return I18n.t("process.notify_recordings_done", { count: sr });
+  return I18n.t("process.notify_organizer_combined", { ss, sr });
+}
+
 function buildCompletionText(processType, stats) {
   if (processType === "organize_screenshots")
     return I18n.t("process.notify_screenshots_done", {
@@ -70,5 +80,6 @@ function buildCompletionText(processType, stats) {
 
 export default {
   formatTimestamp,
-  buildCompletionText
+  buildCompletionText,
+  buildOrganizerNotification
 };

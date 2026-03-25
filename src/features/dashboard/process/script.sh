@@ -48,6 +48,8 @@ scan_media_app_packages() {
   package_list=$(find "$source_folder" -maxdepth 1 -type f -name "*_*.$file_type" ! -name ".trashed*" 2>/dev/null \
     | grep -vE "_[0-9]+\.${file_type}" \
     | sed -n "s/.*_\(.*\).${file_type}/\1/p" \
+    | sed 's/\[[^]]*\]//g' \
+    | sed 's/[[:space:]]*$//' \
     | sort -u)
 
   if [ -z "$package_list" ]; then
@@ -170,11 +172,16 @@ EOF
 
 delete_files_batch() {
     files_json="$1"
-    
-    file_list=$(echo "$files_json" | tr -d '[]"' | tr ',' '\n')
-    
+
     deleted_count=0
-    
+
+    if [ -z "$files_json" ] || [ "$files_json" = "[]" ]; then
+        json_response "true" "{\"deleted\": 0}" "null"
+        return 0
+    fi
+
+    file_list=$(printf '%s' "$files_json" | sed 's/^\["//; s/"\]$//; s/","/\n/g')
+
     while IFS= read -r file_path; do
         clean_path=$(echo "$file_path" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//;s/\\\\/\\/g')
         

@@ -48,7 +48,7 @@ async function runStep(step, index, context, callbacks, jsExecutor) {
     const result = await executeStep(step, context, jsExecutor);
     context[step.id] = result;
     Logger.debug("[ProcessEngine] step result", step.id, result);
-    return handleStepResult(step, index, result, callbacks);
+    return await handleStepResult(step, index, result, callbacks);
   } catch (error) {
     if (callbacks.isCancelled?.()) return false;
     await callbacks.onError?.(error, step, index);

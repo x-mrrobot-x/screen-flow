@@ -136,6 +136,7 @@
     "cleanup_done": "{{count}} {{file}} {{removed}}.",
     "notify_screenshots_done": "{{count}} screenshots organized.",
     "notify_recordings_done": "{{count}} screen recordings organized.",
+    "notify_organizer_combined": "{{ss}} screenshots and {{sr}} screen recordings organized.",
     "organize_done_label": "Organization Completed!",
     "cleanup_done_label": "Cleanup Completed!",
     "step_error": "Error in: {{label}}",
