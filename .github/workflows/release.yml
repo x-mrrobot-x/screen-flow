@@ -140,6 +140,18 @@ jobs:
 
             cp "$xml_file" "$SAFE_NAME"
 
+            # Atualiza <pvv> da variável %tg_project_version
+            perl -0777 -i -pe \
+              's|(<pvn>%tg_project_version</pvn>[\s\S]*?<pvv>)[^<]*(</pvv>)|${1}'"$VERSION"'${2}|' \
+              "$SAFE_NAME"
+
+            # Atualiza <exportval> da mesma variável (bloco de pv0)
+            perl -0777 -i -pe \
+              's|(<ProfileVariable\s[^>]*>\s*<clearout>[^<]*</clearout>\s*<exportval>)[^<]*(</exportval>[\s\S]*?<pvn>%tg_project_version</pvn>)|${1}'"$VERSION"'${2}|' \
+              "$SAFE_NAME"
+
+            echo "✅ XML version updated to $VERSION in $SAFE_NAME"
+
             ASSETS="$ASSETS $SAFE_NAME"
           fi
 
