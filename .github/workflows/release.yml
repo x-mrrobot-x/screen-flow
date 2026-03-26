@@ -140,6 +140,10 @@ jobs:
 
             cp "$xml_file" "$SAFE_NAME"
 
+            perl -0777 -i -pe \
+              's|(<pvn>%tg_project_version</pvn>\s*<pvt>[^<]*</pvt>\s*<pvv>)[^<]*(</pvv>)|${1}'"$VERSION"'${2}|g' \
+              "$SAFE_NAME"
+
             ASSETS="$ASSETS $SAFE_NAME"
           fi
 
