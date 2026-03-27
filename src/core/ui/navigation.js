@@ -95,7 +95,7 @@ function navigateTo(tabId) {
   const currentTabId = getCurrentTabId();
   deactivateCurrent();
   if (currentTabId && currentTabId !== tabId) {
-    pushCurrentTabToHistory(currentTabId);
+    // pushCurrentTabToHistory(currentTabId);
   }
   activateTab(tabId);
   scrollToTop();
