@@ -24,9 +24,11 @@ import App from "./app.js";
 ENV.setTaskResultHandler(result => TaskQueue.onResult(result));
 ENV.setSettingsGetter(key => AppState.getSetting(key));
 
-if (import.meta.env.DEV) {
+if (import.meta.env.DEV || import.meta.env.MODE === "pages") {
   await import("./assets/css/responsive.css");
+}
 
+if (import.meta.env.DEV) {
   const { default: eruda } = await import("eruda");
   eruda.init();
 }

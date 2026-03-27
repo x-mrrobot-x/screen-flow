@@ -60,16 +60,17 @@ export default defineConfig(({ mode }) => {
       minifyHtml(),
       !isTasker &&
         viteStaticCopy({
+          targets: [{ src: "src/i18n", dest: "src" }]
+        }),
+      mode === "main" &&
+        viteStaticCopy({
           targets: [
-            {
-              src: "src/i18n",
-              dest: "src"
-            },
-            {
-              src: "src/features/dashboard/process/script.sh",
-              dest: "src"
-            }
+            { src: "src/features/dashboard/process/script.sh", dest: "src" }
           ]
+        }),
+      isPages &&
+        viteStaticCopy({
+          targets: [{ src: "src/assets/icons", dest: "src/assets" }]
         })
     ].filter(Boolean)
   };
