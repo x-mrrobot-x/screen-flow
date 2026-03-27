@@ -101,6 +101,7 @@ const STORAGE = {
 };
 
 const isWeb = typeof tk === "undefined";
+const USE_MOCK = import.meta.env.DEV || import.meta.env.MODE === "pages";
 let settingsGetter = null;
 
 function setSettingsGetter(fn) {
@@ -125,7 +126,7 @@ function getDefault(key) {
 }
 
 function WebEnvironment() {
-  if (import.meta.env.DEV) {
+  if (USE_MOCK) {
     import("../../data/mock-env.js").then(m => m.default.init());
   }
 
@@ -194,7 +195,7 @@ function WebEnvironment() {
   }
 
   async function processMockTask(id, realCommand, taskParams, type) {
-    if (!import.meta.env.DEV) return;
+    if (!USE_MOCK) return;
     try {
       const { default: MockEnv } = await import("../../data/mock-env.js");
       const payload = await MockEnv.processTask(realCommand, taskParams, type);

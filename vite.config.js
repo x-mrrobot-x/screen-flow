@@ -36,9 +36,10 @@ const renameHtml = (from, to) => ({
 
 export default defineConfig(({ mode }) => {
   const isTasker = mode === "tasker";
+  const isPages = mode === "pages";
 
   return {
-    base: mode === "main" ? "/tagly/" : "/",
+    base: mode === "main" || isPages ? "/tagly/" : "/",
 
     build: {
       outDir: isTasker ? "dist/tasker" : "dist",
