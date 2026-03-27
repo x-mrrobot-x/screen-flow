@@ -38,7 +38,7 @@ export default defineConfig(({ mode }) => {
   const isTasker = mode === "tasker";
 
   return {
-    base: mode === "production" ? "/tagly/" : "/",
+    base: mode === "main" ? "/tagly/" : "/",
 
     build: {
       outDir: isTasker ? "dist/tasker" : "dist",
