@@ -118,10 +118,10 @@
     "empty_subtitle": "Organize your screenshots and recordings first so they can be configured for automatic cleanup."
   },
   "stats": {
-    "chart_screenshots": "Screenshots per Day",
-    "chart_recordings": "Recordings per Day",
+    "chart_screenshots": "Organized Screenshots per Day",
+    "chart_recordings": "Organized Recordings per Day",
     "page_subtitle": "Track screenshots, recordings and space savings",
-    "chart_folders_title": "Distribution by Folder",
+    "chart_folders_title": "Top Organized Apps",
     "recent_activity_title": "Recent Activity"
   },
   "process": {

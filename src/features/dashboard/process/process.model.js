@@ -3,40 +3,57 @@ import TaskQueue from "../../../core/platform/task-queue.js";
 import Logger from "../../../core/platform/logger.js";
 import Utils from "../../../lib/utils.js";
 
-async function resolveAppNames(packageNames) {
-  const apps = AppState.getApps();
-  const identifierToAppNameMap = {};
+function buildIdentifierMap(apps) {
+  const map = {};
   apps.forEach(app => {
-    identifierToAppNameMap[app.pkg] = app.name;
-    identifierToAppNameMap[app.name] = app.name;
+    map[app.pkg] = app.name;
+    map[app.name] = app.name;
   });
+  return map;
+}
+
+async function resolveAppNames(packageNames) {
+  const identifierMap = buildIdentifierMap(AppState.getApps());
   const resolvedMap = {};
   for (const identifier of packageNames) {
-    const appName = identifierToAppNameMap[identifier] || identifier;
+    const appName = identifierMap[identifier] || identifier;
     resolvedMap[identifier] = Utils.sanitizeFolderName(appName);
   }
   return resolvedMap;
 }
 
-function buildMoveCommands(resolvedNames, sourcePath, destPath, extension) {
-  const commands = [`cd "${sourcePath}"`];
-  const patterns = [];
-  for (const [pkgName, appName] of Object.entries(resolvedNames)) {
-    patterns.push(`*"_${pkgName}.${extension}"`);
-    commands.push(
-      `mv *"_${pkgName}.${extension}" "${destPath}/${appName.trim()}/"`
-    );
-  }
-  if (patterns.length === 0)
-    return {
-      countCommand: "echo 0",
-      moveCommand: "echo 'No files to move'"
-    };
+function buildEmptyCommands() {
   return {
-    countCommand: `cd "${sourcePath}" && ls -1 ${patterns.join(
+    countCommand: "echo 0",
+    moveCommand: "echo 'No files to move'"
+  };
+}
+
+function buildMoveEntries(resolvedNames, destPath, extension) {
+  const patterns = [];
+  const moveStatements = [];
+  for (const [pkgName, appName] of Object.entries(resolvedNames)) {
+    const pattern = `*"_${pkgName}.${extension}"`;
+    patterns.push(pattern);
+    moveStatements.push(`mv ${pattern} "${destPath}/${appName.trim()}/"`);
+  }
+  return { patterns, moveStatements };
+}
+
+function buildMoveCommands(resolvedNames, sourcePath, destPath, extension) {
+  const { patterns, moveStatements } = buildMoveEntries(
+    resolvedNames,
+    destPath,
+    extension
+  );
+  if (patterns.length === 0) return buildEmptyCommands();
+
+  const cdCommand = `cd "${sourcePath}"`;
+  return {
+    countCommand: `${cdCommand} && ls -1 ${patterns.join(
       " "
     )} 2>/dev/null | wc -l`,
-    moveCommand: commands.join(" ; ")
+    moveCommand: [cdCommand, ...moveStatements].join(" ; ")
   };
 }
 
@@ -49,20 +66,27 @@ async function prepareMediaOrganization(
   return buildMoveCommands(resolvedNames, sourcePath, destPath, extension);
 }
 
-async function loadCleanupRules() {
-  const folders = AppState.getFolders();
+function extractFolderCleanerRules(folder) {
   const rules = { screenshots: [], recordings: [] };
-  folders.forEach(folder => {
-    if (folder.ss?.cleaner?.on)
-      rules.screenshots.push({
-        folder: folder.name,
-        days: folder.ss.cleaner.days
-      });
-    if (folder.sr?.cleaner?.on)
-      rules.recordings.push({
-        folder: folder.name,
-        days: folder.sr.cleaner.days
-      });
+  if (folder.ss?.cleaner?.on)
+    rules.screenshots.push({
+      folder: folder.name,
+      days: folder.ss.cleaner.days
+    });
+  if (folder.sr?.cleaner?.on)
+    rules.recordings.push({
+      folder: folder.name,
+      days: folder.sr.cleaner.days
+    });
+  return rules;
+}
+
+async function loadCleanupRules() {
+  const rules = { screenshots: [], recordings: [] };
+  AppState.getFolders().forEach(folder => {
+    const folderRules = extractFolderCleanerRules(folder);
+    rules.screenshots.push(...folderRules.screenshots);
+    rules.recordings.push(...folderRules.recordings);
   });
   return rules;
 }
@@ -98,22 +122,74 @@ async function findAllExpiredMedia(rules, screenshotsPath, recordingsPath) {
   };
 }
 
+function getTodayMidnight(now) {
+  const d = new Date(now);
+  d.setHours(0, 0, 0, 0);
+  return d.getTime();
+}
+
+function recordDailyCount(mediaType, count, stats, now) {
+  if (count <= 0)
+    return stats.dailyOrganized ?? { screenshots: [], recordings: [] };
+
+  const daily = {
+    screenshots: [...(stats.dailyOrganized?.screenshots ?? [])],
+    recordings: [...(stats.dailyOrganized?.recordings ?? [])]
+  };
+
+  const ts = getTodayMidnight(now);
+  const entries = daily[mediaType];
+  const last = entries[entries.length - 1];
+
+  if (last && last.ts === ts) {
+    entries[entries.length - 1] = { ts, count: last.count + count };
+  } else {
+    entries.push({ ts, count });
+  }
+
+  daily[mediaType] = entries.slice(-20);
+  return daily;
+}
+
+function getOrganizeMediaType(processType) {
+  return processType.includes("screenshots") ? "screenshots" : "recordings";
+}
+
+function updateOrganizeStats(stats, processType, organizedCount, now) {
+  const mediaType = getOrganizeMediaType(processType);
+  const dailyOrganized = recordDailyCount(
+    mediaType,
+    organizedCount,
+    stats,
+    now
+  );
+  AppState.setStats({
+    organizedFiles: (stats.organizedFiles || 0) + organizedCount,
+    lastOrganization: {
+      ...stats.lastOrganization,
+      [mediaType]: now
+    },
+    dailyOrganized
+  });
+}
+
+function updateCleanupStats(stats, cleanedCount, now) {
+  AppState.setStats({
+    cleanedFiles: (stats.cleanedFiles || 0) + cleanedCount,
+    lastClean: {
+      screenshots: now,
+      recordings: now
+    }
+  });
+}
+
 function updateStats({ processType, organizedCount = 0, cleanedCount = 0 }) {
   const stats = AppState.getStats();
   const now = Date.now();
   if (processType.includes("organize")) {
-    const mediaType = processType.includes("screenshots")
-      ? "screenshots"
-      : "recordings";
-    AppState.setStats({
-      organizedFiles: (stats.organizedFiles || 0) + organizedCount,
-      lastOrganization: { ...stats.lastOrganization, [mediaType]: now }
-    });
+    updateOrganizeStats(stats, processType, organizedCount, now);
   } else if (processType.includes("cleanup")) {
-    AppState.setStats({
-      cleanedFiles: (stats.cleanedFiles || 0) + cleanedCount,
-      lastClean: { screenshots: now, recordings: now }
-    });
+    updateCleanupStats(stats, cleanedCount, now);
   }
 }
 

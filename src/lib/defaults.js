@@ -16,6 +16,10 @@ const DEFAULT_STATS = {
   lastClean: {
     screenshots: null,
     recordings: null
+  },
+  dailyOrganized: {
+    screenshots: [],
+    recordings: []
   }
 };
 

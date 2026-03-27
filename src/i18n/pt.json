@@ -95,10 +95,10 @@
     "empty_subtitle": "Organize suas capturas e gravações primeiro para que possam ser configuradas para limpeza automática."
   },
   "stats": {
-    "chart_screenshots": "Capturas por Dia",
-    "chart_recordings": "Gravações por Dia",
+    "chart_screenshots": "Capturas Organizadas por Dia",
+    "chart_recordings": "Gravações Organizadas por Dia",
     "page_subtitle": "Acompanhe capturas, gravações e economia de espaço",
-    "chart_folders_title": "Distribuição por Pasta",
+    "chart_folders_title": "Top Apps Organizados",
     "recent_activity_title": "Atividade Recente"
   },
   "process": {

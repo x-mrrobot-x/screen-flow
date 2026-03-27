@@ -45,6 +45,7 @@
 .stats-chart-header svg {
   width: var(--icon-mg);
   height: var(--icon-md);
+  margin-bottom: 0.2rem;
   color: hsl(var(--primary));
 }
 
@@ -86,7 +87,7 @@
 }
 
 .stats-activity-icon-box span {
-  font-size: 0.7rem;
+  font-size: 0.5rem;
 }
 
 .stats-activity-icon-box svg {

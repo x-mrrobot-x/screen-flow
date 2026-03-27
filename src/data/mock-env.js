@@ -52,6 +52,32 @@ const MOCK_SOURCE_PACKAGES = {
   recordings: ["com.whatsapp", "com.gold.android.youtube"]
 };
 
+function midnightOf(daysAgo) {
+  const d = new Date(Date.now() - daysAgo * 86_400_000);
+  d.setHours(0, 0, 0, 0);
+  return d.getTime();
+}
+
+const DAILY_SCREENSHOT_PATTERN = [
+  { offset: 8, count: 23 },
+  { offset: 7, count: 48 },
+  { offset: 6, count: 31 },
+  { offset: 5, count: 14 },
+  { offset: 4, count: 72 },
+  { offset: 3, count: 38 },
+  { offset: 2, count: 25 }
+];
+
+const DAILY_RECORDING_PATTERN = [
+  { offset: 16, count: 8 },
+  { offset: 14, count: 15 },
+  { offset: 12, count: 6 },
+  { offset: 9, count: 22 },
+  { offset: 7, count: 11 },
+  { offset: 6, count: 4 },
+  { offset: 4, count: 18 }
+];
+
 const MOCK_STATS = {
   organizedFiles: 150,
   cleanedFiles: 45,
@@ -64,6 +90,16 @@ const MOCK_STATS = {
   lastClean: {
     screenshots: Date.now() - 259_200_000,
     recordings: Date.now() - 345_600_000
+  },
+  dailyOrganized: {
+    screenshots: DAILY_SCREENSHOT_PATTERN.map(({ offset, count }) => ({
+      ts: midnightOf(offset),
+      count
+    })),
+    recordings: DAILY_RECORDING_PATTERN.map(({ offset, count }) => ({
+      ts: midnightOf(offset),
+      count
+    }))
   }
 };
 
@@ -163,7 +199,6 @@ const MOCK_COMMANDS = {
       name => `${name},${timestamps[name] ?? 1771000000}`
     );
   },
-
 
   rename_folder() {
     return { renamed: true, timestamp: Math.floor(Date.now() / 1000) };

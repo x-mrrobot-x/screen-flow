@@ -1,38 +1,31 @@
 import AppState from "../../core/state/app-state.js";
+import I18n from "../../core/services/i18n.js";
+
+const MEDIA_TYPES = ["screenshots", "recordings"];
 
 let state = {
   activeMediaType: "screenshots",
-  weeklyData: {},
+  weeklyData: [],
   topFolders: []
 };
 
-const weeklyData = {
-  screenshots: [
-    { day: "Seg", value: 25 },
-    { day: "Ter", value: 40 },
-    { day: "Qua", value: 18 },
-    { day: "Qui", value: 52 },
-    { day: "Sex", value: 35 },
-    { day: "Sáb", value: 65 },
-    { day: "Dom", value: 48 }
-  ],
-  recordings: [
-    { day: "Seg", value: 20 },
-    { day: "Ter", value: 38 },
-    { day: "Qua", value: 14 },
-    { day: "Qui", value: 43 },
-    { day: "Sex", value: 32 },
-    { day: "Sáb", value: 55 },
-    { day: "Dom", value: 41 }
-  ]
-};
+function formatDayLabel(ts) {
+  return new Date(ts).toLocaleDateString(I18n.getLocale(), {
+    day: "2-digit",
+    month: "2-digit"
+  });
+}
 
 function getWeeklyData(mediaType = "screenshots") {
-  return weeklyData[mediaType] || weeklyData.screenshots;
+  const daily = AppState.getStats().dailyOrganized?.[mediaType] ?? [];
+  return daily.map(({ ts, count }) => ({
+    day: formatDayLabel(ts),
+    value: count
+  }));
 }
 
 function getMediaTypeOptions() {
-  return Object.keys(weeklyData);
+  return MEDIA_TYPES;
 }
 
 function getTopFolders(mediaType) {
@@ -46,8 +39,7 @@ function getState() {
 }
 
 function setMediaType(mediaType) {
-  if (getMediaTypeOptions().includes(mediaType))
-    state.activeMediaType = mediaType;
+  if (MEDIA_TYPES.includes(mediaType)) state.activeMediaType = mediaType;
 }
 
 export default {
