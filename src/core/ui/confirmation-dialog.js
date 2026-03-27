@@ -1,5 +1,5 @@
 import DOM from "../../lib/dom.js";
-import DialogStack from "./dialog-stack.js";
+import History from "./history.js";
 
 let elements = null;
 let onConfirmCallback = null;
@@ -19,11 +19,11 @@ function open({ title, message }, onConfirm) {
   elements.title.textContent = title;
   elements.message.textContent = message;
   onConfirmCallback = onConfirm;
-  DialogStack.push(elements.dialog);
+  History.pushDialog(elements.dialog);
 }
 
 function close() {
-  DialogStack.goBack();
+  History.goBack();
   onConfirmCallback = null;
 }
 

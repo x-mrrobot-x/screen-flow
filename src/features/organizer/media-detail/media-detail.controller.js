@@ -1,6 +1,6 @@
 import MediaDetailModel from "./media-detail.model.js";
 import MediaDetailView from "./media-detail.view.js";
-import DialogStack from "../../../core/ui/dialog-stack.js";
+import History from "../../../core/ui/history.js";
 import Toast from "../../../core/ui/toast.js";
 import I18n from "../../../core/services/i18n.js";
 
@@ -24,7 +24,7 @@ function open(file, type) {
   currentType = type;
   MediaDetailView.update.open(file, type);
   const { dialog, player } = MediaDetailView.getElements();
-  DialogStack.push(dialog, onClose);
+  History.pushDialog(dialog, onClose);
   if (type === "video" && player) player.play().catch(() => {});
 }
 
@@ -64,7 +64,7 @@ function handleTagRemoval(tag) {
 }
 
 const handlers = {
-  onClose: () => DialogStack.goBack(),
+  onClose: () => History.goBack(),
   onTagsClick: e => {
     const btn = e.target.closest(".tag-remove-btn");
     if (btn) handleTagRemoval(btn.dataset.tag);

@@ -2,7 +2,7 @@ import ProcessView from "./process.view.js";
 import ProcessModel from "./process.model.js";
 import ProcessConfig from "./process.config.js";
 import ProcessEngine from "../../../core/services/process-engine.js";
-import DialogStack from "../../../core/ui/dialog-stack.js";
+import History from "../../../core/ui/history.js";
 import EventBus from "../../../core/platform/event-bus.js";
 import Navigation from "../../../core/ui/navigation.js";
 import AppState from "../../../core/state/app-state.js";
@@ -136,11 +136,11 @@ function cancelCurrentProcess() {
 
 function open() {
   const { dialog } = ProcessView.getElements();
-  DialogStack.push(dialog, cancelCurrentProcess);
+  History.pushDialog(dialog, cancelCurrentProcess);
 }
 
 function close() {
-  DialogStack.goBack();
+  History.goBack();
 }
 
 async function validateProcess(processType) {

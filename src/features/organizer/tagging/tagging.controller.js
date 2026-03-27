@@ -3,7 +3,7 @@ import TaggingModel from "./tagging.model.js";
 import TaggingView from "./tagging.view.js";
 import AppState from "../../../core/state/app-state.js";
 import Navigation from "../../../core/ui/navigation.js";
-import DialogStack from "../../../core/ui/dialog-stack.js";
+import History from "../../../core/ui/history.js";
 import Toast from "../../../core/ui/toast.js";
 import I18n from "../../../core/services/i18n.js";
 import ImageUtils from "../../../lib/image-utils.js";
@@ -33,7 +33,7 @@ async function openTaggingDialog() {
   const { activeFilter } = OrganizerModel.getState();
   const type = activeFilter === "recordings" ? "sr" : "ss";
   const { taggingDialog } = TaggingView.getElements();
-  DialogStack.push(taggingDialog);
+  History.pushDialog(taggingDialog);
   TaggingView.update.taggingLoader(true);
 
   await Promise.all([
@@ -67,7 +67,7 @@ function handleTaggingError(err) {
 function requireGeminiKey() {
   const gemini = AppState.getSetting("gemini") || {};
   if (gemini.apiKeys?.length) return true;
-  DialogStack.goBack();
+  History.goBack();
   Toast.info(I18n.t("gemini.api_key_required"), 5000);
   Navigation.navigateToAndHighlight("settings", "#gemini-config-card");
   return false;
@@ -296,7 +296,7 @@ function attachEvents() {
   } = TaggingView.getElements();
 
   const events = [
-    [taggingClose, "click", DialogStack.goBack],
+    [taggingClose, "click", History.goBack],
     [taggingBtnSkip, "click", handleSkip],
     [taggingBtnGenerate, "click", handleGenerateTags],
     [taggingBtnSkipAll, "click", handleSkipAll],

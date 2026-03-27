@@ -7,7 +7,7 @@ import SubfolderMonitor from "./core/services/subfolder-monitor.js";
 import AppMonitor from "./core/services/app-monitor.js";
 import Navigation from "./core/ui/navigation.js";
 import TaskQueue from "./core/platform/task-queue.js";
-import DialogStack from "./core/ui/dialog-stack.js";
+import History from "./core/ui/history.js";
 import DOM from "./lib/dom.js";
 import SettingsView from "./features/settings/settings.view.js";
 import DashboardController from "./features/dashboard/dashboard.controller.js";
@@ -37,7 +37,7 @@ function handleTaskResult(resultJson) {
 }
 
 function goBack() {
-  return DialogStack.goBack();
+  return History.goBack();
 }
 
 async function init() {

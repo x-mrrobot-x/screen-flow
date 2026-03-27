@@ -1,3 +1,4 @@
+import History from "../../core/ui/history.js";
 import OrganizerModel from "./organizer.model.js";
 import OrganizerView from "./organizer.view.js";
 import TaggingController from "./tagging/tagging.controller.js";
@@ -19,6 +20,7 @@ import ThumbnailCache from "../../core/ui/thumbnail-cache.js";
 let suppressNextRender = false;
 let currentPopupMenu = null;
 let paginator = null;
+let folderContextHandle = null;
 
 function computeFolderTotals(filtered) {
   return {
@@ -354,10 +356,13 @@ async function enterFolder(folder) {
     Logger.warn("[OrganizerController] Could not load folder contents:", e);
   }
 
+  folderContextHandle = History.pushContext(exitFolder);
   renderMedia();
 }
 
 function exitFolder() {
+  History.popContext(folderContextHandle);
+  folderContextHandle = null;
   ThumbnailQueue.reset();
   OrganizerView.update.infoBar("hidden");
   paginator = null;

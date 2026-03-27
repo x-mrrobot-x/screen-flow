@@ -1,6 +1,6 @@
 import GeminiModel from "./gemini.model.js";
 import GeminiView from "./gemini.view.js";
-import DialogStack from "../../../core/ui/dialog-stack.js";
+import History from "../../../core/ui/history.js";
 import Toast from "../../../core/ui/toast.js";
 import I18n from "../../../core/services/i18n.js";
 import { FALLBACK_MODELS } from "../../../lib/gemini.js";
@@ -24,13 +24,13 @@ function open() {
   const gemini = loadState();
   setupView(gemini);
   const { dialog } = GeminiView.getElements();
-  DialogStack.push(dialog);
+  History.pushDialog(dialog);
 }
 
 function save() {
   const model = GeminiView.getSelectedModel();
   GeminiModel.saveSetting(model, geminiKeys);
-  DialogStack.goBack();
+  History.goBack();
   Toast.success(I18n.t("gemini.saved"));
 }
 
@@ -53,7 +53,7 @@ function removeKey(index) {
 
 const handlers = {
   onSave: () => save(),
-  onCancel: () => DialogStack.goBack(),
+  onCancel: () => History.goBack(),
   onAddKeyClick: () => showAddKeyRow(),
   onConfirmAddKey: () => confirmAddKey(),
   onNewKeyEnter: e => {
