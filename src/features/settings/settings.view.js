@@ -14,7 +14,9 @@ function queryElements() {
     languageLabel: DOM.qs("#current-language-label"),
     destinationBtn: DOM.qs("#setting-custom-destination"),
     destinationPathEl: DOM.qs("#custom-destination-path"),
-    geminiConfigBtn: DOM.qs("#setting-gemini-config")
+    geminiConfigBtn: DOM.qs("#setting-gemini-config"),
+    exportBtn: DOM.qs("#setting-export-data"),
+    importBtn: DOM.qs("#setting-import-data")
   };
 }
 

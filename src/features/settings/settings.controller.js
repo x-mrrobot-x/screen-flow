@@ -9,6 +9,7 @@ import Logger from "../../core/platform/logger.js";
 import TaskQueue from "../../core/platform/task-queue.js";
 import ThumbnailCache from "../../core/ui/thumbnail-cache.js";
 import SubfolderMonitor from "../../core/services/subfolder-monitor.js";
+import AppState from "../../core/state/app-state.js";
 
 let isInitialized = false;
 
@@ -83,6 +84,51 @@ const handlers = {
       Toast.error(I18n.t("settings.destination_error"));
     }
   },
+  onExport: async () => {
+    try {
+      const backup = SettingsModel.buildBackup();
+      const filename = `tagly-backup-${backup.exportedAt}.json`;
+
+      const result = await TaskQueue.add(
+        "export_data",
+        { filename, data: JSON.stringify(backup) },
+        "default"
+      );
+      if (!result.success) return;
+
+      Toast.success(I18n.t("settings.export_success"));
+    } catch (error) {
+      Logger.error("[Settings] Export failed:", error);
+      Toast.error(I18n.t("settings.export_error"));
+    }
+  },
+  onImport: async () => {
+    try {
+      const result = await TaskQueue.add("import_data", [], "default");
+      const content = result?.content ?? null;
+      if (!content) return;
+
+      let backup;
+      try {
+        backup = typeof content === "string" ? JSON.parse(content) : content;
+      } catch {
+        Toast.error(I18n.t("settings.import_invalid"));
+        return;
+      }
+
+      const ok = SettingsModel.restoreBackup(backup);
+      if (!ok) {
+        Toast.error(I18n.t("settings.import_invalid"));
+        return;
+      }
+
+      await AppState.flushPersist();
+      Toast.success(I18n.t("settings.import_success"));
+    } catch (error) {
+      Logger.error("[Settings] Import failed:", error);
+      Toast.error(I18n.t("settings.import_error"));
+    }
+  },
   onGeminiConfigClick: () => GeminiController.open(),
   onStateChange: data => {
     if (data?.key === "settings") renderAll();
@@ -96,7 +142,9 @@ function attachEvents() {
     deleteBtn,
     languageSelect,
     destinationBtn,
-    geminiConfigBtn
+    geminiConfigBtn,
+    exportBtn,
+    importBtn
   } = SettingsView.getElements();
 
   const events = [
@@ -106,7 +154,9 @@ function attachEvents() {
     [resetBtn, "click", handlers.onReset],
     [deleteBtn, "click", handlers.onDelete],
     [destinationBtn, "click", handlers.onDestinationClick],
-    [geminiConfigBtn, "click", handlers.onGeminiConfigClick]
+    [geminiConfigBtn, "click", handlers.onGeminiConfigClick],
+    [exportBtn, "click", handlers.onExport],
+    [importBtn, "click", handlers.onImport]
   ];
   events.forEach(([el, event, handler]) => {
     if (el) el.addEventListener(event, handler);

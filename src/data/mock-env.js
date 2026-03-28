@@ -237,6 +237,58 @@ const MOCK_COMMANDS = {
     return { path: "/storage/emulated/0/OrganizedMedia/Custom" };
   },
 
+  export_data() {
+    return true;
+  },
+
+  import_data() {
+    const mockBackup = {
+      version: "1",
+      exportedAt: Date.now(),
+      data: {
+        settings: {
+          theme: "dark",
+          autoOrganizer: true,
+          autoCleaner: false,
+          notifyOrganizationResult: true,
+          notifyCleanupResult: true,
+          notifyPendingFiles: false,
+          animationsEnabled: true,
+          customDestination: null,
+          language: "en"
+        },
+        folders: [],
+        activities: [],
+        stats: {
+          organizedFiles: 0,
+          cleanedFiles: 0,
+          toOrganize: {
+            screenshots: 0,
+            recordings: 0
+          },
+          foldersCreated: {
+            screenshots: 0,
+            recordings: 0
+          },
+          lastOrganization: {
+            screenshots: null,
+            recordings: null
+          },
+          lastClean: {
+            screenshots: null,
+            recordings: null
+          },
+          dailyOrganized: {
+            screenshots: [],
+            recordings: []
+          }
+        },
+        apps: []
+      }
+    };
+    return { content: JSON.stringify(mockBackup) };
+  },
+
   delete_folder_contents(args) {
     const [folderPath] = args;
     const mediaType = getFolderMediaType(folderPath);
