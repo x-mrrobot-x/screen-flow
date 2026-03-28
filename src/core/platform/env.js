@@ -5,11 +5,11 @@ import Logger from "./logger.js";
 const { DEFAULT_SETTINGS, DEFAULT_STATS } = Defaults;
 
 const TASKER = {
-  SCENE_NAME: "TG - TAGLY",
+  MAIN_SCENE: "TG - MAIN SCENE",
   TASKS: {
-    QUEUE: "TG 06 - HANDLE TASK QUEUE",
-    STOP_QUEUE: "TG 08 - KILL TASK QUEUE",
-    NOTIFY: "TG 09 - SEND NOTIFICATION"
+    DISPATCH_QUEUE: "TG 06 - DISPATCH QUEUE",
+    ABORT_QUEUE: "TG 07 - ABORT QUEUE",
+    NOTIFY: "TG 08 - NOTIFY"
   }
 };
 
@@ -379,7 +379,7 @@ function TaskerEnvironment() {
   }
 
   function exit() {
-    tk.destroyScene(TASKER.SCENE_NAME);
+    tk.destroyScene(TASKER.MAIN_SCENE);
   }
 
   function sendNotification(title, content) {

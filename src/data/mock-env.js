@@ -81,8 +81,14 @@ const DAILY_RECORDING_PATTERN = [
 const MOCK_STATS = {
   organizedFiles: 150,
   cleanedFiles: 45,
-  toOrganize: { screenshots: 25, recordings: 10 },
-  foldersCreated: { screenshots: 15, recordings: 8 },
+  toOrganize: {
+    screenshots: 25,
+    recordings: 10
+  },
+  foldersCreated: {
+    screenshots: 15,
+    recordings: 8
+  },
   lastOrganization: {
     screenshots: Date.now() - 86_400_000,
     recordings: Date.now() - 172_800_000
