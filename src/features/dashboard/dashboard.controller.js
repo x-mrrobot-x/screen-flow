@@ -1,7 +1,7 @@
 import DashboardModel from "./dashboard.model.js";
 import DashboardView from "./dashboard.view.js";
 import EventBus from "../../core/platform/event-bus.js";
-import Navigation from "../../core/ui/navigation.js";
+import ENV from "../../core/platform/env.js";
 import Logger from "../../core/platform/logger.js";
 import Utils from "../../lib/utils.js";
 
@@ -28,29 +28,31 @@ async function loadStats() {
 
 const handlers = {
   onStateChange: data => {
-    if (["stats", "folders", "settings"].includes(data.key))
-      debouncedUpdateUI();
+    if (["stats", "folders"].includes(data.key)) debouncedUpdateUI();
   },
-  onAutomationsClick: e => {
-    const card = e.target.closest("[data-navigate]");
+  onTriggersClick: e => {
+    const card = e.target.closest("[data-trigger]");
     if (!card) return;
-    const tab = card.dataset.navigate;
-    const highlightMap = {
-      organizer: "#organizer-automation-card",
-      cleaner: "#cleaner-automation-card"
-    };
-    const elementId = highlightMap[tab];
-    if (elementId) {
-      Navigation.navigateToAndHighlight(tab, elementId);
+    const triggerName = card.dataset.trigger;
+    const isActive = card.classList.contains("active");
+    const newState = !isActive;
+
+    ENV.toggleTrigger(triggerName, newState);
+
+    const currentEnabled = DashboardModel.getEnabledTriggers();
+    if (newState) {
+      currentEnabled.add(triggerName);
     } else {
-      Navigation.navigateTo(tab);
+      currentEnabled.delete(triggerName);
     }
+    DashboardView.update.triggers(currentEnabled);
   }
 };
 
 function attachEvents() {
-  const { automations } = DashboardView.getElements();
-  const events = [[automations.section, "click", handlers.onAutomationsClick]];
+  const { triggers } = DashboardView.getElements();
+
+  const events = [[triggers.section, "click", handlers.onTriggersClick]];
   events.forEach(([el, event, handler]) => el.addEventListener(event, handler));
 
   EventBus.on("appstate:changed", handlers.onStateChange);

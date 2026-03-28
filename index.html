@@ -300,7 +300,7 @@
             </h2>
             <div class="dashboard-action-list">
               <button
-                class="dashboard-action-card card animate-fade-in-up"
+                class="dashboard-action-card card tap-scale animate-fade-in-up"
                 style="animation-delay: 0.5s"
                 data-process-type="organize_screenshots"
               >
@@ -314,7 +314,7 @@
               </button>
 
               <button
-                class="dashboard-action-card card animate-fade-in-up"
+                class="dashboard-action-card card tap-scale animate-fade-in-up"
                 style="animation-delay: 0.5s"
                 data-process-type="organize_recordings"
               >
@@ -331,7 +331,7 @@
               </button>
 
               <button
-                class="dashboard-action-card card animate-fade-in-up"
+                class="dashboard-action-card card tap-scale animate-fade-in-up"
                 style="animation-delay: 0.5s"
                 data-process-type="cleanup_old_files"
               >
@@ -350,68 +350,62 @@
           </section>
 
           <section
-            id="automations"
-            class="dashboard-automations-section animate-fade-in-up"
+            id="triggers"
+            class="dashboard-triggers-section animate-fade-in-up"
             style="animation-delay: 0.6s"
-            aria-label="Automações"
+            aria-label="Gatilhos"
             aria-live="polite"
           >
-            <h2 class="section-title" data-i18n="dashboard.automations_title">
-              Automações
+            <h2 class="section-title" data-i18n="dashboard.triggers_title">
+              Gatilhos
             </h2>
-            <div class="dashboard-automations-grid">
+            <div class="dashboard-triggers-grid">
               <div
-                class="dashboard-automation-card card"
-                id="automation-organizer"
+                class="dashboard-trigger-card card tap-scale"
+                data-trigger="TG 01 - SCHEDULED RUN"
                 data-navigate="organizer"
               >
-                <div class="dashboard-automation-icon" aria-hidden="true">
-                  <i data-icon="folder-open"></i>
+                <div class="dashboard-trigger-icon" aria-hidden="true">
+                  <i data-icon="clock"></i>
                 </div>
-                <div class="dashboard-automation-text">
+                <div class="dashboard-trigger-text">
                   <span
-                    class="dashboard-automation-name"
-                    data-i18n="features.auto_organizer"
-                    >Organização Automática</span
+                    class="dashboard-trigger-name"
+                    data-i18n="dashboard.trigger_scheduled_name"
+                    >Execução Agendada</span
                   >
                   <span
-                    class="dashboard-automation-status"
-                    id="automation-organizer-status"
-                    data-i18n="dashboard.auto_checking"
-                    >Verificando...</span
+                    class="dashboard-trigger-status"
+                    data-i18n="dashboard.trigger_scheduled_desc"
+                    >Organiza e limpa arquivos diariamente às 01:00, se
+                    configurado</span
                   >
                 </div>
-                <span
-                  class="dashboard-automation-badge"
-                  id="automation-organizer-badge"
-                ></span>
+                <span class="dashboard-trigger-badge"></span>
               </div>
 
               <div
-                class="dashboard-automation-card card"
-                id="automation-cleaner"
+                class="dashboard-trigger-card card tap-scale"
+                data-trigger="TG 02 - STAMP SCREEN RECORDING"
                 data-navigate="cleaner"
               >
-                <div class="dashboard-automation-icon" aria-hidden="true">
-                  <i data-icon="broom"></i>
+                <div class="dashboard-trigger-icon" aria-hidden="true">
+                  <i data-icon="video"></i>
                 </div>
-                <div class="dashboard-automation-text">
+                <div class="dashboard-trigger-text">
                   <span
-                    class="dashboard-automation-name"
-                    data-i18n="features.auto_cleaner"
-                    >Limpeza Automática</span
+                    class="dashboard-trigger-name"
+                    data-i18n="dashboard.trigger_stamp_name"
+                    >Carimbo de Gravação</span
                   >
                   <span
-                    class="dashboard-automation-status"
-                    id="automation-cleaner-status"
-                    data-i18n="dashboard.auto_checking"
-                    >Verificando...</span
+                    class="dashboard-trigger-status"
+                    data-i18n="dashboard.trigger_stamp_desc"
+                    >Detecta gravações de tela e adiciona o nome do aplicativo
+                    capturado</span
                   >
                 </div>
-                <span
-                  class="dashboard-automation-badge"
-                  id="automation-cleaner-badge"
-                ></span>
+                <span class="dashboard-trigger-badge"></span>
               </div>
             </div>
           </section>

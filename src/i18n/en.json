@@ -37,10 +37,6 @@
   "dashboard": {
     "status_active": "Active",
     "status_inactive": "Inactive",
-    "organizer_desc_on": "New screenshots and screen recordings will be organized periodically",
-    "organizer_desc_off": "New screenshots and screen recordings will not be organized periodically",
-    "cleaner_desc_on": "Screenshots and recordings will be removed periodically after the configured deadline",
-    "cleaner_desc_off": "Screenshots and recordings will not be removed periodically",
     "page_subtitle": "Everything organized automatically",
     "summary_organized": "Organized Files",
     "summary_removed": "Removed Files",
@@ -52,8 +48,11 @@
     "quick_actions_title": "Quick Actions",
     "action_organize": "Organize",
     "action_execute": "Run",
-    "automations_title": "Automations",
-    "auto_checking": "Checking..."
+    "triggers_title": "Triggers",
+    "trigger_scheduled_name": "Scheduled Run",
+    "trigger_scheduled_desc": "Organizes and cleans files daily at 01:00, if configured",
+    "trigger_stamp_name": "Stamp Screen Recording",
+    "trigger_stamp_desc": "Detects screen recordings and stamps the captured app name"
   },
   "organizer": {
     "empty_screenshots_title": "No folders with screenshots",

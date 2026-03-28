@@ -37,10 +37,6 @@
   "dashboard": {
     "status_active": "Activo",
     "status_inactive": "Inactivo",
-    "organizer_desc_on": "Las nuevas capturas y grabaciones de pantalla se organizarán periódicamente",
-    "organizer_desc_off": "Las nuevas capturas y grabaciones de pantalla no se organizarán periódicamente",
-    "cleaner_desc_on": "Las capturas y grabaciones de pantalla se eliminarán periódicamente después del plazo configurado",
-    "cleaner_desc_off": "Las capturas y grabaciones de pantalla no se eliminarán periódicamente",
     "page_subtitle": "Todo organizado automáticamente",
     "summary_organized": "Archivos Organizados",
     "summary_removed": "Archivos Eliminados",
@@ -52,8 +48,11 @@
     "quick_actions_title": "Acciones Rápidas",
     "action_organize": "Organizar",
     "action_execute": "Ejecutar",
-    "automations_title": "Automatizaciones",
-    "auto_checking": "Verificando..."
+    "triggers_title": "Disparadores",
+    "trigger_scheduled_name": "Ejecución Programada",
+    "trigger_scheduled_desc": "Organiza y limpia archivos diariamente a la 01:00, si está configurado",
+    "trigger_stamp_name": "Sello de Grabación",
+    "trigger_stamp_desc": "Detecta grabaciones de pantalla y añade el nombre de la app capturada"
   },
   "organizer": {
     "empty_screenshots_title": "Sin carpetas con capturas de pantalla",

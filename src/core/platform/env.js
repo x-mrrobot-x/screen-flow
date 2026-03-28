@@ -239,6 +239,10 @@ function WebEnvironment() {
     Logger.debug("Closing the application...");
   }
 
+  function toggleTrigger(name, enabled) {
+    Logger.debug(`[WEB ENV] toggleTrigger("${name}", ${enabled})`);
+  }
+
   function sendNotification(title, content) {
     console.log("[NOTIFY]", title, "→", content);
   }
@@ -253,6 +257,7 @@ function WebEnvironment() {
     resolveIconPath,
     getFilePath,
     getVariable,
+    toggleTrigger,
     readFile,
     writeFile,
     runTask,
@@ -310,7 +315,8 @@ function TaskerEnvironment() {
   }
 
   function getVariable(name) {
-    const raw = tk.local(name);
+    const isGlobal = /[A-Z]/.test(name);
+    const raw = isGlobal ? tk.global(name) : tk.local(name);
     if (raw) {
       try {
         return JSON.parse(raw);
@@ -388,6 +394,10 @@ function TaskerEnvironment() {
 
   function setTaskResultHandler() {}
 
+  function toggleTrigger(name, enabled) {
+    tk.enableProfile(name, enabled);
+  }
+
   return {
     isWeb: false,
     WORK_DIR,
@@ -398,6 +408,7 @@ function TaskerEnvironment() {
     resolveIconPath,
     getFilePath,
     getVariable,
+    toggleTrigger,
     readFile,
     writeFile,
     execute,

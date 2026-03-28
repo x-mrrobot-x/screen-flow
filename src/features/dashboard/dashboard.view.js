@@ -34,12 +34,8 @@ function queryElements() {
       name: DOM.qs("#top-app-name"),
       count: DOM.qs("#top-app-count")
     },
-    automations: {
-      section: DOM.qs("#automations"),
-      organizerStatus: DOM.qs("#automation-organizer-status"),
-      organizerBadge: DOM.qs("#automation-organizer-badge"),
-      cleanerStatus: DOM.qs("#automation-cleaner-status"),
-      cleanerBadge: DOM.qs("#automation-cleaner-badge")
+    triggers: {
+      section: DOM.qs("#triggers")
     }
   };
 }
@@ -119,37 +115,16 @@ const update = {
     if (elements.topApp.icon.getAttribute("src") !== newIconSrc)
       elements.topApp.icon.src = newIconSrc;
   },
-  automations: (autoOrganizer, autoCleaner) => {
-    const { automations } = elements;
-    const setAutomation = (
-      statusEl,
-      badgeEl,
-      active,
-      activeText,
-      inactiveText
-    ) => {
-      statusEl.textContent = active ? activeText : inactiveText;
-      badgeEl.textContent = active
+  triggers: enabledSet => {
+    const cards = DOM.qsa("[data-trigger]", elements.triggers.section);
+    cards.forEach(card => {
+      const isActive = enabledSet.has(card.dataset.trigger);
+      const badge = card.querySelector(".dashboard-trigger-badge");
+      card.classList.toggle("active", isActive);
+      badge.textContent = isActive
         ? I18n.t("dashboard.status_active")
         : I18n.t("dashboard.status_inactive");
-      badgeEl
-        .closest(".dashboard-automation-card")
-        ?.classList.toggle("active", active);
-    };
-    setAutomation(
-      automations.organizerStatus,
-      automations.organizerBadge,
-      autoOrganizer,
-      I18n.t("dashboard.organizer_desc_on"),
-      I18n.t("dashboard.organizer_desc_off")
-    );
-    setAutomation(
-      automations.cleanerStatus,
-      automations.cleanerBadge,
-      autoCleaner,
-      I18n.t("dashboard.cleaner_desc_on"),
-      I18n.t("dashboard.cleaner_desc_off")
-    );
+    });
   },
   all: data => {
     if (!data) return;
@@ -168,11 +143,7 @@ const update = {
     );
     update.lastClean(data.lastClean.screenshots, data.lastClean.recordings);
     update.mostCapturedApp(data.mostCapturedApp);
-    if (data.settings)
-      update.automations(
-        data.settings.autoOrganizer,
-        data.settings.autoCleaner
-      );
+    if (data.triggers) update.triggers(data.triggers);
   }
 };
 

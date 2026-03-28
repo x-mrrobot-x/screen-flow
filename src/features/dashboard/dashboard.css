@@ -180,10 +180,6 @@
     box-shadow 0.2s;
 }
 
-.dashboard-action-card:active {
-  transform: scale(0.95) !important;
-}
-
 .dashboard-action-icon {
   display: flex;
   justify-content: center;
@@ -212,26 +208,27 @@
   display: block;
 }
 
-.dashboard-automations-section {
+.dashboard-triggers-section {
   margin-bottom: var(--space-xl);
 }
 
-.dashboard-automations-grid {
+.dashboard-triggers-grid {
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
 }
 
-.dashboard-automation-card {
+.dashboard-trigger-card {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
   transition:
     border-color 0.3s ease,
-    background 0.3s ease;
+    background 0.3s ease,
+    transform 0.2s var(--transition-spring);
 }
 
-.dashboard-automation-icon {
+.dashboard-trigger-icon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -240,17 +237,17 @@
   flex-shrink: 0;
 }
 
-.dashboard-automation-card .dashboard-automation-icon {
+.dashboard-trigger-card .dashboard-trigger-icon {
   background: hsl(var(--primary) / 0.12);
 }
 
-.dashboard-automation-icon svg {
+.dashboard-trigger-icon svg {
   width: var(--icon-md);
   height: var(--icon-md);
   color: hsl(var(--primary));
 }
 
-.dashboard-automation-text {
+.dashboard-trigger-text {
   display: flex;
   flex-direction: column;
   gap: var(--space-xxs);
@@ -258,18 +255,18 @@
   min-width: 0;
 }
 
-.dashboard-automation-name {
+.dashboard-trigger-name {
   font-size: var(--font-sm);
   font-weight: 600;
   color: hsl(var(--foreground));
 }
 
-.dashboard-automation-status {
+.dashboard-trigger-status {
   font-size: var(--font-xs);
   color: hsl(var(--muted-foreground));
 }
 
-.dashboard-automation-badge {
+.dashboard-trigger-badge {
   color: hsl(var(--muted-foreground));
   font-size: var(--font-xxs);
   font-weight: 700;
@@ -281,7 +278,7 @@
   background: hsl(var(--muted));
 }
 
-.dashboard-automation-card.active .dashboard-automation-badge {
+.dashboard-trigger-card.active .dashboard-trigger-badge {
   background: hsl(var(--success) / 0.15);
   color: hsl(var(--success));
 }

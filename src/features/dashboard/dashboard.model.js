@@ -76,11 +76,11 @@ function resolveTopApp() {
   );
 }
 
-function getAppSettings() {
-  return {
-    autoOrganizer: AppState.getSetting("autoOrganizer") ?? false,
-    autoCleaner: AppState.getSetting("autoCleaner") ?? false
-  };
+function getEnabledTriggers() {
+  const raw = ENV.getVariable("PENABLED");
+  if (!raw || typeof raw !== "string") return new Set();
+  const matches = [...raw.matchAll(/(?:^|,)(TG[^,]+)/g)].map(m => m[1].trim());
+  return new Set(matches);
 }
 
 function setStats(stats) {
@@ -109,12 +109,13 @@ function getState() {
       recordings: null
     },
     mostCapturedApp: resolveTopApp(),
-    settings: getAppSettings()
+    triggers: getEnabledTriggers()
   };
 }
 
 export default {
   getState,
+  getEnabledTriggers,
   getToOrganizeFileCounts,
   getOrganizedFolderCounts,
   setStats
