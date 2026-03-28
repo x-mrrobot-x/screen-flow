@@ -32,7 +32,6 @@ const DEFAULT_SETTINGS = {
   notifyPendingFiles: false,
   animationsEnabled: true,
   customDestination: null,
-  scheduleTime: null,
   language: null
 };
 
