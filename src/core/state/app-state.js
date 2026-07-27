@@ -8,6 +8,7 @@ let settings = {};
 let activities = [];
 let folders = [];
 let apps = [];
+let rules = [];
 
 const MAX_ACTIVITIES = 10;
 const timers = {};
@@ -25,7 +26,8 @@ const persist = {
   settings: () => debouncedPersist("SETTINGS", settings, 300),
   stats: () => debouncedPersist("STATS", stats, 300),
   activities: () => debouncedPersist("ACTIVITIES", activities, 300),
-  apps: () => debouncedPersist("APPS", apps, 300)
+  apps: () => debouncedPersist("APPS", apps, 300),
+  rules: () => debouncedPersist("RULES", rules, 300)
 };
 
 function persistAll() {
@@ -51,6 +53,7 @@ function resetAllToDefaults() {
   activities = ENV.getDefault("ACTIVITIES");
   settings = ENV.getDefault("SETTINGS");
   apps = ENV.getDefault("APPS");
+  rules = ENV.getDefault("RULES");
 }
 
 function deleteAll() {
@@ -86,7 +89,8 @@ function writeAllFiles() {
     ENV.writeFile("SETTINGS", settings),
     ENV.writeFile("STATS", stats),
     ENV.writeFile("ACTIVITIES", activities),
-    ENV.writeFile("APPS", apps)
+    ENV.writeFile("APPS", apps),
+    ENV.writeFile("RULES", rules)
   ]);
 }
 
@@ -96,6 +100,7 @@ function loadStates() {
   folders = ENV.getVariable("folders");
   activities = ENV.getVariable("activities");
   apps = ENV.getVariable("apps");
+  rules = ENV.getVariable("rules");
 }
 
 function init() {
@@ -136,6 +141,16 @@ function setApps(newApps) {
   apps = [...newApps];
   persist.apps();
   emitChange("apps");
+}
+
+function getRules() {
+  return [...rules];
+}
+
+function setRules(newRules) {
+  rules = [...newRules];
+  persist.rules();
+  emitChange("rules");
 }
 
 function getSettings() {
@@ -200,6 +215,8 @@ export default {
   addActivity,
   getApps,
   setApps,
+  getRules,
+  setRules,
   getSettings,
   getSetting,
   setSetting,

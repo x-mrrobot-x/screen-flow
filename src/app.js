@@ -16,6 +16,7 @@ import ConfirmationDialog from "./core/ui/confirmation-dialog.js";
 import OrganizerController from "./features/organizer/organizer.controller.js";
 import StatsController from "./features/stats/stats.controller.js";
 import CleanerController from "./features/cleaner/cleaner.controller.js";
+import RulesController from "./features/rules/rules.controller.js";
 import SettingsController from "./features/settings/settings.controller.js";
 
 function reveal() {
@@ -60,6 +61,7 @@ async function init() {
     Navigation.registerLazy("organizer", () => OrganizerController.init());
     Navigation.registerLazy("stats", () => StatsController.init());
     Navigation.registerLazy("cleaner", () => CleanerController.init());
+    Navigation.registerLazy("rules", () => RulesController.init());
     Navigation.registerLazy("settings", () => SettingsController.init());
 
     Logger.info("✓ Application initialized successfully");

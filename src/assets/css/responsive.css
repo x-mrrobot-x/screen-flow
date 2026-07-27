@@ -275,6 +275,17 @@
     max-width: 72rem;
   }
 
+  .rules-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-md);
+    align-items: start;
+  }
+
+  .rule-card.is-expanded {
+    grid-column: 1 / -1;
+  }
+
   .settings-theme-grid {
     grid-template-columns: repeat(3, 1fr);
     gap: var(--space-md);

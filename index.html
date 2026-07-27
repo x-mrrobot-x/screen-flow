@@ -658,6 +658,69 @@
           ></section>
         </article>
 
+        <!-- RULES -->
+        <article
+          id="tab-rules"
+          class="tab-content page-container animate-fade-in"
+          role="tabpanel"
+          aria-label="Regras de organização"
+        >
+          <header class="page-header animate-fade-in-down">
+            <div class="header-row">
+              <div class="page-header-icon" aria-hidden="true">
+                <i data-icon="braces"></i>
+              </div>
+              <div class="header-text">
+                <h2 class="page-title" data-i18n="nav.rules">Regras</h2>
+                <p class="page-subtitle" data-i18n="rules.page_subtitle">
+                  Crie regras personalizadas para organizar seus arquivos
+                </p>
+              </div>
+            </div>
+          </header>
+
+          <div
+            class="rules-overview animate-fade-in-up"
+            id="rules-overview"
+            style="animation-delay: 0.1s"
+          >
+            <div class="rules-overview-stats">
+              <div class="rules-stat-item">
+                <span class="rules-stat-value" id="rules-stat-total">0</span>
+                <span
+                  class="rules-stat-label"
+                  data-i18n="rules.stat_total"
+                  >Regras</span
+                >
+              </div>
+              <div class="rules-stat-divider" aria-hidden="true"></div>
+              <div class="rules-stat-item">
+                <span class="rules-stat-value" id="rules-stat-active">0</span>
+                <span
+                  class="rules-stat-label"
+                  data-i18n="rules.stat_active"
+                  >Ativas</span
+                >
+              </div>
+            </div>
+            <button
+              type="button"
+              class="rules-add-btn tap-scale"
+              id="rules-add-btn"
+            >
+              <i data-icon="circle-fading-plus"></i>
+              <span data-i18n="rules.add_btn">Nova Regra</span>
+            </button>
+          </div>
+
+          <section
+            id="rules-list"
+            class="rules-list animate-fade-in"
+            style="animation-delay: 0.2s"
+            aria-label="Lista de regras"
+          ></section>
+        </article>
+
         <!-- STATS -->
         <article
           id="tab-stats"
@@ -1258,6 +1321,10 @@
             <i class="nav-icon" data-icon="broom" aria-hidden="true"></i>
             <span class="nav-label" data-i18n="nav.cleaner">Limpeza</span>
           </button>
+          <button id="nav-rules" class="nav-button" data-tab="rules">
+            <i class="nav-icon" data-icon="braces" aria-hidden="true"></i>
+            <span class="nav-label" data-i18n="nav.rules">Regras</span>
+          </button>
           <button id="nav-stats" class="nav-button" data-tab="stats">
             <i class="nav-icon" data-icon="chart-column" aria-hidden="true"></i>
             <span class="nav-label" data-i18n="nav.stats">Estatísticas</span>
@@ -1744,6 +1811,314 @@
         </button>
       </header>
       <div class="dialog-body" id="dialog-cleaner-folder-body"></div>
+    </div>
+
+    <!-- RULE DIALOG -->
+    <div
+      class="dialog dialog-rule"
+      id="dialog-rule"
+      role="dialog"
+      aria-labelledby="dialog-rule-title"
+      aria-hidden="true"
+    >
+      <header class="dialog-header">
+        <div
+          class="dialog-header-icon"
+          id="dialog-rule-icon"
+          aria-hidden="true"
+        >
+          <i data-icon="braces"></i>
+        </div>
+        <div class="dialog-header-text">
+          <h2
+            class="dialog-title"
+            id="dialog-rule-title"
+            data-i18n="rules.dialog_title_create"
+          >
+            Nova Regra de Organização
+          </h2>
+          <p class="dialog-subtitle" data-i18n="rules.dialog_subtitle">
+            Defina como e onde seus arquivos serão organizados
+          </p>
+        </div>
+        <button
+          type="button"
+          class="dialog-close tap-scale"
+          id="dialog-rule-close"
+          aria-label="Fechar"
+        >
+          <i data-icon="x"></i>
+        </button>
+      </header>
+
+      <div class="dialog-body rule-dialog-body" id="rule-dialog-body">
+        <div class="rule-field">
+          <label
+            class="rule-label"
+            for="rule-name-input"
+            data-i18n="rules.field_name"
+            >Nome da regra</label
+          >
+          <input
+            type="text"
+            id="rule-name-input"
+            class="gemini-input"
+            data-i18n-placeholder="rules.field_name_placeholder"
+            placeholder="Ex: Faturas em PDF"
+          />
+        </div>
+
+        <div class="rule-field">
+          <label
+            class="rule-label"
+            for="rule-source-input"
+            data-i18n="rules.field_source"
+            >Pasta de origem</label
+          >
+          <div class="rule-path-input-row">
+            <input
+              type="text"
+              id="rule-source-input"
+              class="gemini-input"
+              data-i18n-placeholder="rules.field_path_placeholder"
+              placeholder="/storage/emulated/0/..."
+            />
+            <button
+              type="button"
+              class="rule-path-pick-btn tap-scale"
+              id="rule-source-pick-btn"
+              data-i18n-aria-label="rules.pick_folder"
+              aria-label="Selecionar pasta"
+            >
+              <i data-icon="folder-open"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="rule-field">
+          <label
+            class="rule-label"
+            for="rule-destination-input"
+            data-i18n="rules.field_destination"
+            >Pasta de destino</label
+          >
+          <div class="rule-path-input-row">
+            <input
+              type="text"
+              id="rule-destination-input"
+              class="gemini-input"
+              data-i18n-placeholder="rules.field_path_placeholder"
+              placeholder="/storage/emulated/0/..."
+            />
+            <button
+              type="button"
+              class="rule-path-pick-btn tap-scale"
+              id="rule-destination-pick-btn"
+              data-i18n-aria-label="rules.pick_folder"
+              aria-label="Selecionar pasta"
+            >
+              <i data-icon="folder-tree"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="rule-field">
+          <label class="rule-label" data-i18n="rules.field_mode"
+            >Modo de organização</label
+          >
+          <div class="rule-mode-grid" id="rule-mode-grid">
+            <button type="button" class="rule-mode-card tap-scale" data-mode="app">
+              <div class="rule-mode-card-icon icon-blue">
+                <i data-icon="layer-group"></i>
+              </div>
+              <span class="rule-mode-card-name" data-i18n="rules.mode_app"
+                >App</span
+              >
+              <span class="rule-mode-card-desc" data-i18n="rules.mode_app_desc"
+                >Organização padrão</span
+              >
+            </button>
+            <button type="button" class="rule-mode-card tap-scale" data-mode="ai">
+              <div class="rule-mode-card-icon icon-ai">
+                <i data-icon="wand-magic-sparkles"></i>
+              </div>
+              <span class="rule-mode-card-name" data-i18n="rules.mode_ai"
+                >IA</span
+              >
+              <span class="rule-mode-card-desc" data-i18n="rules.mode_ai_desc"
+                >Categoriza com IA</span
+              >
+            </button>
+            <button type="button" class="rule-mode-card tap-scale" data-mode="regex">
+              <div class="rule-mode-card-icon icon-violet">
+                <i data-icon="braces"></i>
+              </div>
+              <span class="rule-mode-card-name" data-i18n="rules.mode_regex"
+                >Regex</span
+              >
+              <span
+                class="rule-mode-card-desc"
+                data-i18n="rules.mode_regex_desc"
+                >Padrões de nome</span
+              >
+            </button>
+            <button
+              type="button"
+              class="rule-mode-card tap-scale"
+              data-mode="extension"
+            >
+              <div class="rule-mode-card-icon icon-teal">
+                <i data-icon="file"></i>
+              </div>
+              <span class="rule-mode-card-name" data-i18n="rules.mode_extension"
+                >Extensão</span
+              >
+              <span
+                class="rule-mode-card-desc"
+                data-i18n="rules.mode_extension_desc"
+                >Tipos de arquivo</span
+              >
+            </button>
+          </div>
+        </div>
+
+        <div
+          class="rule-mode-section"
+          data-mode-section="app"
+          id="rule-mode-section-app"
+        >
+          <div class="rule-info-box">
+            <i data-icon="circle-alert" aria-hidden="true"></i>
+            <p data-i18n="rules.mode_app_info">
+              Esta regra usa a organização padrão do Tagly para Capturas e
+              Gravações de tela. Nenhum parâmetro adicional é necessário.
+            </p>
+          </div>
+        </div>
+
+        <div
+          class="rule-mode-section"
+          data-mode-section="ai"
+          id="rule-mode-section-ai"
+          style="display: none"
+        >
+          <label class="rule-label" data-i18n="rules.field_ai_categories"
+            >Categorias de sugestão (opcional)</label
+          >
+          <p class="rule-field-hint" data-i18n="rules.field_ai_categories_hint">
+            Enviadas à IA como sugestão. Se nenhuma fizer sentido, a IA cria
+            uma categoria nova.
+          </p>
+          <div class="rule-chip-field" data-list="aiCategories">
+            <div class="rule-chip-list" data-chip-list="aiCategories"></div>
+            <div class="rule-chip-add-row">
+              <input
+                type="text"
+                class="gemini-input rule-chip-input"
+                data-chip-input="aiCategories"
+                data-i18n-placeholder="rules.field_ai_categories_placeholder"
+                placeholder="Ex: Recibos"
+              />
+              <button
+                type="button"
+                class="rule-chip-add-btn tap-scale"
+                data-action="addChip"
+                data-list="aiCategories"
+                aria-label="Adicionar"
+              >
+                <i data-icon="circle-fading-plus"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="rule-mode-section"
+          data-mode-section="regex"
+          id="rule-mode-section-regex"
+          style="display: none"
+        >
+          <label class="rule-label" data-i18n="rules.field_regex"
+            >Padrões</label
+          >
+          <p class="rule-field-hint" data-i18n="rules.field_regex_hint">
+            Padrões usados para localizar arquivos na pasta de origem.
+          </p>
+          <div class="rule-chip-field" data-list="regexPatterns">
+            <div class="rule-chip-list" data-chip-list="regexPatterns"></div>
+            <div class="rule-chip-add-row">
+              <input
+                type="text"
+                class="gemini-input rule-chip-input"
+                data-chip-input="regexPatterns"
+                placeholder="*.xml"
+              />
+              <button
+                type="button"
+                class="rule-chip-add-btn tap-scale"
+                data-action="addChip"
+                data-list="regexPatterns"
+                aria-label="Adicionar"
+              >
+                <i data-icon="circle-fading-plus"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="rule-mode-section"
+          data-mode-section="extension"
+          id="rule-mode-section-extension"
+          style="display: none"
+        >
+          <label class="rule-label" data-i18n="rules.field_extension"
+            >Extensões</label
+          >
+          <p class="rule-field-hint" data-i18n="rules.field_extension_hint">
+            Arquivos com estas extensões serão organizados por esta regra.
+          </p>
+          <div class="rule-chip-field" data-list="extensions">
+            <div class="rule-chip-list" data-chip-list="extensions"></div>
+            <div class="rule-chip-add-row">
+              <input
+                type="text"
+                class="gemini-input rule-chip-input"
+                data-chip-input="extensions"
+                placeholder=".pdf"
+              />
+              <button
+                type="button"
+                class="rule-chip-add-btn tap-scale"
+                data-action="addChip"
+                data-list="extensions"
+                aria-label="Adicionar"
+              >
+                <i data-icon="circle-fading-plus"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="dialog-actions">
+        <button
+          type="button"
+          class="btn btn-outline"
+          id="dialog-rule-cancel"
+          data-i18n="dialog.cancel"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          id="dialog-rule-save"
+          data-i18n="rules.save_btn"
+        >
+          Salvar Regra
+        </button>
+      </footer>
     </div>
   </body>
 </html>

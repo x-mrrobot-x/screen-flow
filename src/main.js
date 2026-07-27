@@ -14,6 +14,8 @@ import "./features/dashboard/dashboard.css";
 import "./features/dashboard/process/process.css";
 import "./features/stats/stats.css";
 import "./features/cleaner/cleaner.css";
+import "./features/rules/rules.css";
+import "./features/rules/rule-dialog/rule-dialog.css";
 import "./features/organizer/organizer.css";
 import "./features/settings/settings.css";
 

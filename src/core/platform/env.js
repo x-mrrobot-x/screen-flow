@@ -112,6 +112,18 @@ const STORAGE = {
       path: "src/data/apps.json",
       default: []
     }
+  },
+  RULES: {
+    web: {
+      type: "localStorage",
+      key: "rules",
+      default: []
+    },
+    tasker: {
+      type: "file",
+      path: "src/data/rules.json",
+      default: []
+    }
   }
 };
 
